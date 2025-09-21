@@ -17,16 +17,6 @@ func NewGenericHandler[T, C, R any](repo genericPort.Repository[T]) *GenericHand
 	return &GenericHandler[T, C, R]{repo: repo}
 }
 
-// @Summary Register new user
-// @Description Create a new user account
-// @Tags users
-// @Accept json
-// @Produce json
-// @Param user body dto.UserAccountCreateUpdateDTO true "User Data"
-// @Success 201 {object} dto.UserAccountResponseDTO
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /user_accounts/register [post]
 // ===========================================================CREATE
 func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
 	var dto C
@@ -43,6 +33,28 @@ func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
 	}
 	resp := mapper.MapDomainToDTO[T, R](entity)
 	c.JSON(http.StatusCreated, resp)
+}
+
+// ===========================================================UPDATE
+
+func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
+	id := c.Param("id")
+	var fields map[string]interface{}
+	if err := c.ShouldBindJSON(&fields); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if len(fields) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "no fields to update"})
+		return
+	}
+
+	if err := h.repo.Update(id, fields); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
 
 // ===========================================================GetByID
@@ -67,3 +79,73 @@ func (h *GenericHandler[T, C, R]) GetByID(c *gin.Context) {
 }
 
 // ===========================================================GetAllWhere
+
+func (h *GenericHandler[T, C, R]) GetAllWhere(c *gin.Context) {
+	var fieldsMap map[string]interface{}
+	if err := c.ShouldBindJSON(&fieldsMap); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var fields []string
+	var values []interface{}
+
+	for k, v := range fieldsMap {
+		fields = append(fields, k)
+		values = append(values, v)
+	}
+
+	var entities []T
+
+	if err := h.repo.GetAllWhere(fields, values, &entities); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var resp []*R
+	for _, e := range entities {
+		resp = append(resp, mapper.MapDomainToDTO[T, R](&e))
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+// ===========================================================GetAll
+
+func (h *GenericHandler[T, C, R]) GetAll(c *gin.Context) {
+
+	var entities []T
+	if err := h.repo.GetAll(&entities); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var resp []*R
+	for _, e := range entities {
+		resp = append(resp, mapper.MapDomainToDTO[T, R](&e))
+	}
+	c.JSON(http.StatusOK, resp)
+}
+
+// ===========================================================Delete
+
+func (h *GenericHandler[T, C, R]) Delete(c *gin.Context) {
+	idParam := c.Param("id")
+	var id any
+
+	// Попытка конвертации в int64
+	if n, err := strconv.ParseInt(idParam, 10, 64); err == nil {
+		id = n
+	} else {
+		// Если не число, оставляем как string (для UUID)
+		id = idParam
+	}
+
+	var entity T
+	if err := h.repo.Delete(id, &entity); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}

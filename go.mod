@@ -2,6 +2,8 @@ module github.com/1DamnDaniel3/rscrm_go_serv
 
 go 1.25.0
 
+replace github.com/1DamnDaniel3/rscrm_go_serv => ./ 
+
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.2.1 // indirect

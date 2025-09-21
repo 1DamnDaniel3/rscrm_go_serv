@@ -1,0 +1,204 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Generic CRUD API RSCRM",
+    "version": "1.0.0",
+    "description": "Универсальная документация CRUD для всех сущностей. Пример показан на UserAccount."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001/api"
+    }
+  ],
+  "paths": {
+    "/user_accounts/register": {
+      "post": {
+        "summary": "Create new entity",
+        "tags": ["CRUD"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAccountCreateUpdateDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccountResponseDTO"
+                }
+              }
+            }
+          },
+          "400": { "description": "Bad Request" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/user_accounts/update/{id}": {
+      "post": {
+        "summary": "Update entity by ID",
+        "tags": ["CRUD"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAccountCreateUpdateDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccountResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user_accounts/getone/{id}": {
+      "get": {
+        "summary": "Get entity by ID",
+        "tags": ["CRUD"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Found entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAccountResponseDTO"
+                }
+              }
+            }
+          },
+          "404": { "description": "Not Found" }
+        }
+      }
+    },
+    "/user_accounts/getall": {
+      "get": {
+        "summary": "Get all entities",
+        "tags": ["CRUD"],
+        "responses": {
+          "200": {
+            "description": "List of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserAccountResponseDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user_accounts/getallwhere": {
+      "post": {
+        "summary": "Get all entities with filter",
+        "tags": ["CRUD"],
+        "requestBody": {
+          "description": "Фильтры для поиска (ключ-значение)",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Filtered list of entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserAccountResponseDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user_accounts/delete/{id}": {
+      "delete": {
+        "summary": "Delete entity by ID",
+        "tags": ["CRUD"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted successfully" },
+          "404": { "description": "Not Found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserAccountCreateUpdateDTO": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string" },
+          "role": { "type": "string" },
+          "school_id": { "type": "string" }
+        },
+        "required": ["email", "password", "role", "school_id"]
+      },
+      "UserAccountResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "email": { "type": "string" },
+          "role": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "school_id": { "type": "string" }
+        }
+      }
+    }
+  }
+}
