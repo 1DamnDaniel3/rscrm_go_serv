@@ -3,7 +3,7 @@
   "info": {
     "title": "Generic CRUD API RSCRM",
     "version": "1.0.0",
-    "description": "Универсальная документация CRUD для всех сущностей. Пример показан на ASDASD."
+    "description": "Универсальная документация CRUD для всех сущностей. Пример показан на user_account."
   },
   "servers": [
     {
@@ -206,51 +206,628 @@
     }
   },
   "components": {
-    "schemas": {
-      "UserAccountCreateUpdateDTO": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "school_id": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email",
-          "password",
-          "role",
-          "school_id"
-        ]
+  "schemas": {
+    "UserAccountCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "password": { "type": "string" },
+        "role": { "type": "string" },
+        "school_id": { "type": "string" }
       },
-      "UserAccountResponseDTO": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "email": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "school_id": {
-            "type": "string"
-          }
-        }
+      "required": ["email","password","role","school_id"]
+    },
+    "UserAccountResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "created_at": { "type": "string","format":"date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "AttendanceCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "lesson_id": { "type": "integer" },
+        "status": { "type": "string" },
+        "marked_by": { "type": "integer" },
+        "marked_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["student_id","lesson_id","status","marked_by","marked_at","school_id"]
+    },
+    "AttendanceResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "lesson_id": { "type": "integer" },
+        "status": { "type": "string" },
+        "marked_by": { "type": "integer" },
+        "marked_at": { "type": "string","format":"date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "ClientCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "birthdate": { "type": "string","format":"date-time" },
+        "contact": { "type": "string" },
+        "created_at": { "type": "string","format":"date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["name","phone","birthdate","contact","created_at","school_id"]
+    },
+    "ClientResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "birthdate": { "type": "string","format":"date-time" },
+        "contact": { "type": "string" },
+        "created_at": { "type": "string","format":"date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "ClientGroupCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "client_id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["client_id","group_id","school_id"]
+    },
+    "ClientGroupResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "client_id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "DanceStyleCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "active_from": { "type": "string", "format": "date-time" },
+        "active_to": { "type": "string", "format": "date-time" },
+        "is_archived": { "type": "boolean" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["name","active_from","active_to","school_id"]
+    },
+    "DanceStyleResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "active_from": { "type": "string", "format": "date-time" },
+        "active_to": { "type": "string", "format": "date-time" },
+        "is_archived": { "type": "boolean" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "FinancialReportCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "period_start": { "type": "string", "format": "date-time" },
+        "period_end": { "type": "string", "format": "date-time" },
+        "total_income": { "type": "number", "format": "float" },
+        "total_expenses": { "type": "number", "format": "float" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["period_start","period_end","total_income","total_expenses","created_at","school_id"]
+    },
+    "FinancialReportResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "period_start": { "type": "string", "format": "date-time" },
+        "period_end": { "type": "string", "format": "date-time" },
+        "total_income": { "type": "number", "format": "float" },
+        "total_expenses": { "type": "number", "format": "float" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "GroupCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "entity_type": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["name","entity_type","created_at","school_id"]
+    },
+    "GroupResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "entity_type": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "LeadCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "source_id": { "type": "integer" },
+        "status_id": { "type": "integer" },
+        "trial_date": { "type": "string", "format": "date-time" },
+        "qualification": { "type": "string" },
+        "created_by": { "type": "integer" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "converted_to_client_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["name","phone","source_id","status_id","created_by","created_at","school_id"]
+    },
+    "LeadResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "source_id": { "type": "integer" },
+        "status_id": { "type": "integer" },
+        "trial_date": { "type": "string", "format": "date-time" },
+        "qualification": { "type": "string" },
+        "created_by": { "type": "integer" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "converted_to_client_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "LeadGroupCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "lead_id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["lead_id","group_id","school_id"]
+    },
+    "LeadGroupResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "lead_id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "LessonCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "direction_id": { "type": "integer" },
+        "teacher_id": { "type": "integer" },
+        "lesson_date": { "type": "string", "format": "date-time" },
+        "start_time": { "type": "string", "format": "date-time" },
+        "duration_minutes": { "type": "integer" },
+        "is_canceled": { "type": "boolean" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["group_id","direction_id","teacher_id","lesson_date","start_time","duration_minutes","school_id"]
+    },
+    "LessonResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "direction_id": { "type": "integer" },
+        "teacher_id": { "type": "integer" },
+        "lesson_date": { "type": "string", "format": "date-time" },
+        "start_time": { "type": "string", "format": "date-time" },
+        "duration_minutes": { "type": "integer" },
+        "is_canceled": { "type": "boolean" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "LessonPaymentCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "lesson_id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "amount": { "type": "number", "format": "float" },
+        "paid_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["lesson_id","student_id","amount","paid_at","school_id"]
+    },
+    "LessonPaymentResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "lesson_id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "amount": { "type": "number", "format": "float" },
+        "paid_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "LessonSubscriptionCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "lesson_id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "subscription_id": { "type": "integer" },
+        "used_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["lesson_id","student_id","subscription_id","used_at","school_id"]
+    },
+    "LessonSubscriptionResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "lesson_id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "subscription_id": { "type": "integer" },
+        "used_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "PaymentCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "subscription_id": { "type": "integer" },
+        "amount": { "type": "number", "format": "float" },
+        "paid_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "integer" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["student_id","subscription_id","amount","paid_at","created_by","school_id"]
+    },
+    "PaymentResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "subscription_id": { "type": "integer" },
+        "amount": { "type": "number", "format": "float" },
+        "paid_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "integer" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "ScheduleCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "direction_id": { "type": "integer" },
+        "teacher_id": { "type": "integer" },
+        "weekday": { "type": "integer" },
+        "start_time": { "type": "string", "format": "date-time" },
+        "duration_minutes": { "type": "integer" },
+        "school_id": { "type": "string" },
+        "active_from": { "type": "string", "format": "date-time" },
+        "active_to": { "type": "string", "format": "date-time" }
+      },
+      "required": ["group_id","direction_id","teacher_id","weekday","start_time","duration_minutes","school_id","active_from","active_to"]
+    },
+    "ScheduleResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "direction_id": { "type": "integer" },
+        "teacher_id": { "type": "integer" },
+        "weekday": { "type": "integer" },
+        "start_time": { "type": "string", "format": "date-time" },
+        "duration_minutes": { "type": "integer" },
+        "school_id": { "type": "string" },
+        "active_from": { "type": "string", "format": "date-time" },
+        "active_to": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SchoolCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "city": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name","city","phone","email","created_at"]
+    },
+    "SchoolResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "city": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SourceCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "SourceResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" }
+      }
+    },
+    "StatusCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["name","type","school_id"]
+    },
+    "StatusResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "StudentClientCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "client_id": { "type": "integer" },
+        "is_payer": { "type": "boolean" },
+        "relation": { "type": "string" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["student_id","client_id","is_payer","relation","school_id"]
+    },
+  "StudentClientResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "client_id": { "type": "integer" },
+        "is_payer": { "type": "boolean" },
+        "relation": { "type": "string" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "StudentCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "birthdate": { "type": "string", "format": "date-time" },
+        "skill_level": { "type": "string" },
+        "contact": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["name","birthdate","skill_level","contact","created_at","school_id"]
+    },
+    "StudentResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "birthdate": { "type": "string", "format": "date-time" },
+        "skill_level": { "type": "string" },
+        "contact": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "StudentGroupCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["student_id","group_id","school_id"]
+    },
+    "StudentGroupResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "group_id": { "type": "integer" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "StudentSubscriptionCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "subscription_id": { "type": "integer" },
+        "issued_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "remaining_visits": { "type": "integer" },
+        "is_active": { "type": "boolean" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["student_id","subscription_id","issued_at","expires_at","remaining_visits","is_active","school_id"]
+    },
+    "StudentSubscriptionResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_id": { "type": "integer" },
+        "subscription_id": { "type": "integer" },
+        "issued_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "remaining_visits": { "type": "integer" },
+        "is_active": { "type": "boolean" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "SubscriptionCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "price": { "type": "number", "format": "float" },
+        "visit_limit": { "type": "integer" },
+        "active_from": { "type": "string", "format": "date-time" },
+        "active_to": { "type": "string", "format": "date-time" },
+        "is_archived": { "type": "boolean" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["name","price","visit_limit","active_from","active_to","school_id"]
+    },
+    "SubscriptionResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "price": { "type": "number", "format": "float" },
+        "visit_limit": { "type": "integer" },
+        "active_from": { "type": "string", "format": "date-time" },
+        "active_to": { "type": "string", "format": "date-time" },
+        "is_archived": { "type": "boolean" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "SubscriptionPauseCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_subscription_id": { "type": "integer" },
+        "paused_from": { "type": "string", "format": "date-time" },
+        "paused_to": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["student_subscription_id","paused_from","paused_to","school_id"]
+    },
+    "SubscriptionPauseResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "student_subscription_id": { "type": "integer" },
+        "paused_from": { "type": "string", "format": "date-time" },
+        "paused_to": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "TeacherRatePolicyCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["name","description","created_at","school_id"]
+    },
+    "TeacherRatePolicyResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "TeacherRateRuleCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "policy_id": { "type": "integer" },
+        "rule_type": { "type": "string" },
+        "threshold": { "type": "integer" },
+        "base_amount": { "type": "number", "format": "float" },
+        "per_student": { "type": "number", "format": "float" },
+        "percent_of_income": { "type": "number", "format": "float" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["policy_id","rule_type","threshold","base_amount","per_student","percent_of_income","school_id"]
+    },
+    "TeacherRateResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "teacher_id": { "type": "integer" },
+        "policy_id": { "type": "integer" },
+        "active_from": { "type": "string", "format": "date-time" },
+        "active_to": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      }
+    },
+    "TeacherRateCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "integer" },
+        "teacher_id": { "type": "integer" },
+        "policy_id": { "type": "integer" },
+        "active_from": { "type": "string", "format": "date-time" },
+        "active_to": { "type": "string", "format": "date-time" },
+        "school_id": { "type": "string" }
+      },
+      "required": ["teacher_id","policy_id","active_from","active_to","school_id"]
+    },
+    "UserProfileCreateUpdateDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "account_id": { "type": "integer" },
+        "phone": { "type": "string" },
+        "full_name": { "type": "string" },
+        "birthdate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["account_id","phone","full_name","birthdate"]
+    },
+    "UserProfileResponseDTO": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "account_id": { "type": "integer" },
+        "phone": { "type": "string" },
+        "full_name": { "type": "string" },
+        "birthdate": { "type": "string", "format": "date-time" }
       }
     }
   }
+}
+
+
 }

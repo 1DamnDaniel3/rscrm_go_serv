@@ -36,11 +36,11 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, input dto.RegisterInput)
 
 		// 1. Создаём школу
 		school := &entities.School{
-			Name:      input.School.Name,
-			City:      input.School.City,
-			Phone:     input.School.Phone,
-			Email:     input.School.Email,
-			CreatedAt: now,
+			Name:       input.School.Name,
+			City:       input.School.City,
+			Phone:      input.School.Phone,
+			Email:      input.School.Email,
+			Created_at: now,
 		}
 		if err := uc.schoolRepo.Create(school); err != nil {
 			return err
@@ -65,10 +65,10 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, input dto.RegisterInput)
 
 		// 3. Создаём профиль
 		profile := &entities.UserProfile{
-			FullName:  input.Profile.FullName,
-			Phone:     input.Profile.Phone,
-			BirthDate: input.Profile.Birthdate,
-			AccountID: user.ID,
+			Full_name:  input.Profile.FullName,
+			Phone:      input.Profile.Phone,
+			Birthdate:  input.Profile.Birthdate,
+			Account_id: user.ID,
 		}
 		if err := uc.profileRepo.Create(profile); err != nil {
 			return err

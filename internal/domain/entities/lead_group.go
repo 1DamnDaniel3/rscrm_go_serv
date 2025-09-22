@@ -1,8 +1,8 @@
 package entities
 
 type LeadGroup struct {
-	ID       int64
-	LeadID   int64
-	GroupID  int64
-	SchoolID string
+	ID        int64
+	Lead_id   int64
+	Group_id  int64
+	School_id string
 }
