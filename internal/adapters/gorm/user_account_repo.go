@@ -4,13 +4,22 @@ import (
 	genericAdapter "github.com/1DamnDaniel3/rscrm_go_serv/internal/adapters/gorm/generic"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/ports"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/ports/generic"
 	"gorm.io/gorm"
 )
 
 type GormUserAccountRepo struct {
-	generic.Repository[entities.UserAccount]
-	db *gorm.DB
+	*genericAdapter.GormRepository[entities.UserAccount]
+	db     *gorm.DB
+	hasher ports.PasswordHasher
+}
+
+func (r *GormUserAccountRepo) Create(entity *entities.UserAccount) error {
+	var err error
+	entity.Password, err = r.hasher.Hash(entity.Password)
+	if err != nil {
+		return err
+	}
+	return r.db.Create(entity).Error
 }
 
 func (r *GormUserAccountRepo) GetByEmail(email string) (*entities.UserAccount, error) {
@@ -21,8 +30,9 @@ func (r *GormUserAccountRepo) GetByEmail(email string) (*entities.UserAccount, e
 	return &user, nil
 }
 
-func NewGormUserAccountRepo(db *gorm.DB) ports.UserAccountRepository {
+func NewGormUserAccountRepo(db *gorm.DB, hasher ports.PasswordHasher) ports.UserAccountRepository {
 	return &GormUserAccountRepo{
-		Repository: genericAdapter.NewGormRepository[entities.UserAccount](db),
-		db:         db}
+		GormRepository: genericAdapter.NewGormRepository[entities.UserAccount](db),
+		db:             db,
+		hasher:         hasher}
 }

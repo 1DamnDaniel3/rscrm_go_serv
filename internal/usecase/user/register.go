@@ -1,4 +1,4 @@
-package useraccount
+package user
 
 import (
 	"context"
@@ -8,12 +8,13 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/ports"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/ports/generic"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/usecase/useraccount/dto"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/usecase/user/dto"
+	"github.com/google/uuid"
 )
 
 type RegisterUseCase struct {
 	tx             services.Transaction
-	userRepo       generic.Repository[entities.UserAccount]
+	userRepo       ports.UserAccountRepository
 	profileRepo    generic.Repository[entities.UserProfile]
 	schoolRepo     generic.Repository[entities.School]
 	passwordHasher ports.PasswordHasher
@@ -21,7 +22,7 @@ type RegisterUseCase struct {
 
 func NewRegisterUseCase(
 	tx services.Transaction,
-	userRepo generic.Repository[entities.UserAccount],
+	userRepo ports.UserAccountRepository,
 	profileRepo generic.Repository[entities.UserProfile],
 	schoolRepo generic.Repository[entities.School],
 	passwordHasher ports.PasswordHasher) *RegisterUseCase {
@@ -36,6 +37,7 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, input dto.RegisterInput)
 
 		// 1. Создаём школу
 		school := &entities.School{
+			ID:         uuid.New().String(),
 			Name:       input.School.Name,
 			City:       input.School.City,
 			Phone:      input.School.Phone,
@@ -65,6 +67,7 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, input dto.RegisterInput)
 
 		// 3. Создаём профиль
 		profile := &entities.UserProfile{
+			ID:         user.ID,
 			Full_name:  input.Profile.FullName,
 			Phone:      input.Profile.Phone,
 			Birthdate:  input.Profile.Birthdate,
@@ -76,7 +79,7 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, input dto.RegisterInput)
 
 		// Заполняем output
 		output = dto.RegisterOutput{
-			School: school.Name,
+			School_id: school.ID,
 		}
 
 		return nil

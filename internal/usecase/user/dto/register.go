@@ -11,7 +11,7 @@ type RegisterInput struct {
 
 // RegisterOutput данные, возвращаемые после успешной регистрации
 type RegisterOutput struct {
-	School string `json:"school" example:"Right Step"`
+	School_id string `json:"school_id" example:"bbeb26e7-7a3a-4bcf-8a70-338f362eabd1"`
 }
 
 // SchoolDTO данные о школе

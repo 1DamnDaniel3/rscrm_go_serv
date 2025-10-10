@@ -1,17 +1,15 @@
 package entityroutes
 
 import (
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/adapters/gorm/generic"
 	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/adapters/http/gin/handlers/generic"
 	genericRoute "github.com/1DamnDaniel3/rscrm_go_serv/internal/adapters/http/gin/routes/entity_routes/generic_handler"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/dto"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/ports"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func UserAccountRoutes(r *gin.RouterGroup, db *gorm.DB) {
-	userRepo := generic.NewGormRepository[entities.UserAccount](db)
+func UserAccountRoutes(r *gin.RouterGroup, userRepo ports.UserAccountRepository) {
 	userHandler := genericHandler.NewGenericHandler[
 		entities.UserAccount,
 		dto.UserAccountCreateUpdateDTO,
@@ -19,4 +17,5 @@ func UserAccountRoutes(r *gin.RouterGroup, db *gorm.DB) {
 	](userRepo)
 
 	genericRoute.RegisterCRUDRoutes(r, "user_accounts", userHandler)
+	// r.POST("/user_accounts/create")
 }
