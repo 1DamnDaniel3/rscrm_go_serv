@@ -14,7 +14,127 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/ownerschool/register": {
+            "post": {
+                "description": "Создаёт школу, аккаунт владельца и профиль",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Регистрация новой школы",
+                "parameters": [
+                    {
+                        "description": "Данные для регистрации",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RegisterOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.AccountDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "popov@gmail.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "secret"
+                }
+            }
+        },
+        "dto.ProfileDTO": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string",
+                    "example": "1985-01-01T00:00:00Z"
+                },
+                "full_name": {
+                    "type": "string",
+                    "example": "Артём Попов"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+7-999-123-45-67"
+                }
+            }
+        },
+        "dto.RegisterInput": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "$ref": "#/definitions/dto.AccountDTO"
+                },
+                "profile": {
+                    "$ref": "#/definitions/dto.ProfileDTO"
+                },
+                "school": {
+                    "$ref": "#/definitions/dto.SchoolDTO"
+                }
+            }
+        },
+        "dto.RegisterOutput": {
+            "type": "object",
+            "properties": {
+                "school_id": {
+                    "type": "string",
+                    "example": "bbeb26e7-7a3a-4bcf-8a70-338f362eabd1"
+                }
+            }
+        },
+        "dto.SchoolDTO": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "example": "Тимашевск"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "popov@gmail.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Right Step"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+7-999-123-45-67"
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

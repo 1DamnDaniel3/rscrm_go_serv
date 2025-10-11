@@ -3,8 +3,8 @@ package transactions
 import (
 	"net/http"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/usecase/user"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/usecase/user/dto"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/user"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/user/dto"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +12,16 @@ type RegisterHandler struct {
 	usecase *user.RegisterUseCase
 }
 
+// Register godoc
+// @Summary      Регистрация новой школы
+// @Description  Создаёт школу, аккаунт владельца и профиль
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        input  body      dto.RegisterInput  true  "Данные для регистрации"
+// @Success      200    {object}  dto.RegisterOutput
+// @Failure      400    {object}  map[string]string
+// @Router       api/ownerschool/register [post]
 func NewRegisterHandler(uc *user.RegisterUseCase) *RegisterHandler {
 	return &RegisterHandler{usecase: uc}
 }

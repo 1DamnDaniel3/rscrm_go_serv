@@ -4,9 +4,9 @@ import "time"
 
 // RegisterInput входные данные для регистрации
 type RegisterInput struct {
-	School  SchoolDTO  `json:"school" example:"{\"name\":\"Right Step\",\"city\":\"Тимашевск\",\"phone\":\"+7-999-123-45-67\",\"email\":\"popov@gmail.com\"}"`
-	Account AccountDTO `json:"account" example:"{\"email\":\"popov@gmail.com\",\"password\":\"secret\"}"`
-	Profile ProfileDTO `json:"profile" example:"{\"full_name\":\"Артём Попов\",\"phone\":\"+7-999-123-45-67\",\"birthdate\":\"1985-01-01T00:00:00Z\"}"`
+	School  SchoolDTO  `json:"school"`
+	Account AccountDTO `json:"account"`
+	Profile ProfileDTO `json:"profile"`
 }
 
 // RegisterOutput данные, возвращаемые после успешной регистрации

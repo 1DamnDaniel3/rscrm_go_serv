@@ -1,4 +1,84 @@
+definitions:
+  dto.AccountDTO:
+    properties:
+      email:
+        example: popov@gmail.com
+        type: string
+      password:
+        example: secret
+        type: string
+    type: object
+  dto.ProfileDTO:
+    properties:
+      birthdate:
+        example: "1985-01-01T00:00:00Z"
+        type: string
+      full_name:
+        example: Артём Попов
+        type: string
+      phone:
+        example: +7-999-123-45-67
+        type: string
+    type: object
+  dto.RegisterInput:
+    properties:
+      account:
+        $ref: '#/definitions/dto.AccountDTO'
+      profile:
+        $ref: '#/definitions/dto.ProfileDTO'
+      school:
+        $ref: '#/definitions/dto.SchoolDTO'
+    type: object
+  dto.RegisterOutput:
+    properties:
+      school_id:
+        example: bbeb26e7-7a3a-4bcf-8a70-338f362eabd1
+        type: string
+    type: object
+  dto.SchoolDTO:
+    properties:
+      city:
+        example: Тимашевск
+        type: string
+      email:
+        example: popov@gmail.com
+        type: string
+      name:
+        example: Right Step
+        type: string
+      phone:
+        example: +7-999-123-45-67
+        type: string
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /ownerschool/register:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт школу, аккаунт владельца и профиль
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RegisterOutput'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Регистрация новой школы
+      tags:
+      - auth
 swagger: "2.0"

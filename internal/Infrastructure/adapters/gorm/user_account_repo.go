@@ -1,9 +1,9 @@
 package adapters
 
 import (
-	genericAdapter "github.com/1DamnDaniel3/rscrm_go_serv/internal/adapters/gorm/generic"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/ports"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
+	genericAdapter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/generic"
 	"gorm.io/gorm"
 )
 

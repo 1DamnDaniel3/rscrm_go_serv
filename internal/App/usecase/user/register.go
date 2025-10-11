@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/domain/services"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/ports"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/ports/generic"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/usecase/user/dto"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/generic"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/user/dto"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/google/uuid"
 )
 

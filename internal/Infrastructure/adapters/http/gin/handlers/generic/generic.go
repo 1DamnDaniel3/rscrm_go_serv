@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/mapper"
-	genericPort "github.com/1DamnDaniel3/rscrm_go_serv/internal/ports/generic"
+	genericPort "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/generic"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,7 +1,7 @@
 package generichandler
 
 import (
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/adapters/http/gin/handlers/generic"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
 	"github.com/gin-gonic/gin"
 )
 

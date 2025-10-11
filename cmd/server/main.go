@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/adapters/gorm"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/adapters/http/gin/routes"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/config"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/config"
+	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes"
 	"github.com/gin-gonic/gin"
 )
 

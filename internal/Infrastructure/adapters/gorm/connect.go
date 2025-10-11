@@ -3,7 +3,7 @@ package adapters
 import (
 	"fmt"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/config"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
