@@ -27,7 +27,8 @@ func NewLoginHandler(uc *user.LoginUC) *LoginHandler {
 // @Accept       json
 // @Produce      json
 // @Param        input  body     dto.LoginDTO  true  "Данные для логина"
-// @Success      200	{object} map[string]string
+// @Success      200	{string} string "Ok. JWT установлен в httpOnly cookie"
+// @Header 		 200	{string} Set-Cookie "JWT-токен"
 // @Failure      400    {object}  map[string]string
 // @Router       /api/useraccounts/login [post]
 func (r *LoginHandler) Login(c *gin.Context) {

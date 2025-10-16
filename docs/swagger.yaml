@@ -92,7 +92,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Вход стандарт email password
+      description: Вход стандарт email password, запись в httpOnly Cookies JWT
       parameters:
       - description: Данные для логина
         in: body
@@ -104,11 +104,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
-          schema:
-            additionalProperties:
+          description: Ok. JWT установлен в httpOnly cookie
+          headers:
+            Set-Cookie:
+              description: JWT-токен
               type: string
-            type: object
+          schema:
+            type: string
         "400":
           description: Bad Request
           schema:

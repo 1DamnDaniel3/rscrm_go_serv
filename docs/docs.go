@@ -60,7 +60,7 @@ const docTemplate = `{
         },
         "/api/useraccounts/login": {
             "post": {
-                "description": "Вход стандарт email password",
+                "description": "Вход стандарт email password, запись в httpOnly Cookies JWT",
                 "consumes": [
                     "application/json"
                 ],
@@ -84,11 +84,14 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Ok. JWT установлен в httpOnly cookie",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
+                            "type": "string"
+                        },
+                        "headers": {
+                            "Set-Cookie": {
+                                "type": "string",
+                                "description": "JWT-токен"
                             }
                         }
                     },
