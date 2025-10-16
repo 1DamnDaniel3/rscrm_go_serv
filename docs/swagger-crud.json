@@ -11,7 +11,7 @@
     }
   ],
   "paths": {
-    "/user_accounts/register": {
+    "/user_accounts/create": {
       "post": {
         "summary": "Create new entity",
         "tags": [

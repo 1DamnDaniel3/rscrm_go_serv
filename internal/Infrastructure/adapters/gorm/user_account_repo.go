@@ -1,7 +1,11 @@
 package adapters
 
 import (
+	"context"
+	"errors"
+
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
+	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	genericAdapter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/generic"
 	"gorm.io/gorm"
@@ -30,7 +34,20 @@ func (r *GormUserAccountRepo) GetByEmail(email string) (*entities.UserAccount, e
 	return &user, nil
 }
 
-func NewGormUserAccountRepo(db *gorm.DB, hasher ports.PasswordHasher) ports.UserAccountRepository {
+func (r *GormUserAccountRepo) Register(ctx context.Context, entity *entities.UserAccount) error {
+	var err error
+	entity.Password, err = r.hasher.Hash(entity.Password)
+	if err != nil {
+		return err
+	}
+	tx, ok := ctx.Value(txKey{}).(*gorm.DB)
+	if !ok {
+		return errors.New("no transaction in context")
+	}
+	return tx.Create(entity).Error
+}
+
+func NewGormUserAccountRepo(db *gorm.DB, hasher ports.PasswordHasher) entitiesrepos.UserAccountRepository {
 	return &GormUserAccountRepo{
 		GormRepository: genericAdapter.NewGormRepository[entities.UserAccount](db),
 		db:             db,

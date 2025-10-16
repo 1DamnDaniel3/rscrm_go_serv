@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/ownerschool/register": {
+        "/api/ownerschool/register": {
             "post": {
                 "description": "Создаёт школу, аккаунт владельца и профиль",
                 "consumes": [
@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Регистрация новой школы",
                 "parameters": [
@@ -57,6 +57,52 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/useraccounts/login": {
+            "post": {
+                "description": "Вход стандарт email password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Логин",
+                "parameters": [
+                    {
+                        "description": "Данные для логина",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.LoginDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -70,6 +116,17 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "example": "secret"
+                }
+            }
+        },
+        "dto.LoginDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
                 }
             }
         },

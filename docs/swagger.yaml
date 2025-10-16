@@ -8,6 +8,13 @@ definitions:
         example: secret
         type: string
     type: object
+  dto.LoginDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
   dto.ProfileDTO:
     properties:
       birthdate:
@@ -53,7 +60,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /ownerschool/register:
+  /api/ownerschool/register:
     post:
       consumes:
       - application/json
@@ -80,5 +87,35 @@ paths:
             type: object
       summary: Регистрация новой школы
       tags:
-      - auth
+      - Auth
+  /api/useraccounts/login:
+    post:
+      consumes:
+      - application/json
+      description: Вход стандарт email password
+      parameters:
+      - description: Данные для логина
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Логин
+      tags:
+      - Auth
 swagger: "2.0"

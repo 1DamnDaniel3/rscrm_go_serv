@@ -1,13 +1,14 @@
 package routes
 
 import (
+	"os"
+	"time"
+
 	_ "github.com/1DamnDaniel3/rscrm_go_serv/docs"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/user"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/bcrypt"
 	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/generic"
 	entityroutes "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/jwt"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -21,6 +22,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 
 	r.StaticFile("/swagger-crud.json", "./docs/swagger-crud.json")
 	r.GET("/swagger-crud/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/swagger-crud.json")))
+	// ====================shared dependences
 
 	// == passwordHasher ==
 	hasher := bcrypt.NewBcryptHasher(12)
@@ -28,17 +30,16 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	// == GORM_transaction ==
 	tx := adapters.NewGormTransaction(db)
 
+	// == JWT ==
+	secret := os.Getenv("JWT_SECRET")
+	JWTSigner := jwt.NewJWTAdapter(secret, 5*time.Hour)
+
 	// == Repositories GENERIC ==
-	profileRepo := generic.NewGormRepository[entities.UserProfile](db)
-	schoolRepo := generic.NewGormRepository[entities.School](db)
 
 	// == Repositories Entities ==
-	userRepo := adapters.NewGormUserAccountRepo(db, hasher)
 
 	// == usecases ==
-	registerUC := user.NewRegisterUseCase(tx, userRepo, profileRepo, schoolRepo, hasher)
 
 	// == routes ==
-	entityroutes.UserAccountRoutes(api, userRepo)
-	entityroutes.RegisterRouter(api, registerUC)
+	entityroutes.UserAccountRoutes(api, db, hasher, tx, JWTSigner)
 }

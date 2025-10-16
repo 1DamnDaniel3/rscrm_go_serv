@@ -11,9 +11,12 @@ type GormTransaction struct {
 	db *gorm.DB
 }
 
+type txKey struct{}
+
 func (t *GormTransaction) Do(ctx context.Context, fn func(ctx context.Context) error) error {
 	return t.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		return fn(ctx)
+		txCtx := context.WithValue(ctx, txKey{}, tx)
+		return fn(txCtx)
 	})
 }
 
