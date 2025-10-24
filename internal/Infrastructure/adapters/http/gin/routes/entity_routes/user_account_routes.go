@@ -24,8 +24,8 @@ func UserAccountRoutes(
 	JwtSigner ports.JWTservice) {
 	// ==/== repos
 	userRepo := adapters.NewGormUserAccountRepo(db, hasher)
-	schoolRepo := adapters.NewGormSchoolRepo()
-	profileRepo := adapters.NewGormUserProfileRepo()
+	schoolRepo := adapters.NewGormSchoolRepo(db)
+	profileRepo := adapters.NewGormUserProfileRepo(db)
 	// ==/== usecases
 	LoginUseCase := userUC.NewLoginUseCase(hasher, userRepo, JwtSigner)
 	registerUC := userUC.NewRegisterUseCase(tx, userRepo, profileRepo, schoolRepo, hasher)
@@ -38,13 +38,15 @@ func UserAccountRoutes(
 	](userRepo)
 	loginHandler := user.NewLoginHandler(LoginUseCase)
 	registerHandler := transactions.NewRegisterHandler(registerUC)
+	authCheckHandler := user.NewAuthCheckHandler(JwtSigner)
 
 	// ==/== routes
 
 	genericRoute.RegisterCRUDRoutes(r, "user_accounts", genericUserHandler)
 
+	r.GET("/auth/check", authCheckHandler.CheckAuth)
 	r.POST("/ownerschool/register", registerHandler.Register)
-	r.POST("/useraccounts/login", loginHandler.Login)
+	r.POST("/user_accounts/login", loginHandler.Login)
 
 	// r.POST("/user_accounts/create")
 }

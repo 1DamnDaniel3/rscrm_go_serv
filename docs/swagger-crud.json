@@ -90,6 +90,7 @@
     "/user_accounts/getone/{id}": {
       "get": {
         "summary": "Get entity by ID",
+        "description": "ПРИМЕЧАНИЕ: для schools используется другой путь (schools/getoneschool/:id) т.к. school id это uuid",
         "tags": [
           "CRUD"
         ],

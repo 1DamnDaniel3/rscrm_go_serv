@@ -21,23 +21,26 @@ func NewLoginUseCase(
 	return &LoginUC{hasher, repo, JWTservice}
 }
 
-func (uc *LoginUC) Execute(input *entities.UserAccount) (string, error) {
+func (uc *LoginUC) Execute(input *entities.UserAccount) (*entities.UserAccount, string, error) {
 	account, err := uc.userRepo.GetByEmail(input.Email)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
+
 	if !uc.passwordHasher.Compare(account.Password, input.Password) {
-		return "", errors.New("wrong password")
+		return nil, "", errors.New("wrong password")
 	}
 	// JWT SIGNING
 	claims := map[string]interface{}{
-		"user_id": account.ID,
-		"email":   account.Email,
+		"id":        account.ID,
+		"role":      account.Role,
+		"email":     account.Email,
+		"school_id": account.School_id,
 	}
 
 	token, err := uc.JWTservice.Sign(claims)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
-	return token, nil
+	return account, token, nil
 }

@@ -57,9 +57,59 @@ definitions:
         example: +7-999-123-45-67
         type: string
     type: object
+  dto.UserAccountResponseDTO:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      role:
+        type: string
+      school_id:
+        type: string
+    type: object
+  user.AuthCheckResponse:
+    properties:
+      isAuthenticated:
+        type: boolean
+      user:
+        additionalProperties: true
+        type: object
+    type: object
+  user.LoginResponse:
+    properties:
+      message:
+        example: success
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserAccountResponseDTO'
+    type: object
 info:
   contact: {}
 paths:
+  /api/auth/check:
+    get:
+      consumes:
+      - application/json
+      description: Приходит кука с токеном, высылается 200, если токен ещё валиден
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.AuthCheckResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Проверка авторизации
+      tags:
+      - Auth
   /api/ownerschool/register:
     post:
       consumes:
@@ -104,13 +154,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: Ok. JWT установлен в httpOnly cookie
+          description: OK
           headers:
             Set-Cookie:
               description: JWT-токен
               type: string
           schema:
-            type: string
+            $ref: '#/definitions/user.LoginResponse'
         "400":
           description: Bad Request
           schema:

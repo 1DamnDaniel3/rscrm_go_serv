@@ -4,14 +4,15 @@ import (
 	"context"
 	"errors"
 
+	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/generic"
+	genericAdapter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/generic"
 	"gorm.io/gorm"
 )
 
 type GormUserProfileRepo struct {
-	*generic.GormRepository[entities.UserProfile]
-	// db *gorm.DB
+	*genericAdapter.GormRepository[entities.UserProfile]
+	db *gorm.DB
 }
 
 func (r *GormUserProfileRepo) Register(ctx context.Context, entity *entities.UserProfile) error {
@@ -22,6 +23,12 @@ func (r *GormUserProfileRepo) Register(ctx context.Context, entity *entities.Use
 	return tx.Create(entity).Error
 }
 
-func NewGormUserProfileRepo() *GormUserProfileRepo {
-	return &GormUserProfileRepo{}
+func NewGormUserProfileRepo(db *gorm.DB) entitiesrepos.ProfileRepo {
+	if db == nil {
+		panic("NewGormUserProfileRepo: db is nil — database not initialized")
+	}
+	return &GormUserProfileRepo{
+		GormRepository: genericAdapter.NewGormRepository[entities.UserProfile](db),
+		db:             db,
+	}
 }

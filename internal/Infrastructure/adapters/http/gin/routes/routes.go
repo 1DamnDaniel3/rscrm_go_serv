@@ -42,4 +42,10 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 
 	// == routes ==
 	entityroutes.UserAccountRoutes(api, db, hasher, tx, JWTSigner)
+	entityroutes.UserProfileRoutes(api, db)
+	entityroutes.SchoolRoutes(api, db)
+	entityroutes.LeadRoutes(api, db)
+	entityroutes.GroupRoutes(api, db)
+	entityroutes.StatusRoutes(api, db)
+	entityroutes.SourceRoutes(api, db)
 }

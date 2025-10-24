@@ -27,7 +27,7 @@ func NewLoginHandler(uc *user.LoginUC) *LoginHandler {
 // @Accept       json
 // @Produce      json
 // @Param        input  body     dto.LoginDTO  true  "Данные для логина"
-// @Success      200	{string} string "Ok. JWT установлен в httpOnly cookie"
+// @Success      200	{object} LoginResponse
 // @Header 		 200	{string} Set-Cookie "JWT-токен"
 // @Failure      400    {object}  map[string]string
 // @Router       /api/useraccounts/login [post]
@@ -40,7 +40,7 @@ func (r *LoginHandler) Login(c *gin.Context) {
 
 	entity := mapper.MapDTOToDomain[dto.LoginDTO, entities.UserAccount](&DTO)
 
-	token, err := r.uc.Execute(entity)
+	account, token, err := r.uc.Execute(entity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
@@ -57,6 +57,18 @@ func (r *LoginHandler) Login(c *gin.Context) {
 		true,
 	)
 
-	c.JSON(http.StatusOK, gin.H{"message": "success"})
+	response := mapper.MapDomainToDTO[entities.UserAccount, dto.UserAccountResponseDTO](account)
 
+	c.JSON(http.StatusOK, LoginResponse{
+		Message: "success",
+		User:    response,
+	})
+
+}
+
+// === DTO ===
+
+type LoginResponse struct {
+	Message string                      `json:"message" example:"success"`
+	User    *dto.UserAccountResponseDTO `json:"user"`
 }

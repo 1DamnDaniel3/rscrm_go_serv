@@ -13,7 +13,7 @@ func (r *GormRepository[T]) Create(entity *T) error {
 }
 
 func (r *GormRepository[T]) GetByID(id any, entity *T) error {
-	return r.db.First(entity, id).Error
+	return r.db.First(entity, "id=?", id).Error
 }
 
 func (r *GormRepository[T]) GetAllWhere(fields []string, values []interface{}, entities *[]T) error {

@@ -54,7 +54,7 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.Status(http.StatusOK)
 }
 
 // ===========================================================GetByID
