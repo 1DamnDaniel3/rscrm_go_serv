@@ -46,13 +46,19 @@ func (r *LoginHandler) Login(c *gin.Context) {
 	}
 
 	secure := os.Getenv("ENV") == "prod"
+	var host string
+	if os.Getenv("ENV") == "prod" {
+		host = os.Getenv("HOST")
+	} else {
+		host = "localhost"
+	}
 
 	c.SetCookie(
 		"jwt",
 		token,
 		int(5*time.Hour),
 		"/api",
-		"localhost",
+		host,
 		secure,
 		true,
 	)
