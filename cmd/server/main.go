@@ -9,9 +9,15 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️  .env file not found, using system environment")
+	}
+	PORT := os.Getenv("PORT")
+
 	router := gin.Default()
 
 	if os.Getenv("ENV") == "dev" {
@@ -34,5 +40,5 @@ func main() {
 	}
 	routes.SetupRoutes(router, db)
 
-	router.Run(":3001")
+	router.Run(":" + PORT)
 }
