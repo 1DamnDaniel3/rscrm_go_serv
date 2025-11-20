@@ -30,7 +30,7 @@ func main() {
 
 	db_cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
+		log.Fatalf("failed to load config :( because: %v", err)
 	}
 
 	db, err := adapters.ConnectDB(db_cfg)
