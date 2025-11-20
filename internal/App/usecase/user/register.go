@@ -17,6 +17,13 @@ type RegisterUseCase struct {
 	passwordHasher ports.PasswordHasher
 }
 
+type IRegisterUseCase interface {
+	Execute(ctx context.Context,
+		school *entities.School,
+		userAccount *entities.UserAccount,
+		userProfile *entities.UserProfile) (*entities.School, error)
+}
+
 func NewRegisterUseCase(
 	tx services.Transaction,
 	userRepo entitiesrepos.UserAccountRepository,

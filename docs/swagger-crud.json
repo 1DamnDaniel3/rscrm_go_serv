@@ -48,7 +48,7 @@
       }
     },
     "/user_accounts/update/{id}": {
-      "post": {
+      "patch": {
         "summary": "Update entity by ID",
         "tags": [
           "CRUD"
@@ -195,9 +195,22 @@
             }
           }
         ],
-        "responses": {
-          "204": {
-            "description": "Deleted successfully"
+          "responses": {
+          "200": {
+            "description": "Deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "ID of the deleted entity"
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found"

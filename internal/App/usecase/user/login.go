@@ -14,6 +14,10 @@ type LoginUC struct {
 	JWTservice     ports.JWTservice
 }
 
+type ILoginUC interface {
+	Execute(input *entities.UserAccount) (*entities.UserAccount, string, error)
+}
+
 func NewLoginUseCase(
 	hasher ports.PasswordHasher,
 	repo entitiesrepos.UserAccountRepository,

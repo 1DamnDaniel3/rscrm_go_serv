@@ -10,12 +10,11 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/pressly/goose/v3"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  .env file not found, using system environment")
-	}
+	_ = godotenv.Load()
 	PORT := os.Getenv("PORT")
 
 	router := gin.Default()
@@ -39,6 +38,17 @@ func main() {
 		log.Fatalf("failed to connectDB: %v", err)
 	}
 	routes.SetupRoutes(router, db)
+
+	// migrations
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sqlDB.Close()
+	if err := goose.Up(sqlDB, "./migrations"); err != nil { // migrations up
+		log.Fatal(err)
+	}
 
 	router.Run(":" + PORT)
 }

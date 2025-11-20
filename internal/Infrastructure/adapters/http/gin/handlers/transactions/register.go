@@ -12,7 +12,7 @@ import (
 )
 
 type RegisterHandler struct {
-	usecase *user.RegisterUseCase
+	usecase user.IRegisterUseCase
 }
 
 // Register godoc
@@ -25,7 +25,7 @@ type RegisterHandler struct {
 // @Success      200    {object}  dto.RegisterOutput
 // @Failure      400    {object}  map[string]string
 // @Router       /api/ownerschool/register [post]
-func NewRegisterHandler(uc *user.RegisterUseCase) *RegisterHandler {
+func NewRegisterHandler(uc user.IRegisterUseCase) *RegisterHandler {
 	return &RegisterHandler{usecase: uc}
 }
 

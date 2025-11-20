@@ -13,10 +13,10 @@ import (
 )
 
 type LoginHandler struct {
-	uc *user.LoginUC
+	uc user.ILoginUC
 }
 
-func NewLoginHandler(uc *user.LoginUC) *LoginHandler {
+func NewLoginHandler(uc user.ILoginUC) *LoginHandler {
 	return &LoginHandler{uc}
 }
 

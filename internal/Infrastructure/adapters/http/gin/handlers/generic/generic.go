@@ -1,7 +1,6 @@
 package generic
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,13 +37,8 @@ func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
 
 // ===========================================================UPDATE
 
-// ПОМЕНЯТЬ РЕПОЗИТОРИЙ ЧТОБЫ НЕ ВОЗИТЬСЯ С ТИПОМ UUID или INT. Поставить id interface{}
 func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 	id := c.Param("id")
-	intId, err := strconv.Atoi(id)
-	if err != nil {
-		fmt.Println("Cannot convert string id to int")
-	}
 	var fields map[string]interface{}
 	if err := c.ShouldBindJSON(&fields); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -60,7 +54,7 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 		return
 	}
 
-	fields["id"] = intId
+	fields["id"] = id
 
 	c.JSON(http.StatusOK, fields)
 }
@@ -155,5 +149,5 @@ func (h *GenericHandler[T, C, R]) Delete(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, gin.H{"id": id})
 }

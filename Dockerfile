@@ -20,6 +20,8 @@ WORKDIR /app
 
 COPY --from=builder /app/server .
 
+COPY migrations ./migrations
+
 EXPOSE 3001
 
 CMD ["./server"]
