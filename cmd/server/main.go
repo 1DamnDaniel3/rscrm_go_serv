@@ -35,7 +35,7 @@ func main() {
 
 	db, err := adapters.ConnectDB(db_cfg)
 	if err != nil {
-		log.Fatalf("failed to connectDB: %v", err)
+		log.Fatalf("failed to connectDB :( because: %v", err)
 	}
 	routes.SetupRoutes(router, db)
 
