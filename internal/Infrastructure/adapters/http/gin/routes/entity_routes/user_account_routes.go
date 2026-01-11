@@ -2,7 +2,7 @@ package entityroutes
 
 import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
-	userUC "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/user"
+	userUC "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/userUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/bcrypt"
@@ -26,9 +26,12 @@ func UserAccountRoutes(
 	userRepo := adapters.NewGormUserAccountRepo(db, hasher)
 	schoolRepo := adapters.NewGormSchoolRepo(db)
 	profileRepo := adapters.NewGormUserProfileRepo(db)
+
+	accRolesRepo := adapters.NewGormAccountRolesRepo(db)
+	rolesRepo := adapters.NewGormRolesRepo(db)
 	// ==/== usecases
-	LoginUseCase := userUC.NewLoginUseCase(hasher, userRepo, JwtSigner)
-	registerUC := userUC.NewRegisterUseCase(tx, userRepo, profileRepo, schoolRepo, hasher)
+	LoginUseCase := userUC.NewLoginUseCase(hasher, userRepo, accRolesRepo, rolesRepo, JwtSigner)
+	registerUC := userUC.NewRegisterUseCase(tx, userRepo, profileRepo, schoolRepo, accRolesRepo, hasher)
 
 	// ==/== handlers
 	genericUserHandler := genericHandler.NewGenericHandler[

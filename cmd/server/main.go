@@ -13,6 +13,9 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
+// генерация swagger
+// swag init -g cmd/server/main.go
+
 func main() {
 	_ = godotenv.Load()
 	PORT := os.Getenv("PORT")

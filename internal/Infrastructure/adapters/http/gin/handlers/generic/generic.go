@@ -1,6 +1,7 @@
 package generic
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -17,6 +18,10 @@ func NewGenericHandler[T, C, R any](repo genericPort.Repository[T]) *GenericHand
 	return &GenericHandler[T, C, R]{repo: repo}
 }
 
+type ResponceArrayDTO[T any] struct {
+	Data *[]T `json:"data"`
+}
+
 // ===========================================================CREATE
 func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
 	var dto C
@@ -31,6 +36,7 @@ func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	resp := mapper.MapDomainToDTO[T, R](entity)
 	c.JSON(http.StatusCreated, resp)
 }
@@ -62,16 +68,10 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 // ===========================================================GetByID
 func (h *GenericHandler[T, C, R]) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
-	id, err := strconv.Atoi(idParam)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
+	log.Println("PARAMETER ID IS ", idParam)
 	var entity T
 
-	if err := h.repo.GetByID(id, &entity); err != nil {
+	if err := h.repo.GetByID(idParam, &entity); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -89,24 +89,20 @@ func (h *GenericHandler[T, C, R]) GetAllWhere(c *gin.Context) {
 		return
 	}
 
-	var fields []string
-	var values []interface{}
-
-	for k, v := range fieldsMap {
-		fields = append(fields, k)
-		values = append(values, v)
-	}
-
 	var entities []T
 
-	if err := h.repo.GetAllWhere(fields, values, &entities); err != nil {
+	if err := h.repo.GetAllWhere(fieldsMap, &entities); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	var resp []*R
+	var data []*R
 	for _, e := range entities {
-		resp = append(resp, mapper.MapDomainToDTO[T, R](&e))
+		data = append(data, mapper.MapDomainToDTO[T, R](&e))
+	}
+
+	resp := &ResponceArrayDTO[*R]{
+		Data: &data,
 	}
 
 	c.JSON(http.StatusOK, resp)
@@ -122,10 +118,15 @@ func (h *GenericHandler[T, C, R]) GetAll(c *gin.Context) {
 		return
 	}
 
-	var resp []*R
+	var data []*R
 	for _, e := range entities {
-		resp = append(resp, mapper.MapDomainToDTO[T, R](&e))
+		data = append(data, mapper.MapDomainToDTO[T, R](&e))
 	}
+
+	resp := &ResponceArrayDTO[*R]{
+		Data: &data,
+	}
+
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -133,21 +134,18 @@ func (h *GenericHandler[T, C, R]) GetAll(c *gin.Context) {
 
 func (h *GenericHandler[T, C, R]) Delete(c *gin.Context) {
 	idParam := c.Param("id")
-	var id any
-
-	// Попытка конвертации в int64
-	if n, err := strconv.ParseInt(idParam, 10, 64); err == nil {
-		id = n
-	} else {
-		// Если не число, оставляем как string (для UUID)
-		id = idParam
-	}
-
 	var entity T
-	if err := h.repo.Delete(id, &entity); err != nil {
+	if err := h.repo.Delete(idParam, &entity); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"id": idParam})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{"id": id})
+
 }

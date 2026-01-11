@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/user"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/userUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
@@ -13,10 +13,10 @@ import (
 )
 
 type LoginHandler struct {
-	uc user.ILoginUC
+	uc userUCs.ILoginUC
 }
 
-func NewLoginHandler(uc user.ILoginUC) *LoginHandler {
+func NewLoginHandler(uc userUCs.ILoginUC) *LoginHandler {
 	return &LoginHandler{uc}
 }
 
@@ -36,13 +36,16 @@ func (r *LoginHandler) Login(c *gin.Context) {
 	err := c.ShouldBindJSON(&DTO)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	entity := mapper.MapDTOToDomain[dto.LoginDTO, entities.UserAccount](&DTO)
 
-	account, token, err := r.uc.Execute(entity)
+	// login UC
+	account, token, roles, err := r.uc.Execute(entity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	secure := os.Getenv("ENV") == "prod"
@@ -68,6 +71,7 @@ func (r *LoginHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, LoginResponse{
 		Message: "success",
 		User:    response,
+		Roles:   roles,
 	})
 
 }
@@ -77,4 +81,5 @@ func (r *LoginHandler) Login(c *gin.Context) {
 type LoginResponse struct {
 	Message string                      `json:"message" example:"success"`
 	User    *dto.UserAccountResponseDTO `json:"user"`
+	Roles   []string                    `json:"roles"`
 }

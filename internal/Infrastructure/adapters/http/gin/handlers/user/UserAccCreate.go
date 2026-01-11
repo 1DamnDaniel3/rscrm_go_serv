@@ -20,6 +20,7 @@ func (h *CreateHandler) CreateUserAccountHandler(c *gin.Context) {
 	var DTO dto.UserAccountCreateDTO
 	if err := c.ShouldBindJSON(&DTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	// entity := mapper.MapDTOToDomain[dto.UserAccountCreateUpdateDTO, entities.UserAccount](&DTO)
 

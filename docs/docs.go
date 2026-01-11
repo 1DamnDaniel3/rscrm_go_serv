@@ -47,6 +47,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/leads/groupedleads": {
+            "post": {
+                "description": "Позволяет получить сгруппированных лидов школы",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Leads"
+                ],
+                "summary": "GroupedLeads",
+                "parameters": [
+                    {
+                        "description": "Фильтры group_id и school_id",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/leadhandlers.GroupedLeadInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/leadhandlers.GroupedLeadOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/ownerschool/register": {
             "post": {
                 "description": "Создаёт школу, аккаунт владельца и профиль",
@@ -154,6 +202,44 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.LeadCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "converted_to_client_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "qualification": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "source_id": {
+                    "type": "integer"
+                },
+                "status_id": {
+                    "type": "integer"
+                },
+                "trial_date": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.LoginDTO": {
             "type": "object",
             "properties": {
@@ -238,11 +324,30 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "role": {
+                "school_id": {
                     "type": "string"
+                }
+            }
+        },
+        "leadhandlers.GroupedLeadInputDTO": {
+            "type": "object",
+            "properties": {
+                "group_id": {
+                    "type": "integer"
                 },
                 "school_id": {
                     "type": "string"
+                }
+            }
+        },
+        "leadhandlers.GroupedLeadOutputDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.LeadCreateUpdateDTO"
+                    }
                 }
             }
         },
@@ -264,6 +369,12 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "success"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "user": {
                     "$ref": "#/definitions/dto.UserAccountResponseDTO"

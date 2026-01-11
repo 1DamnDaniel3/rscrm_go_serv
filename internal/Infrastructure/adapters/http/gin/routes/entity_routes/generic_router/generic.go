@@ -5,11 +5,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterCRUDRoutes[T any, C any, R any](r *gin.RouterGroup, prefix string, handler *generic.GenericHandler[T, C, R]) {
+// Auto generate unique routes for basic CRUD operations.
+// r for RouterGroup like `/api/somethings/`
+// Prefix its REST oriented entity name in route like `/cars/`.
+// gin handler with *gin.Context
+func RegisterCRUDRoutes[T any, C any, R any](r *gin.RouterGroup,
+	prefix string,
+	handler *generic.GenericHandler[T, C, R]) {
+
 	r.POST("/"+prefix+"/create", handler.Create)
 	r.PATCH("/"+prefix+"/update/:id", handler.Update)
 	r.POST("/"+prefix+"/getallwhere", handler.GetAllWhere)
 	r.GET("/"+prefix+"/getone/:id", handler.GetByID)
 	r.GET("/"+prefix+"/getall", handler.GetAll)
 	r.DELETE("/"+prefix+"/delete/:id", handler.Delete)
+
 }

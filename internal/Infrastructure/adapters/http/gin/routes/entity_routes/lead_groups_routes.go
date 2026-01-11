@@ -3,24 +3,24 @@ package entityroutes
 import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
-	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func SchoolRoutes(
+func LeadGroupsRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 ) {
-	schoolRepo := adapters.NewGormSchoolRepo(db)
+	lead_groups_repo := adapters.NewGormLeadGroupsRepo(db)
 
-	genericHandler := genericHandler.NewGenericHandler[
-		entities.School,
-		dto.SchoolCreateUpdateDTO,
-		dto.SchoolResponseDTO,
-	](schoolRepo)
+	genericHandler := generic.NewGenericHandler[
+		entities.LeadGroup,
+		dto.LeadGroupCreateUpdateDTO,
+		dto.LeadGroupResponseDTO,
+	](lead_groups_repo)
 
-	genericrouter.RegisterCRUDRoutes(r, "schools", genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "lead_groups", genericHandler)
 }

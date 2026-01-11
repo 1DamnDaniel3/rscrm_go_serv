@@ -5,7 +5,6 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 )
 
-type LeadsRepository interface {
-	generic.Repository[entities.Lead]
-	GetGroupedLeads(school_id string, group_id int64, entities *[]entities.Lead) error
+type RolesRepo interface {
+	generic.Repository[entities.Roles]
 }

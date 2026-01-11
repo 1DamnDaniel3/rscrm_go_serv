@@ -90,7 +90,7 @@
     "/user_accounts/getone/{id}": {
       "get": {
         "summary": "Get entity by ID",
-        "description": "ПРИМЕЧАНИЕ: для schools используется другой путь (schools/getoneschool/:id) т.к. school id это uuid",
+        "description": "Получаем единственную запись по ID в параметрах",
         "tags": [
           "CRUD"
         ],
@@ -129,14 +129,11 @@
         ],
         "responses": {
           "200": {
-            "description": "List of entities",
+            "description": "List of entities wrapped in data",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserAccountResponseDTO"
-                  }
+                  "$ref": "#/components/schemas/ResponceArrayDTO"
                 }
               }
             }
@@ -164,14 +161,11 @@
         },
         "responses": {
           "200": {
-            "description": "Filtered list of entities",
+            "description": "Filtered list of entities wrapped in data",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserAccountResponseDTO"
-                  }
+                  "$ref": "#/components/schemas/ResponceArrayDTO"
                 }
               }
             }
@@ -221,6 +215,16 @@
   },
   "components": {
   "schemas": {
+    "ResponceArrayDTO": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": { "$ref": "#/components/schemas/UserAccountCreateUpdateDTO" }
+        }
+      },
+      "required": ["data"]
+    },
     "UserAccountCreateUpdateDTO": {
       "type": "object",
       "properties": {

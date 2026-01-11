@@ -1,4 +1,4 @@
-package user
+package userUCs
 
 import (
 	"context"
@@ -10,10 +10,12 @@ import (
 )
 
 type RegisterUseCase struct {
-	tx             services.Transaction
-	userRepo       entitiesrepos.UserAccountRepository
-	profileRepo    entitiesrepos.ProfileRepo
-	schoolRepo     entitiesrepos.SchoolRepository
+	tx               services.Transaction
+	userRepo         entitiesrepos.UserAccountRepository
+	profileRepo      entitiesrepos.ProfileRepo
+	schoolRepo       entitiesrepos.SchoolRepository
+	accountRolesRepo entitiesrepos.AccountRolesRepo
+
 	passwordHasher ports.PasswordHasher
 }
 
@@ -21,7 +23,9 @@ type IRegisterUseCase interface {
 	Execute(ctx context.Context,
 		school *entities.School,
 		userAccount *entities.UserAccount,
-		userProfile *entities.UserProfile) (*entities.School, error)
+		userProfile *entities.UserProfile,
+		accountRoles *entities.AccountRoles,
+	) (*entities.School, error)
 }
 
 func NewRegisterUseCase(
@@ -29,14 +33,18 @@ func NewRegisterUseCase(
 	userRepo entitiesrepos.UserAccountRepository,
 	profileRepo entitiesrepos.ProfileRepo,
 	schoolRepo entitiesrepos.SchoolRepository,
+	accountRolesRepo entitiesrepos.AccountRolesRepo,
+
 	passwordHasher ports.PasswordHasher) *RegisterUseCase {
-	return &RegisterUseCase{tx, userRepo, profileRepo, schoolRepo, passwordHasher}
+	return &RegisterUseCase{tx, userRepo, profileRepo, schoolRepo, accountRolesRepo, passwordHasher}
 }
 
 func (uc *RegisterUseCase) Execute(ctx context.Context,
 	school *entities.School,
 	userAccount *entities.UserAccount,
-	userProfile *entities.UserProfile) (*entities.School, error) {
+	userProfile *entities.UserProfile,
+	accountRoles *entities.AccountRoles,
+) (*entities.School, error) {
 
 	err := uc.tx.Do(ctx, func(txCtx context.Context) error {
 		// School Create
@@ -45,14 +53,24 @@ func (uc *RegisterUseCase) Execute(ctx context.Context,
 		}
 
 		// UserAccount Create
+		userAccount.School_id = school.Id
 		if err := uc.userRepo.Register(txCtx, userAccount); err != nil {
 			return err
 		}
 
-		userProfile.ID = userAccount.ID
-		userProfile.Account_id = userAccount.ID
+		userProfile.Id = userAccount.Id
+		userProfile.Account_id = userAccount.Id
+		userProfile.School_id = school.Id
 		// UserProfile Create
 		if err := uc.profileRepo.Register(txCtx, userProfile); err != nil {
+			return err
+		}
+
+		// устанавливаем роль при регистрации - owner
+		accountRoles.Role_id = 2
+		accountRoles.Account_id = userAccount.Id
+		accountRoles.School_id = school.Id
+		if err := uc.accountRolesRepo.Register(txCtx, accountRoles); err != nil {
 			return err
 		}
 

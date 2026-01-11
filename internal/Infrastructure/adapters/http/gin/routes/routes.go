@@ -34,13 +34,8 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	secret := os.Getenv("JWT_SECRET")
 	JWTSigner := jwt.NewJWTAdapter(secret, 5*time.Hour)
 
-	// == Repositories GENERIC ==
-
-	// == Repositories Entities ==
-
-	// == usecases ==
-
 	// == routes ==
+
 	entityroutes.UserAccountRoutes(api, db, hasher, tx, JWTSigner)
 	entityroutes.UserProfileRoutes(api, db)
 	entityroutes.SchoolRoutes(api, db)
@@ -48,4 +43,8 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	entityroutes.GroupRoutes(api, db)
 	entityroutes.StatusRoutes(api, db)
 	entityroutes.SourceRoutes(api, db)
+
+	// == related tables routes
+
+	entityroutes.LeadGroupsRoutes(api, db)
 }

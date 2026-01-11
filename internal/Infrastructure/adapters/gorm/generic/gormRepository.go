@@ -16,12 +16,8 @@ func (r *GormRepository[T]) GetByID(id any, entity *T) error {
 	return r.db.First(entity, "id=?", id).Error
 }
 
-func (r *GormRepository[T]) GetAllWhere(fields []string, values []interface{}, entities *[]T) error {
-	query := r.db
-	for i, field := range fields {
-		query = query.Where(field+" =?", values[i])
-	}
-	return query.Find(entities).Error
+func (r *GormRepository[T]) GetAllWhere(filters map[string]interface{}, entities *[]T) error {
+	return r.db.Where(filters).Find(entities).Error
 }
 
 func (r *GormRepository[T]) GetAll(entities *[]T) error {
@@ -36,7 +32,7 @@ func (r *GormRepository[T]) Update(id any, fields map[string]interface{}) error 
 }
 
 func (r *GormRepository[T]) Delete(id any, entity *T) error {
-	return r.db.Delete(entity, id).Error
+	return r.db.Delete(entity, "id=?", id).Error
 }
 
 func NewGormRepository[T any](db *gorm.DB) *GormRepository[T] {

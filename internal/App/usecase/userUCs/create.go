@@ -1,4 +1,4 @@
-package user
+package userUCs
 
 import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"

@@ -16,20 +16,35 @@ CREATE TABLE user_accounts (
   id SERIAL PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  role TEXT CHECK (role IN ('admin', 'manager', 'teacher', 'receptionist', 'accountant', 'owner')) DEFAULT 'owner',
   created_at TIMESTAMP DEFAULT NOW(),
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
+
+-- Доступные роли 
+CREATE TABLE roles(
+  id SERIAL PRIMARY KEY,
+  role TEXT CHECK (role IN ('admin', 'manager', 'teacher', 'receptionist', 'accountant', 'owner'))
+);
+
+-- Роли пользователей many-to-many
+CREATE TABLE account_roles(
+  id SERIAL PRIMARY KEY,
+  account_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
+  role_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE user_profiles (
   id SERIAL PRIMARY KEY,
   account_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
   phone TEXT,
   full_name TEXT,
-  birthdate DATE
+  birthdate DATE,
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 
--- 3. Справочники
+-- 3. Источники привлечения клиентов
 CREATE TABLE sources (
   id SERIAL PRIMARY KEY,
   name TEXT
@@ -48,7 +63,7 @@ CREATE TABLE leads (
   name TEXT,
   phone TEXT,
   source_id INTEGER REFERENCES sources(id) ON DELETE SET NULL,
-  status_id INTEGER REFERENCES statuses(id),
+  status_id INTEGER REFERENCES statuses(id) ON DELETE SET NULL,
   trial_date DATE,
   qualification TEXT,
   created_by INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
@@ -275,72 +290,31 @@ CREATE TABLE teacher_rate_rules (
 
 
 --- Индексы для внешних ключей (если они не создаются автоматически)
-CREATE INDEX idx_user_accounts_school_id ON user_accounts(school_id);
-CREATE INDEX idx_statuses_school_id ON statuses(school_id); 
-CREATE INDEX idx_leads_school_id ON leads(school_id);
-CREATE INDEX idx_clients_school_id ON clients(school_id);
-CREATE INDEX idx_students_school_id ON students(school_id);
-CREATE INDEX idx_student_clients_school_id ON student_clients(school_id);
-CREATE INDEX idx_subscriptions_school_id ON subscriptions(school_id);
-CREATE INDEX idx_student_subscriptions_school_id ON student_subscriptions(school_id);
-CREATE INDEX idx_groups_school_id ON groups(school_id);
-CREATE INDEX idx_lead_groups_school_id ON lead_groups(school_id);
-CREATE INDEX idx_client_groups_school_id ON client_groups(school_id);
-CREATE INDEX idx_student_groups_school_id ON student_groups(school_id);
-CREATE INDEX idx_dance_styles_school_id ON dance_styles(school_id);
-CREATE INDEX idx_schedules_school_id ON schedules(school_id);
-CREATE INDEX idx_lessons_school_id ON lessons(school_id);
-CREATE INDEX idx_attendance_school_id ON attendance(school_id);
-CREATE INDEX idx_payments_school_id ON payments(school_id);
-CREATE INDEX idx_lesson_payments_school_id ON lesson_payments(school_id);
-CREATE INDEX idx_financial_reports_school_id ON financial_reports(school_id);
-CREATE INDEX idx_lesson_subscriptions_school_id ON lesson_subscriptions(school_id);
-CREATE INDEX idx_teacher_rate_policies_school_id ON teacher_rate_policies(school_id);
-CREATE INDEX idx_teacher_rates_school_id ON teacher_rates(school_id);
+-- Индексы для внешних ключей с HASH индексами
+CREATE INDEX idx_user_accounts_school_id ON user_accounts USING HASH(school_id);
+CREATE INDEX idx_statuses_school_id ON statuses USING HASH(school_id); 
+CREATE INDEX idx_leads_school_id ON leads USING HASH(school_id);
+CREATE INDEX idx_clients_school_id ON clients USING HASH(school_id);
+CREATE INDEX idx_students_school_id ON students USING HASH(school_id);
+CREATE INDEX idx_student_clients_school_id ON student_clients USING HASH(school_id);
+CREATE INDEX idx_subscriptions_school_id ON subscriptions USING HASH(school_id);
+CREATE INDEX idx_student_subscriptions_school_id ON student_subscriptions USING HASH(school_id);
+CREATE INDEX idx_groups_school_id ON groups USING HASH(school_id);
+CREATE INDEX idx_lead_groups_school_id ON lead_groups USING HASH(school_id);
+CREATE INDEX idx_client_groups_school_id ON client_groups USING HASH(school_id);
+CREATE INDEX idx_student_groups_school_id ON student_groups USING HASH(school_id);
+CREATE INDEX idx_dance_styles_school_id ON dance_styles USING HASH(school_id);
+CREATE INDEX idx_schedules_school_id ON schedules USING HASH(school_id);
+CREATE INDEX idx_lessons_school_id ON lessons USING HASH(school_id);
+CREATE INDEX idx_attendance_school_id ON attendance USING HASH(school_id);
+CREATE INDEX idx_payments_school_id ON payments USING HASH(school_id);
+CREATE INDEX idx_lesson_payments_school_id ON lesson_payments USING HASH(school_id);
+CREATE INDEX idx_financial_reports_school_id ON financial_reports USING HASH(school_id);
+CREATE INDEX idx_lesson_subscriptions_school_id ON lesson_subscriptions USING HASH(school_id);
+CREATE INDEX idx_teacher_rate_policies_school_id ON teacher_rate_policies USING HASH(school_id);
+CREATE INDEX idx_teacher_rates_school_id ON teacher_rates USING HASH(school_id);
+
 CREATE INDEX idx_teacher_rate_rules_policy_id ON teacher_rate_rules(policy_id);
-
--- Индексы по внешним ключам к другим таблицам
-CREATE INDEX idx_user_profiles_account_id ON user_profiles(account_id);
-CREATE INDEX idx_leads_source_id ON leads(source_id);
-CREATE INDEX idx_leads_status_id ON leads(status_id);
-CREATE INDEX idx_leads_created_by ON leads(created_by);
-CREATE INDEX idx_student_clients_student_id ON student_clients(student_id);
-CREATE INDEX idx_student_clients_client_id ON student_clients(client_id);
-CREATE INDEX idx_student_subscriptions_student_id ON student_subscriptions(student_id);
-CREATE INDEX idx_student_subscriptions_subscription_id ON student_subscriptions(subscription_id);
-CREATE INDEX idx_subscription_pauses_student_subscription_id ON subscription_pauses(student_subscription_id);
-CREATE INDEX idx_lead_groups_lead_id ON lead_groups(lead_id);
-CREATE INDEX idx_lead_groups_group_id ON lead_groups(group_id);
-CREATE INDEX idx_client_groups_client_id ON client_groups(client_id);
-CREATE INDEX idx_client_groups_group_id ON client_groups(group_id);
-CREATE INDEX idx_student_groups_student_id ON student_groups(student_id);
-CREATE INDEX idx_student_groups_group_id ON student_groups(group_id);
-CREATE INDEX idx_schedules_group_id ON schedules(group_id);
-CREATE INDEX idx_lessons_group_id ON lessons(group_id);
-CREATE INDEX idx_lessons_direction_id ON lessons(direction_id);
-CREATE INDEX idx_lessons_teacher_id ON lessons(teacher_id);
-CREATE INDEX idx_attendance_student_id ON attendance(student_id);
-CREATE INDEX idx_attendance_lesson_id ON attendance(lesson_id);
-CREATE INDEX idx_attendance_marked_by ON attendance(marked_by);
-CREATE INDEX idx_payments_student_id ON payments(student_id);
-CREATE INDEX idx_payments_subscription_id ON payments(subscription_id);
-CREATE INDEX idx_payments_created_by ON payments(created_by);
-CREATE INDEX idx_lesson_payments_lesson_id ON lesson_payments(lesson_id);
-CREATE INDEX idx_lesson_payments_student_id ON lesson_payments(student_id);
-CREATE INDEX idx_lesson_subscriptions_lesson_id ON lesson_subscriptions(lesson_id);
-CREATE INDEX idx_lesson_subscriptions_student_id ON lesson_subscriptions(student_id);
-CREATE INDEX idx_lesson_subscriptions_subscription_id ON lesson_subscriptions(subscription_id);
-CREATE INDEX idx_teacher_rates_teacher_id ON teacher_rates(teacher_id);
-CREATE INDEX idx_teacher_rates_policy_id ON teacher_rates(policy_id);
-
--- Уникальный индекс уже есть на user_accounts.email
-
--- Индексы по часто используемым фильтрам
-CREATE INDEX idx_leads_phone ON leads(phone);
-CREATE INDEX idx_clients_phone ON clients(phone);
-CREATE INDEX idx_students_birthdate ON students(birthdate);
-CREATE INDEX idx_lessons_start_time ON lessons(start_time);
-
 
 
 ----------------------------------------------------- ДАМП заполнения --------------------------
@@ -350,27 +324,45 @@ WITH ins_school AS (
     RETURNING id
 ),
 ins_users AS (
-    INSERT INTO user_accounts (email, password, role, created_at, school_id)
+    INSERT INTO user_accounts (email, password, created_at, school_id)
     SELECT * FROM (
         VALUES
-        ('admin@gmail.com', '$2a$10$FlEeydohowlZtkt.fcN4Leit1lA2gfYcJ44hWvBH/TtDASQzqf8mK', 'admin', NOW(), NULL),
-        ('owner@gmail.com', '$2a$10$d8REo8wDZUsvfEEUtLM9oeEQ7963bF4VsyFrSsG3Wjt0xdC9DMksO', 'owner', NOW(), (SELECT id FROM ins_school)),
-        ('manager@gmail.com', '$2a$10$aQ2qfd/lc.lj14q2IFPml.3RyUfD3EGWJla9R66JDpGtFC0aoFf16', 'manager', NOW(), (SELECT id FROM ins_school)),
-        ('teacher@gmail.com', '$2a$10$uWLa7aKUbBiDoe0AdrUzWu.es3Z10xoMb3aJyNikn2i6T2qBzcmVm', 'teacher', NOW(), (SELECT id FROM ins_school)),
-        ('accountant@gmail.com', '$2a$10$8X3grbQVWyLHvZbPbIf4ve5ZFCLUN0LGnRPVvJs7aJmIiBigtFT2q', 'accountant', NOW(), (SELECT id FROM ins_school)),
-        ('receptionist@gmail.com', '$2a$10$0EdbnGzRRUpkzWGfRQRwBuFlVMwA6W4GoAb8beIBPdhCIWgklef86', 'receptionist', NOW(), (SELECT id FROM ins_school))
-    ) AS t(email, password, role, created_at, school_id)
+        ('admin@gmail.com', '$2a$10$FlEeydohowlZtkt.fcN4Leit1lA2gfYcJ44hWvBH/TtDASQzqf8mK', NOW(), NULL),
+        ('owner@gmail.com', '$2a$10$d8REo8wDZUsvfEEUtLM9oeEQ7963bF4VsyFrSsG3Wjt0xdC9DMksO', NOW(), (SELECT id FROM ins_school)),
+        ('manager@gmail.com', '$2a$10$aQ2qfd/lc.lj14q2IFPml.3RyUfD3EGWJla9R66JDpGtFC0aoFf16', NOW(), (SELECT id FROM ins_school)),
+        ('teacher@gmail.com', '$2a$10$uWLa7aKUbBiDoe0AdrUzWu.es3Z10xoMb3aJyNikn2i6T2qBzcmVm', NOW(), (SELECT id FROM ins_school)),
+        ('accountant@gmail.com', '$2a$10$8X3grbQVWyLHvZbPbIf4ve5ZFCLUN0LGnRPVvJs7aJmIiBigtFT2q', NOW(), (SELECT id FROM ins_school)),
+        ('receptionist@gmail.com', '$2a$10$0EdbnGzRRUpkzWGfRQRwBuFlVMwA6W4GoAb8beIBPdhCIWgklef86', NOW(), (SELECT id FROM ins_school))
+    ) AS t(email, password, created_at, school_id)
     RETURNING id
 ),
+ins_roles AS (
+    INSERT INTO roles (role) VALUES
+    ('admin'),
+    ('owner'),
+    ('manager'),
+    ('teacher'),
+    ('accountant'),
+    ('receptionist')
+),
+ins_account_roles AS (
+    INSERT INTO account_roles (account_id, role_id, school_id) VALUES
+    (1, 1, (SELECT id FROM ins_school)),  -- admin
+    (2, 2, (SELECT id FROM ins_school)),  -- owner
+    (3, 3, (SELECT id FROM ins_school)),  -- manager
+    (4, 4, (SELECT id FROM ins_school)),  -- teacher
+    (5, 5, (SELECT id FROM ins_school)),  -- accountant
+    (6, 6, (SELECT id FROM ins_school))  -- receptionist
+),
 ins_profiles AS (
-    INSERT INTO user_profiles (account_id, phone, full_name, birthdate)
+    INSERT INTO user_profiles (account_id, phone, full_name, birthdate, school_id)
     VALUES
-    (1, '+7 (900) 900-9090', 'Admin', '2025-05-24'),
-    (2, '+7 (900) 901-9191', 'Owner', '2025-05-24'),
-    (3, '+7 (900) 902-9292', 'Manager', '2025-05-24'),
-    (4, '+7 (900) 903-9393', 'Teacher', '2025-05-24'),
-    (5, '+7 (900) 904-9494', 'Accountant', '2025-05-24'),
-    (6, '+7 (900) 905-9595', 'Receptionist', '2025-05-24')
+    (1, '+7 (900) 900-9090', 'Admin', '2025-05-24', (SELECT id FROM ins_school)),
+    (2, '+7 (900) 901-9191', 'Owner', '2025-05-24', (SELECT id FROM ins_school)),
+    (3, '+7 (900) 902-9292', 'Manager', '2025-05-24', (SELECT id FROM ins_school)),
+    (4, '+7 (900) 903-9393', 'Teacher', '2025-05-24', (SELECT id FROM ins_school)),
+    (5, '+7 (900) 904-9494', 'Accountant', '2025-05-24', (SELECT id FROM ins_school)),
+    (6, '+7 (900) 905-9595', 'Receptionist', '2025-05-24', (SELECT id FROM ins_school))
 ),
 ins_sources AS (
     INSERT INTO sources (name) VALUES
@@ -492,67 +484,29 @@ VALUES
 
 -- ============================= Индексы 
 
-DROP INDEX IF EXISTS idx_teacher_rates_policy_id;
-DROP INDEX IF EXISTS idx_teacher_rates_teacher_id;
-DROP INDEX IF EXISTS idx_lesson_subscriptions_subscription_id;
-DROP INDEX IF EXISTS idx_lesson_subscriptions_student_id;
-DROP INDEX IF EXISTS idx_lesson_subscriptions_lesson_id;
-DROP INDEX IF EXISTS idx_lesson_payments_student_id;
-DROP INDEX IF EXISTS idx_lesson_payments_lesson_id;
-DROP INDEX IF EXISTS idx_payments_created_by;
-DROP INDEX IF EXISTS idx_payments_subscription_id;
-DROP INDEX IF EXISTS idx_payments_student_id;
-DROP INDEX IF EXISTS idx_attendance_marked_by;
-DROP INDEX IF EXISTS idx_attendance_lesson_id;
-DROP INDEX IF EXISTS idx_attendance_student_id;
-DROP INDEX IF EXISTS idx_lessons_teacher_id;
-DROP INDEX IF EXISTS idx_lessons_direction_id;
-DROP INDEX IF EXISTS idx_lessons_group_id;
-DROP INDEX IF EXISTS idx_schedules_group_id;
-DROP INDEX IF EXISTS idx_student_groups_group_id;
-DROP INDEX IF EXISTS idx_student_groups_student_id;
-DROP INDEX IF EXISTS idx_client_groups_group_id;
-DROP INDEX IF EXISTS idx_client_groups_client_id;
-DROP INDEX IF EXISTS idx_lead_groups_group_id;
-DROP INDEX IF EXISTS idx_lead_groups_lead_id;
-DROP INDEX IF EXISTS idx_subscription_pauses_student_subscription_id;
-DROP INDEX IF EXISTS idx_student_subscriptions_subscription_id;
-DROP INDEX IF EXISTS idx_student_subscriptions_student_id;
-DROP INDEX IF EXISTS idx_student_clients_client_id;
-DROP INDEX IF EXISTS idx_student_clients_student_id;
-DROP INDEX IF EXISTS idx_leads_created_by;
-DROP INDEX IF EXISTS idx_leads_status_id;
-DROP INDEX IF EXISTS idx_leads_source_id;
-DROP INDEX IF EXISTS idx_user_profiles_account_id;
-
-DROP INDEX IF EXISTS idx_teacher_rate_rules_policy_id;
-DROP INDEX IF EXISTS idx_teacher_rates_school_id;
-DROP INDEX IF EXISTS idx_teacher_rate_policies_school_id;
-DROP INDEX IF EXISTS idx_lesson_subscriptions_school_id;
-DROP INDEX IF EXISTS idx_financial_reports_school_id;
-DROP INDEX IF EXISTS idx_lesson_payments_school_id;
-DROP INDEX IF EXISTS idx_payments_school_id;
-DROP INDEX IF EXISTS idx_attendance_school_id;
-DROP INDEX IF EXISTS idx_lessons_school_id;
-DROP INDEX IF EXISTS idx_schedules_school_id;
-DROP INDEX IF EXISTS idx_dance_styles_school_id;
-DROP INDEX IF EXISTS idx_student_groups_school_id;
-DROP INDEX IF EXISTS idx_client_groups_school_id;
-DROP INDEX IF EXISTS idx_lead_groups_school_id;
-DROP INDEX IF EXISTS idx_groups_school_id;
-DROP INDEX IF EXISTS idx_student_subscriptions_school_id;
-DROP INDEX IF EXISTS idx_subscriptions_school_id;
-DROP INDEX IF EXISTS idx_student_clients_school_id;
-DROP INDEX IF EXISTS idx_students_school_id;
-DROP INDEX IF EXISTS idx_clients_school_id;
-DROP INDEX IF EXISTS idx_leads_school_id;
-DROP INDEX IF EXISTS idx_statuses_school_id;
 DROP INDEX IF EXISTS idx_user_accounts_school_id;
-
-DROP INDEX IF EXISTS idx_students_birthdate;
-DROP INDEX IF EXISTS idx_clients_phone;
-DROP INDEX IF EXISTS idx_leads_phone;
-DROP INDEX IF EXISTS idx_lessons_start_time;
+DROP INDEX IF EXISTS idx_statuses_school_id;
+DROP INDEX IF EXISTS idx_leads_school_id;
+DROP INDEX IF EXISTS idx_clients_school_id;
+DROP INDEX IF EXISTS idx_students_school_id;
+DROP INDEX IF EXISTS idx_student_clients_school_id;
+DROP INDEX IF EXISTS idx_subscriptions_school_id;
+DROP INDEX IF EXISTS idx_student_subscriptions_school_id;
+DROP INDEX IF EXISTS idx_groups_school_id;
+DROP INDEX IF EXISTS idx_lead_groups_school_id;
+DROP INDEX IF EXISTS idx_client_groups_school_id;
+DROP INDEX IF EXISTS idx_student_groups_school_id;
+DROP INDEX IF EXISTS idx_dance_styles_school_id;
+DROP INDEX IF EXISTS idx_schedules_school_id;
+DROP INDEX IF EXISTS idx_lessons_school_id;
+DROP INDEX IF EXISTS idx_attendance_school_id;
+DROP INDEX IF EXISTS idx_payments_school_id;
+DROP INDEX IF EXISTS idx_lesson_payments_school_id;
+DROP INDEX IF EXISTS idx_financial_reports_school_id;
+DROP INDEX IF EXISTS idx_lesson_subscriptions_school_id;
+DROP INDEX IF EXISTS idx_teacher_rate_policies_school_id;
+DROP INDEX IF EXISTS idx_teacher_rates_school_id;
+DROP INDEX IF EXISTS idx_teacher_rate_rules_policy_id;
 
 -- ====================== Таблицы 
 
@@ -591,6 +545,8 @@ DROP TABLE IF EXISTS statuses CASCADE;
 DROP TABLE IF EXISTS sources CASCADE;
 
 DROP TABLE IF EXISTS user_profiles CASCADE;
+DROP TABLE IF EXISTS account_roles CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
 DROP TABLE IF EXISTS user_accounts CASCADE;
 
 DROP TABLE IF EXISTS schools CASCADE;
