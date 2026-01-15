@@ -1,7 +1,9 @@
 package generic
 
+import "context"
+
 type Repository[T any] interface {
-	Create(entity *T) error
+	Create(ctx context.Context, entity *T) error
 	GetByID(id any, entity *T) error
 	GetAllWhere(filters map[string]interface{}, entities *[]T) error
 	GetAll(entities *[]T) error

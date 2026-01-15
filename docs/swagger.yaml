@@ -33,6 +33,42 @@ definitions:
       trial_date:
         type: string
     type: object
+  dto.LeadGroupCreateUpdateDTO:
+    properties:
+      group_id:
+        type: integer
+      id:
+        type: integer
+      lead_id:
+        type: integer
+      school_id:
+        type: string
+    type: object
+  dto.LeadResponseDTO:
+    properties:
+      converted_to_client_at:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      qualification:
+        type: string
+      school_id:
+        type: string
+      source_id:
+        type: integer
+      status_id:
+        type: integer
+      trial_date:
+        type: string
+    type: object
   dto.LoginDTO:
     properties:
       email:
@@ -107,6 +143,13 @@ definitions:
           $ref: '#/definitions/dto.LeadCreateUpdateDTO'
         type: array
     type: object
+  leadhandlers.СreateLeadInputDto:
+    properties:
+      group:
+        $ref: '#/definitions/dto.LeadGroupCreateUpdateDTO'
+      lead:
+        $ref: '#/definitions/dto.LeadCreateUpdateDTO'
+    type: object
   user.AuthCheckResponse:
     properties:
       isAuthenticated:
@@ -151,6 +194,38 @@ paths:
       summary: Проверка авторизации
       tags:
       - Auth
+  /api/leads/createandgroup:
+    post:
+      consumes:
+      - application/json
+      description: Транзакция на создания лида с записью в lead_groups
+      parameters:
+      - description: Данные для создания лида и привязке к группе
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/leadhandlers.%D0%A1reateLeadInputDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LeadResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: LeadsAndGroups
+      tags:
+      - Leads
   /api/leads/groupedleads:
     post:
       consumes:
@@ -241,6 +316,16 @@ paths:
               type: string
             type: object
       summary: Логин
+      tags:
+      - Auth
+  /api/useraccounts/logout:
+    get:
+      description: Простой get для logout. Пока только удаляет JWT из браузера, не
+        ведёт blacklist
+      responses:
+        "204":
+          description: No Content
+      summary: Логаут
       tags:
       - Auth
 swagger: "2.0"

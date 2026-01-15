@@ -1,4 +1,4 @@
-package adapters
+package gormentityrepos
 
 import (
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"

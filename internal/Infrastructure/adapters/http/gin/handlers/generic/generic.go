@@ -24,6 +24,8 @@ type ResponceArrayDTO[T any] struct {
 
 // ===========================================================CREATE
 func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
+	ctx := c.Request.Context()
+
 	var dto C
 	if err := c.ShouldBindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -32,7 +34,7 @@ func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
 
 	entity := mapper.MapDTOToDomain[C, T](&dto)
 
-	if err := h.repo.Create(entity); err != nil {
+	if err := h.repo.Create(ctx, entity); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

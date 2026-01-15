@@ -1,6 +1,10 @@
 package generic
 
 import (
+	"context"
+
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
+	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
 	"gorm.io/gorm"
 )
 
@@ -8,8 +12,23 @@ type GormRepository[T any] struct {
 	db *gorm.DB
 }
 
-func (r *GormRepository[T]) Create(entity *T) error {
-	return r.db.Create(entity).Error
+// If we have transaction in ctx - then we should use db from tx, else use db from repo
+func (r *GormRepository[T]) dbFromCtx(ctx context.Context) *gorm.DB {
+	if tx, ok := ctx.Value(adapters.TxKey{}).(*gorm.DB); ok {
+		return tx
+	}
+	return r.db
+}
+
+func (r *GormRepository[T]) Create(ctx context.Context, entity *T) error {
+
+	if beforeCreate, ok := any(entity).(services.BeforeCreate); ok {
+		if err := beforeCreate.BeforeCreate(); err != nil {
+			return err
+		}
+	}
+
+	return r.dbFromCtx(ctx).Create(entity).Error
 }
 
 func (r *GormRepository[T]) GetByID(id any, entity *T) error {

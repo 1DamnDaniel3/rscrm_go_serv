@@ -9,7 +9,7 @@ import (
 
 type UserAccountRepository interface {
 	generic.Repository[entities.UserAccount]
-	Create(entity *entities.UserAccount) error
+	Create(ctx context.Context, entity *entities.UserAccount) error
 	GetByEmail(email string) (*entities.UserAccount, error)
 	Register(ctx context.Context, entity *entities.UserAccount) error
 }

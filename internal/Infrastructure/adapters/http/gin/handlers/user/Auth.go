@@ -12,12 +12,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type LoginHandler struct {
+type AuthHandler struct {
 	uc userUCs.ILoginUC
 }
 
-func NewLoginHandler(uc userUCs.ILoginUC) *LoginHandler {
-	return &LoginHandler{uc}
+func NewLoginHandler(uc userUCs.ILoginUC) *AuthHandler {
+	return &AuthHandler{uc}
 }
 
 // Login godoc
@@ -31,7 +31,7 @@ func NewLoginHandler(uc userUCs.ILoginUC) *LoginHandler {
 // @Header 		 200	{string} Set-Cookie "JWT-токен"
 // @Failure      400    {object}  map[string]string
 // @Router       /api/useraccounts/login [post]
-func (r *LoginHandler) Login(c *gin.Context) {
+func (r *AuthHandler) Login(c *gin.Context) {
 	var DTO dto.LoginDTO
 	err := c.ShouldBindJSON(&DTO)
 	if err != nil {
@@ -74,6 +74,34 @@ func (r *LoginHandler) Login(c *gin.Context) {
 		Roles:   roles,
 	})
 
+}
+
+// Logout godoc
+// @Summary      Логаут
+// @Description  Простой get для logout. Пока только удаляет JWT из браузера, не ведёт blacklist
+// @Tags         Auth
+// @Success      204
+// @Router       /api/useraccounts/logout [get]
+func (r *AuthHandler) Logout(c *gin.Context) {
+
+	secure := os.Getenv("ENV") == "prod"
+	var host string
+	if os.Getenv("ENV") == "prod" {
+		host = os.Getenv("HOST")
+	} else {
+		host = "localhost"
+	}
+
+	c.SetCookie(
+		"jwt",
+		"",
+		-1,
+		"/api",
+		host,
+		secure,
+		true,
+	)
+	c.Status(http.StatusNoContent)
 }
 
 // === DTO ===

@@ -7,6 +7,7 @@ type AccountRoles struct {
 	School_id  string
 }
 
+// role codes
 // 'admin' id code = 1
 // 'owner' id code = 2
 // 'manager' id code = 3

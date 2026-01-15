@@ -1,4 +1,4 @@
-package adapters
+package gormentityrepos
 
 import (
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
@@ -7,13 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type GormLeadGroupRepo struct {
-	*genericAdapter.GormRepository[entities.LeadGroup]
+type GormRolesRepo struct {
+	*genericAdapter.GormRepository[entities.Roles]
 	db *gorm.DB
 }
 
-func NewGormLeadGroupsRepo(db *gorm.DB) entitiesrepos.LeadGroupsRepo {
-	return &GormLeadGroupRepo{
-		GormRepository: genericAdapter.NewGormRepository[entities.LeadGroup](db),
-		db:             db}
+func NewGormRolesRepo(db *gorm.DB) entitiesrepos.RolesRepo {
+	return &GormRolesRepo{
+		GormRepository: genericAdapter.NewGormRepository[entities.Roles](db),
+		db:             db,
+	}
 }

@@ -2,7 +2,7 @@ package mapper
 
 import "reflect"
 
-func MapDomainToDTO[D any, R any](domain *D) *R {
+func MapDomainToDTO[D, R any](domain *D) *R {
 	dto := new(R)
 	domainVal := reflect.ValueOf(domain).Elem()
 	dtoVal := reflect.ValueOf(dto).Elem()
@@ -18,7 +18,7 @@ func MapDomainToDTO[D any, R any](domain *D) *R {
 }
 
 // MapDTOToDomain копирует все совпадающие поля из DTO в Domain
-func MapDTOToDomain[D any, R any](dto *D) *R {
+func MapDTOToDomain[D, R any](dto *D) *R {
 	domain := new(R)
 	dtoVal := reflect.ValueOf(dto).Elem()
 	domainVal := reflect.ValueOf(domain).Elem()

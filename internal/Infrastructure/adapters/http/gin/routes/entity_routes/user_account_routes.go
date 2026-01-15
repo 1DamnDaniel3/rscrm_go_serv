@@ -6,7 +6,7 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/bcrypt"
-	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
 	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/transactions"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/user"
@@ -23,12 +23,12 @@ func UserAccountRoutes(
 	tx services.Transaction,
 	JwtSigner ports.JWTservice) {
 	// ==/== repos
-	userRepo := adapters.NewGormUserAccountRepo(db, hasher)
-	schoolRepo := adapters.NewGormSchoolRepo(db)
-	profileRepo := adapters.NewGormUserProfileRepo(db)
+	userRepo := gormentityrepos.NewGormUserAccountRepo(db, hasher)
+	schoolRepo := gormentityrepos.NewGormSchoolRepo(db)
+	profileRepo := gormentityrepos.NewGormUserProfileRepo(db)
 
-	accRolesRepo := adapters.NewGormAccountRolesRepo(db)
-	rolesRepo := adapters.NewGormRolesRepo(db)
+	accRolesRepo := gormentityrepos.NewGormAccountRolesRepo(db)
+	rolesRepo := gormentityrepos.NewGormRolesRepo(db)
 	// ==/== usecases
 	LoginUseCase := userUC.NewLoginUseCase(hasher, userRepo, accRolesRepo, rolesRepo, JwtSigner)
 	registerUC := userUC.NewRegisterUseCase(tx, userRepo, profileRepo, schoolRepo, accRolesRepo, hasher)
@@ -50,6 +50,7 @@ func UserAccountRoutes(
 	r.GET("/auth/check", authCheckHandler.CheckAuth)
 	r.POST("/ownerschool/register", registerHandler.Register)
 	r.POST("/user_accounts/login", loginHandler.Login)
+	r.GET("/user_accounts/logout", loginHandler.Logout)
 
 	// r.POST("/user_accounts/create")
 }

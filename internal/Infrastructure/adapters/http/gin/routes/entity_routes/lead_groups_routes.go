@@ -2,7 +2,7 @@ package entityroutes
 
 import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
@@ -14,7 +14,7 @@ func LeadGroupsRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 ) {
-	lead_groups_repo := adapters.NewGormLeadGroupsRepo(db)
+	lead_groups_repo := gormentityrepos.NewGormLeadGroupsRepo(db)
 
 	genericHandler := generic.NewGenericHandler[
 		entities.LeadGroup,

@@ -47,6 +47,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/leads/createandgroup": {
+            "post": {
+                "description": "Транзакция на создания лида с записью в lead_groups",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Leads"
+                ],
+                "summary": "LeadsAndGroups",
+                "parameters": [
+                    {
+                        "description": "Данные для создания лида и привязке к группе",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/leadhandlers.%D0%A1reateLeadInputDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LeadResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/leads/groupedleads": {
             "post": {
                 "description": "Позволяет получить сгруппированных лидов школы",
@@ -186,6 +234,20 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/useraccounts/logout": {
+            "get": {
+                "description": "Простой get для logout. Пока только удаляет JWT из браузера, не ведёт blacklist",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Логаут",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -203,6 +265,61 @@ const docTemplate = `{
             }
         },
         "dto.LeadCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "converted_to_client_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "qualification": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "source_id": {
+                    "type": "integer"
+                },
+                "status_id": {
+                    "type": "integer"
+                },
+                "trial_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.LeadGroupCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "group_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lead_id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.LeadResponseDTO": {
             "type": "object",
             "properties": {
                 "converted_to_client_at": {
@@ -348,6 +465,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/dto.LeadCreateUpdateDTO"
                     }
+                }
+            }
+        },
+        "leadhandlers.СreateLeadInputDto": {
+            "type": "object",
+            "properties": {
+                "group": {
+                    "$ref": "#/definitions/dto.LeadGroupCreateUpdateDTO"
+                },
+                "lead": {
+                    "$ref": "#/definitions/dto.LeadCreateUpdateDTO"
                 }
             }
         },
