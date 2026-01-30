@@ -4,6 +4,7 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ import (
 func UserProfileRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
+	authMiddleware *middleware.AuthMiddleware,
 ) {
 	profileRepo := gormentityrepos.NewGormUserProfileRepo(db)
 
@@ -22,5 +24,5 @@ func UserProfileRoutes(
 		dto.UserProfileResponseDTO,
 	](profileRepo)
 
-	genericrouter.RegisterCRUDRoutes(r, "user_profiles", genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "user_profiles", authMiddleware, genericHandler)
 }

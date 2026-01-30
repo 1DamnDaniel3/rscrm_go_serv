@@ -10,6 +10,7 @@ import (
 	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/transactions"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/user"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericRoute "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,8 @@ func UserAccountRoutes(
 	db *gorm.DB,
 	hasher *bcrypt.BcryptHasher,
 	tx services.Transaction,
-	JwtSigner ports.JWTservice) {
+	JwtSigner ports.JWTservice,
+	authMiddleware *middleware.AuthMiddleware) {
 	// ==/== repos
 	userRepo := gormentityrepos.NewGormUserAccountRepo(db, hasher)
 	schoolRepo := gormentityrepos.NewGormSchoolRepo(db)
@@ -45,7 +47,7 @@ func UserAccountRoutes(
 
 	// ==/== routes
 
-	genericRoute.RegisterCRUDRoutes(r, "user_accounts", genericUserHandler)
+	genericRoute.RegisterCRUDRoutes(r, "user_accounts", authMiddleware, genericUserHandler)
 
 	r.GET("/auth/check", authCheckHandler.CheckAuth)
 	r.POST("/ownerschool/register", registerHandler.Register)

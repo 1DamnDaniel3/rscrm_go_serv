@@ -59,7 +59,7 @@ func (r *AuthHandler) Login(c *gin.Context) {
 	c.SetCookie(
 		"jwt",
 		token,
-		int(5*time.Hour),
+		int(5*time.Hour.Seconds()),
 		"/api",
 		host,
 		secure,

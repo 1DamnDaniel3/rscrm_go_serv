@@ -1,6 +1,7 @@
 package userUCs
 
 import (
+	"context"
 	"errors"
 
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
@@ -43,12 +44,13 @@ func (uc *LoginUC) Execute(input *entities.UserAccount) (*entities.UserAccount, 
 	filters := make(map[string]interface{})
 	filters["school_id"] = account.School_id
 	filters["account_id"] = account.Id
-	if err := uc.accRolesRepo.GetAllWhere(filters, &accountRoleIds); err != nil {
+	ctx := context.Background()
+	if err := uc.accRolesRepo.GetAllWhere(ctx, filters, &accountRoleIds); err != nil {
 		return nil, "", make([]string, 0), err
 	}
 
 	allRoles := &[]entities.Roles{} // Получаем вообще все роли
-	if err := uc.rolesRepo.GetAll(allRoles); err != nil {
+	if err := uc.rolesRepo.GetAll(ctx, allRoles); err != nil {
 		return nil, "", make([]string, 0), err
 	}
 	allRolesMap := make(map[int64]string) //складываем в map

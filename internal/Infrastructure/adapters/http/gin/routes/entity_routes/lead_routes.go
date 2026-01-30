@@ -7,6 +7,7 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
 	leadhandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/leadHandlers"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ func LeadRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 	tx services.Transaction,
+	authMiddleware *middleware.AuthMiddleware,
 ) {
 	leadRepo := gormentityrepos.NewGormLeadsRepo(db)
 	leadGroupsRepo := gormentityrepos.NewGormLeadGroupsRepo(db)
@@ -35,7 +37,7 @@ func LeadRoutes(
 		dto.LeadResponseDTO,
 	](leadRepo)
 
-	genericrouter.RegisterCRUDRoutes(r, "leads", genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "leads", authMiddleware, genericHandler)
 	r.POST("leads/groupedleads", groupedLeadsHandler.GetGroupedLeads)
 	r.POST("leads/createandgroup", createLeadHandler.CreateLead)
 

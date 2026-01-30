@@ -45,7 +45,7 @@ func (a *AuthCheckHandler) CheckAuth(c *gin.Context) {
 		return
 	}
 
-	c.Set("user", claims)
+	// c.Set("user", claims)
 	delete(claims, "exp")
 	c.JSON(http.StatusOK, AuthCheckResponse{
 		IsAuthenticated: true,

@@ -2,6 +2,7 @@ package genericrouter
 
 import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,13 +12,21 @@ import (
 // gin handler with *gin.Context
 func RegisterCRUDRoutes[T any, C any, R any](r *gin.RouterGroup,
 	prefix string,
-	handler *generic.GenericHandler[T, C, R]) {
+	authMiddleware *middleware.AuthMiddleware,
+	handler *generic.GenericHandler[T, C, R],
+) {
 
-	r.POST("/"+prefix+"/create", handler.Create)
-	r.PATCH("/"+prefix+"/update/:id", handler.Update)
-	r.POST("/"+prefix+"/getallwhere", handler.GetAllWhere)
-	r.GET("/"+prefix+"/getone/:id", handler.GetByID)
-	r.GET("/"+prefix+"/getall", handler.GetAll)
-	r.DELETE("/"+prefix+"/delete/:id", handler.Delete)
+	routeGroup := r
+	if authMiddleware != nil {
+		routeGroup = r.Group("")
+		routeGroup.Use(authMiddleware.TryAuth())
+	}
+
+	routeGroup.POST("/"+prefix+"/create", handler.Create)
+	routeGroup.PATCH("/"+prefix+"/update/:id", handler.Update)
+	routeGroup.POST("/"+prefix+"/getallwhere", handler.GetAllWhere)
+	routeGroup.GET("/"+prefix+"/getone/:id", handler.GetByID)
+	routeGroup.GET("/"+prefix+"/getall", handler.GetAll)
+	routeGroup.DELETE("/"+prefix+"/delete/:id", handler.Delete)
 
 }

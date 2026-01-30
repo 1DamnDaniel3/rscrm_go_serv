@@ -7,6 +7,7 @@ import (
 	_ "github.com/1DamnDaniel3/rscrm_go_serv/docs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/bcrypt"
 	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	entityroutes "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/jwt"
 	"github.com/gin-gonic/gin"
@@ -33,18 +34,19 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	// == JWT ==
 	secret := os.Getenv("JWT_SECRET")
 	JWTSigner := jwt.NewJWTAdapter(secret, 5*time.Hour)
+	authMiddleware := middleware.NewAuthMiddleware(JWTSigner)
 
 	// == routes ==
 
-	entityroutes.UserAccountRoutes(api, db, hasher, tx, JWTSigner)
-	entityroutes.UserProfileRoutes(api, db)
-	entityroutes.SchoolRoutes(api, db)
-	entityroutes.LeadRoutes(api, db, tx)
-	entityroutes.GroupRoutes(api, db)
-	entityroutes.StatusRoutes(api, db)
-	entityroutes.SourceRoutes(api, db)
+	entityroutes.UserAccountRoutes(api, db, hasher, tx, JWTSigner, authMiddleware)
+	entityroutes.UserProfileRoutes(api, db, authMiddleware)
+	entityroutes.SchoolRoutes(api, db, authMiddleware)
+	entityroutes.LeadRoutes(api, db, tx, authMiddleware)
+	entityroutes.GroupRoutes(api, db, authMiddleware)
+	entityroutes.StatusRoutes(api, db, authMiddleware)
+	entityroutes.SourceRoutes(api, db, authMiddleware)
 
 	// == related tables routes
 
-	entityroutes.LeadGroupsRoutes(api, db)
+	entityroutes.LeadGroupsRoutes(api, db, authMiddleware)
 }

@@ -20,7 +20,7 @@ func (a *AuthMiddleware) TryAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie("jwt")
 		if err != nil {
-			authHeader := c.GetHeader("Authorisation")
+			authHeader := c.GetHeader("Authorization")
 			if strings.HasPrefix(authHeader, "Bearer ") {
 				token = strings.TrimPrefix(authHeader, "Bearer ")
 			}

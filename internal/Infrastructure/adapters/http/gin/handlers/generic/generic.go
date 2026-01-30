@@ -1,17 +1,20 @@
 package generic
 
 import (
-	"log"
+	"context"
 	"net/http"
 	"strconv"
 
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
 	genericPort "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/generic"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/contextkeys"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
 	"github.com/gin-gonic/gin"
 )
 
 type GenericHandler[T, CreateDTO, ResponceDTO any] struct {
-	repo genericPort.Repository[T]
+	repo       genericPort.Repository[T]
+	JwtService ports.JWTservice
 }
 
 func NewGenericHandler[T, C, R any](repo genericPort.Repository[T]) *GenericHandler[T, C, R] {
@@ -57,8 +60,45 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 		return
 	}
 
-	if err := h.repo.Update(id, fields); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// get school_id from token
+	user, exists := c.Get("user")
+	if !exists {
+
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		return
+	}
+
+	claims, ok := user.(map[string]interface{}) // type try
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
+		return
+	}
+
+	// Извлекаем school_id из claims
+	schoolID, ok := claims["school_id"].(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
+		return
+	}
+
+	ctx := context.WithValue(
+		c.Request.Context(),
+		contextkeys.SchoolID,
+		schoolID,
+	)
+
+	err := h.repo.Update(ctx, id, fields)
+	if err != nil {
+		if err.Error() == "entity not found or access denied" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "access denied",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
@@ -70,10 +110,36 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 // ===========================================================GetByID
 func (h *GenericHandler[T, C, R]) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
-	log.Println("PARAMETER ID IS ", idParam)
+	// get token from school_id
+	user, exists := c.Get("user")
+	if !exists {
+
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		return
+	}
+
+	claims, ok := user.(map[string]interface{}) // type try
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
+		return
+	}
+
+	// Извлекаем school_id из claims
+	schoolID, ok := claims["school_id"].(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
+		return
+	}
+
+	ctx := context.WithValue(
+		c.Request.Context(),
+		contextkeys.SchoolID,
+		schoolID,
+	)
+
 	var entity T
 
-	if err := h.repo.GetByID(idParam, &entity); err != nil {
+	if err := h.repo.GetByID(ctx, idParam, &entity); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -90,10 +156,36 @@ func (h *GenericHandler[T, C, R]) GetAllWhere(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// get school_id from token
+	user, exists := c.Get("user")
+	if !exists {
+
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		return
+	}
+
+	claims, ok := user.(map[string]interface{}) // type try
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
+		return
+	}
+
+	// Извлекаем school_id из claims
+	schoolID, ok := claims["school_id"].(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
+		return
+	}
+
+	ctx := context.WithValue(
+		c.Request.Context(),
+		contextkeys.SchoolID,
+		schoolID,
+	)
 
 	var entities []T
 
-	if err := h.repo.GetAllWhere(fieldsMap, &entities); err != nil {
+	if err := h.repo.GetAllWhere(ctx, fieldsMap, &entities); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -114,8 +206,36 @@ func (h *GenericHandler[T, C, R]) GetAllWhere(c *gin.Context) {
 
 func (h *GenericHandler[T, C, R]) GetAll(c *gin.Context) {
 
+	// get school_id from token
+
+	user, exists := c.Get("user")
+	if !exists {
+
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		return
+	}
+
+	claims, ok := user.(map[string]interface{}) // type try
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
+		return
+	}
+
+	// Извлекаем school_id из claims
+	schoolID, ok := claims["school_id"].(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
+		return
+	}
+
+	ctx := context.WithValue(
+		c.Request.Context(),
+		contextkeys.SchoolID,
+		schoolID,
+	)
+
 	var entities []T
-	if err := h.repo.GetAll(&entities); err != nil {
+	if err := h.repo.GetAll(ctx, &entities); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -136,9 +256,47 @@ func (h *GenericHandler[T, C, R]) GetAll(c *gin.Context) {
 
 func (h *GenericHandler[T, C, R]) Delete(c *gin.Context) {
 	idParam := c.Param("id")
+
+	// get school_id from token
+	user, exists := c.Get("user")
+	if !exists {
+
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
+		return
+	}
+
+	claims, ok := user.(map[string]interface{}) // type try
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
+		return
+	}
+
+	// Извлекаем school_id из claims
+	schoolID, ok := claims["school_id"].(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
+		return
+	}
+
+	ctx := context.WithValue(
+		c.Request.Context(),
+		contextkeys.SchoolID,
+		schoolID,
+	)
+
 	var entity T
-	if err := h.repo.Delete(idParam, &entity); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	err := h.repo.Delete(ctx, idParam, &entity)
+	if err != nil {
+		if err.Error() == "entity not found or access denied" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "access denied",
+			})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
