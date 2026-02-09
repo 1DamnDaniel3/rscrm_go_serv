@@ -8,9 +8,6 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 )
 
-// ТРЕБУЕТ МЕТОДА ПРИНИМАЮЩЕГО ТРАНЗАКЦИЮ В РЕПОЗИТОРИЯХ LEADREPO и LEADGROUPSREPO
-// ЕСТЬ МЫСЛЬ СДЕЛАТЬ ПЕРЕДАТЬ ТРАНЗАКЦИЮ В САМ МЕТОД CREATE GENERIC'У, ЧТОБЫ ВСЕ СУЩНОСТИ
-// ПОЛУЧИЛИ ДОСТУП К ТРАНЗАКЦИЯМ
 type CreateLeadUC struct {
 	tx             services.Transaction
 	leadRepo       entitiesrepos.LeadsRepository

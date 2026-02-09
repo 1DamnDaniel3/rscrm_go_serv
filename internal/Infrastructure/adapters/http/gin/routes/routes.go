@@ -35,18 +35,20 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	secret := os.Getenv("JWT_SECRET")
 	JWTSigner := jwt.NewJWTAdapter(secret, 5*time.Hour)
 	authMiddleware := middleware.NewAuthMiddleware(JWTSigner)
+	tenandMiddleware := middleware.NewTenandMiddleware()
 
 	// == routes ==
 
-	entityroutes.UserAccountRoutes(api, db, hasher, tx, JWTSigner, authMiddleware)
-	entityroutes.UserProfileRoutes(api, db, authMiddleware)
-	entityroutes.SchoolRoutes(api, db, authMiddleware)
-	entityroutes.LeadRoutes(api, db, tx, authMiddleware)
-	entityroutes.GroupRoutes(api, db, authMiddleware)
-	entityroutes.StatusRoutes(api, db, authMiddleware)
-	entityroutes.SourceRoutes(api, db, authMiddleware)
+	entityroutes.UserAccountRoutes(api, db, hasher, tx, JWTSigner, authMiddleware, tenandMiddleware)
+	entityroutes.UserProfileRoutes(api, db, authMiddleware, tenandMiddleware)
+	entityroutes.SchoolRoutes(api, db, authMiddleware, tenandMiddleware)
+	entityroutes.LeadRoutes(api, db, tx, authMiddleware, tenandMiddleware)
+	entityroutes.StudentRoutes(api, db, authMiddleware, tenandMiddleware)
+	entityroutes.GroupRoutes(api, db, authMiddleware, tenandMiddleware)
+	entityroutes.StatusRoutes(api, db, authMiddleware, tenandMiddleware)
+	entityroutes.SourceRoutes(api, db, authMiddleware, tenandMiddleware)
 
 	// == related tables routes
 
-	entityroutes.LeadGroupsRoutes(api, db, authMiddleware)
+	entityroutes.LeadGroupsRoutes(api, db, authMiddleware, tenandMiddleware)
 }

@@ -15,6 +15,7 @@ func LeadGroupsRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 	authMiddleware *middleware.AuthMiddleware,
+	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 	lead_groups_repo := gormentityrepos.NewGormLeadGroupsRepo(db)
 
@@ -24,5 +25,5 @@ func LeadGroupsRoutes(
 		dto.LeadGroupResponseDTO,
 	](lead_groups_repo)
 
-	genericrouter.RegisterCRUDRoutes(r, "lead_groups", authMiddleware, genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "lead_groups", authMiddleware, tenantMiddleware, genericHandler)
 }

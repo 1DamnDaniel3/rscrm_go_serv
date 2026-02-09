@@ -1,13 +1,11 @@
 package generic
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
 	genericPort "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/generic"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/contextkeys"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
 	"github.com/gin-gonic/gin"
 )
@@ -61,31 +59,7 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 	}
 
 	// get school_id from token
-	user, exists := c.Get("user")
-	if !exists {
-
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
-		return
-	}
-
-	claims, ok := user.(map[string]interface{}) // type try
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
-		return
-	}
-
-	// Извлекаем school_id из claims
-	schoolID, ok := claims["school_id"].(string)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
-		return
-	}
-
-	ctx := context.WithValue(
-		c.Request.Context(),
-		contextkeys.SchoolID,
-		schoolID,
-	)
+	ctx := c.Request.Context()
 
 	err := h.repo.Update(ctx, id, fields)
 	if err != nil {
@@ -111,31 +85,7 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 func (h *GenericHandler[T, C, R]) GetByID(c *gin.Context) {
 	idParam := c.Param("id")
 	// get token from school_id
-	user, exists := c.Get("user")
-	if !exists {
-
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
-		return
-	}
-
-	claims, ok := user.(map[string]interface{}) // type try
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
-		return
-	}
-
-	// Извлекаем school_id из claims
-	schoolID, ok := claims["school_id"].(string)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
-		return
-	}
-
-	ctx := context.WithValue(
-		c.Request.Context(),
-		contextkeys.SchoolID,
-		schoolID,
-	)
+	ctx := c.Request.Context()
 
 	var entity T
 
@@ -157,31 +107,7 @@ func (h *GenericHandler[T, C, R]) GetAllWhere(c *gin.Context) {
 		return
 	}
 	// get school_id from token
-	user, exists := c.Get("user")
-	if !exists {
-
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
-		return
-	}
-
-	claims, ok := user.(map[string]interface{}) // type try
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
-		return
-	}
-
-	// Извлекаем school_id из claims
-	schoolID, ok := claims["school_id"].(string)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
-		return
-	}
-
-	ctx := context.WithValue(
-		c.Request.Context(),
-		contextkeys.SchoolID,
-		schoolID,
-	)
+	ctx := c.Request.Context()
 
 	var entities []T
 
@@ -207,32 +133,7 @@ func (h *GenericHandler[T, C, R]) GetAllWhere(c *gin.Context) {
 func (h *GenericHandler[T, C, R]) GetAll(c *gin.Context) {
 
 	// get school_id from token
-
-	user, exists := c.Get("user")
-	if !exists {
-
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
-		return
-	}
-
-	claims, ok := user.(map[string]interface{}) // type try
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
-		return
-	}
-
-	// Извлекаем school_id из claims
-	schoolID, ok := claims["school_id"].(string)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
-		return
-	}
-
-	ctx := context.WithValue(
-		c.Request.Context(),
-		contextkeys.SchoolID,
-		schoolID,
-	)
+	ctx := c.Request.Context()
 
 	var entities []T
 	if err := h.repo.GetAll(ctx, &entities); err != nil {
@@ -258,31 +159,7 @@ func (h *GenericHandler[T, C, R]) Delete(c *gin.Context) {
 	idParam := c.Param("id")
 
 	// get school_id from token
-	user, exists := c.Get("user")
-	if !exists {
-
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found in context"})
-		return
-	}
-
-	claims, ok := user.(map[string]interface{}) // type try
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user data in context"})
-		return
-	}
-
-	// Извлекаем school_id из claims
-	schoolID, ok := claims["school_id"].(string)
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "school_id not found in claims"})
-		return
-	}
-
-	ctx := context.WithValue(
-		c.Request.Context(),
-		contextkeys.SchoolID,
-		schoolID,
-	)
+	ctx := c.Request.Context()
 
 	var entity T
 	err := h.repo.Delete(ctx, idParam, &entity)

@@ -3,6 +3,7 @@ package generic
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
@@ -17,25 +18,38 @@ type GormRepository[T any] struct {
 
 func (r *GormRepository[T]) Create(ctx context.Context, entity *T) error {
 
+	db := r.DBFromCtx(ctx)
+	// Получаем school_id из контекста
+	schoolID, ok := ctx.Value(contextkeys.SchoolID).(string)
+	if !ok {
+		return fmt.Errorf("school_id not found in context")
+	}
+
+	// Через reflect подставляем school_id, если такое поле есть
+	val := reflect.ValueOf(entity).Elem()
+	if field := val.FieldByName("School_id"); field.IsValid() && field.CanSet() {
+		field.SetString(schoolID)
+	}
+
 	if beforeCreate, ok := any(entity).(services.BeforeCreate); ok {
 		if err := beforeCreate.BeforeCreate(); err != nil {
 			return err
 		}
 	}
 
-	return r.dbFromCtx(ctx).Create(entity).Error
+	return db.Create(entity).Error
 }
 
 func (r *GormRepository[T]) GetByID(ctx context.Context, id any, entity *T) error {
-	db := r.dbFromCtx(ctx)
-	db = r.applyTenantFilter(ctx, db)
+	db := r.DBFromCtx(ctx)
+	db = r.ApplyTenantFilter(ctx, db)
 
 	return db.First(entity, "id = ?", id).Error
 }
 
 func (r *GormRepository[T]) GetAllWhere(ctx context.Context, filters map[string]interface{}, entities *[]T) error {
-	db := r.dbFromCtx(ctx)
-	db = r.applyTenantFilter(ctx, db)
+	db := r.DBFromCtx(ctx)
+	db = r.ApplyTenantFilter(ctx, db)
 
 	delete(filters, "school_id")
 
@@ -43,8 +57,8 @@ func (r *GormRepository[T]) GetAllWhere(ctx context.Context, filters map[string]
 }
 
 func (r *GormRepository[T]) GetAll(ctx context.Context, entities *[]T) error {
-	db := r.dbFromCtx(ctx)
-	db = r.applyTenantFilter(ctx, db)
+	db := r.DBFromCtx(ctx)
+	db = r.ApplyTenantFilter(ctx, db)
 
 	return db.Find(entities).Error
 }
@@ -54,8 +68,8 @@ func (r *GormRepository[T]) Update(ctx context.Context, id any, fields map[strin
 		return nil
 	}
 
-	db := r.dbFromCtx(ctx)
-	db = r.applyTenantFilter(ctx, db)
+	db := r.DBFromCtx(ctx)
+	db = r.ApplyTenantFilter(ctx, db)
 
 	delete(fields, "school_id")
 
@@ -76,8 +90,8 @@ func (r *GormRepository[T]) Update(ctx context.Context, id any, fields map[strin
 }
 
 func (r *GormRepository[T]) Delete(ctx context.Context, id any, entity *T) error {
-	db := r.dbFromCtx(ctx)
-	db = r.applyTenantFilter(ctx, db)
+	db := r.DBFromCtx(ctx)
+	db = r.ApplyTenantFilter(ctx, db)
 
 	tx := db.
 		Model(entity).
@@ -99,9 +113,9 @@ func NewGormRepository[T any](db *gorm.DB) *GormRepository[T] {
 	return &GormRepository[T]{db: db}
 }
 
-// --- ============== utils ============== ---
+// --- ========================================== utils ========================================== ---
 
-func (r *GormRepository[T]) applyTenantFilter(
+func (r *GormRepository[T]) ApplyTenantFilter(
 	ctx context.Context,
 	db *gorm.DB,
 ) *gorm.DB {
@@ -120,7 +134,7 @@ func (r *GormRepository[T]) applyTenantFilter(
 }
 
 // If we have transaction in ctx - then we should use db from tx, else use db from repo
-func (r *GormRepository[T]) dbFromCtx(ctx context.Context) *gorm.DB {
+func (r *GormRepository[T]) DBFromCtx(ctx context.Context) *gorm.DB {
 	if tx, ok := ctx.Value(adapters.TxKey{}).(*gorm.DB); ok {
 		return tx
 	}

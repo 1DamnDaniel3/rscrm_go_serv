@@ -15,6 +15,7 @@ func SourceRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 	authMiddleware *middleware.AuthMiddleware,
+	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 	sourceRepo := gormentityrepos.NewGormSoutceRepository(db)
 
@@ -24,5 +25,5 @@ func SourceRoutes(
 		dto.SourceResponseDTO,
 	](sourceRepo)
 
-	genericrouter.RegisterCRUDRoutes(r, "sources", authMiddleware, genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "sources", authMiddleware, tenantMiddleware, genericHandler)
 }

@@ -39,7 +39,9 @@ func (h *GroupedLeadsHandler) GetGroupedLeads(c *gin.Context) {
 
 	entitiesSlice := []entities.Lead{}
 
-	if err := h.uc.Execute(inputDTO.School_id, inputDTO.Group_id, &entitiesSlice); err != nil {
+	ctx := c.Request.Context()
+
+	if err := h.uc.Execute(ctx, inputDTO.Group_id, &entitiesSlice); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -59,8 +61,7 @@ func (h *GroupedLeadsHandler) GetGroupedLeads(c *gin.Context) {
 
 // expecting from HTTP
 type GroupedLeadInputDTO struct {
-	School_id string `json:"school_id"`
-	Group_id  int64  `json:"group_id"`
+	Group_id int64 `json:"group_id"`
 }
 
 // answer

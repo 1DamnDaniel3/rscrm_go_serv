@@ -30,7 +30,7 @@ CREATE TABLE roles(
 CREATE TABLE account_roles(
   id SERIAL PRIMARY KEY,
   account_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
-  role_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
+  role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 

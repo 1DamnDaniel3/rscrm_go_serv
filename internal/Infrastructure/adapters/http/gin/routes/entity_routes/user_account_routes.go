@@ -23,7 +23,8 @@ func UserAccountRoutes(
 	hasher *bcrypt.BcryptHasher,
 	tx services.Transaction,
 	JwtSigner ports.JWTservice,
-	authMiddleware *middleware.AuthMiddleware) {
+	authMiddleware *middleware.AuthMiddleware,
+	tenantMiddleware *middleware.TenantMiddleware) {
 	// ==/== repos
 	userRepo := gormentityrepos.NewGormUserAccountRepo(db, hasher)
 	schoolRepo := gormentityrepos.NewGormSchoolRepo(db)
@@ -47,7 +48,7 @@ func UserAccountRoutes(
 
 	// ==/== routes
 
-	genericRoute.RegisterCRUDRoutes(r, "user_accounts", authMiddleware, genericUserHandler)
+	genericRoute.RegisterCRUDRoutes(r, "user_accounts", authMiddleware, tenantMiddleware, genericUserHandler)
 
 	r.GET("/auth/check", authCheckHandler.CheckAuth)
 	r.POST("/ownerschool/register", registerHandler.Register)

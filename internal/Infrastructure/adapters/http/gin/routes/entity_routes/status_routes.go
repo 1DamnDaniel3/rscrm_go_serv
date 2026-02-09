@@ -15,6 +15,7 @@ func StatusRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 	authMiddleware *middleware.AuthMiddleware,
+	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 	statusRepo := gormentityrepos.NewGormStatusRepository(db)
 
@@ -24,5 +25,5 @@ func StatusRoutes(
 		dto.StatusResponseDTO,
 	](statusRepo)
 
-	genericrouter.RegisterCRUDRoutes(r, "statuses", authMiddleware, genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "statuses", authMiddleware, tenantMiddleware, genericHandler)
 }

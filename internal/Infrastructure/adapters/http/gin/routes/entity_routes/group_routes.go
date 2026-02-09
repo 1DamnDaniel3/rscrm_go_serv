@@ -15,6 +15,7 @@ func GroupRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 	authMiddleware *middleware.AuthMiddleware,
+	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 	groupRepo := gormentityrepos.NewGormGroupRepository(db)
 
@@ -24,5 +25,5 @@ func GroupRoutes(
 		dto.GroupResponseDTO,
 	](groupRepo)
 
-	genericrouter.RegisterCRUDRoutes(r, "groups", authMiddleware, genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "groups", authMiddleware, tenantMiddleware, genericHandler)
 }

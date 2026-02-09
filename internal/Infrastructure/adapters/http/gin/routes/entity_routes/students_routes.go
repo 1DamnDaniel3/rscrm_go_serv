@@ -11,19 +11,18 @@ import (
 	"gorm.io/gorm"
 )
 
-func SchoolRoutes(
+func StudentRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	schoolRepo := gormentityrepos.NewGormSchoolRepo(db)
+	students_repo := gormentityrepos.NewGormStudentsRepo(db)
+	genericStudentsHandler := genericHandler.NewGenericHandler[
+		entities.Student,
+		dto.StudentCreateUpdateDTO,
+		dto.StudentResponseDTO,
+	](students_repo)
 
-	genericHandler := genericHandler.NewGenericHandler[
-		entities.School,
-		dto.SchoolCreateUpdateDTO,
-		dto.SchoolResponseDTO,
-	](schoolRepo)
-
-	genericrouter.RegisterCRUDRoutes(r, "schools", authMiddleware, tenantMiddleware, genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "students", authMiddleware, tenantMiddleware, genericStudentsHandler)
 }

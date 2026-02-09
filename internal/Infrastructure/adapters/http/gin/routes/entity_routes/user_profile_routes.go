@@ -15,6 +15,7 @@ func UserProfileRoutes(
 	r *gin.RouterGroup,
 	db *gorm.DB,
 	authMiddleware *middleware.AuthMiddleware,
+	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 	profileRepo := gormentityrepos.NewGormUserProfileRepo(db)
 
@@ -24,5 +25,5 @@ func UserProfileRoutes(
 		dto.UserProfileResponseDTO,
 	](profileRepo)
 
-	genericrouter.RegisterCRUDRoutes(r, "user_profiles", authMiddleware, genericHandler)
+	genericrouter.RegisterCRUDRoutes(r, "user_profiles", authMiddleware, tenantMiddleware, genericHandler)
 }

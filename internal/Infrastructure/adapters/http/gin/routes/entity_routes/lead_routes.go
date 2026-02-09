@@ -19,6 +19,7 @@ func LeadRoutes(
 	db *gorm.DB,
 	tx services.Transaction,
 	authMiddleware *middleware.AuthMiddleware,
+	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 	leadRepo := gormentityrepos.NewGormLeadsRepo(db)
 	leadGroupsRepo := gormentityrepos.NewGormLeadGroupsRepo(db)
@@ -37,8 +38,8 @@ func LeadRoutes(
 		dto.LeadResponseDTO,
 	](leadRepo)
 
-	genericrouter.RegisterCRUDRoutes(r, "leads", authMiddleware, genericHandler)
-	r.POST("leads/groupedleads", groupedLeadsHandler.GetGroupedLeads)
-	r.POST("leads/createandgroup", createLeadHandler.CreateLead)
+	protected := genericrouter.RegisterCRUDRoutes(r, "leads", authMiddleware, tenantMiddleware, genericHandler)
+	protected.POST("leads/groupedleads", groupedLeadsHandler.GetGroupedLeads)
+	protected.POST("leads/createandgroup", createLeadHandler.CreateLead)
 
 }

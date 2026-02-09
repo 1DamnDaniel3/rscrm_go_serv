@@ -10,16 +10,19 @@ import (
 // r for RouterGroup like `/api/somethings/`
 // Prefix its REST oriented entity name in route like `/cars/`.
 // gin handler with *gin.Context
-func RegisterCRUDRoutes[T any, C any, R any](r *gin.RouterGroup,
+// RETURNS PROTECTED ROUTER GROUP with MIDDLEWARES
+func RegisterCRUDRoutes[T any, C any, R any](
+	r *gin.RouterGroup,
 	prefix string,
 	authMiddleware *middleware.AuthMiddleware,
-	handler *generic.GenericHandler[T, C, R],
-) {
+	tenantMiddleware *middleware.TenantMiddleware,
+	handler *generic.GenericHandler[T, C, R]) *gin.RouterGroup {
 
 	routeGroup := r
 	if authMiddleware != nil {
 		routeGroup = r.Group("")
 		routeGroup.Use(authMiddleware.TryAuth())
+		routeGroup.Use(tenantMiddleware.TryTenand())
 	}
 
 	routeGroup.POST("/"+prefix+"/create", handler.Create)
@@ -29,4 +32,5 @@ func RegisterCRUDRoutes[T any, C any, R any](r *gin.RouterGroup,
 	routeGroup.GET("/"+prefix+"/getall", handler.GetAll)
 	routeGroup.DELETE("/"+prefix+"/delete/:id", handler.Delete)
 
+	return routeGroup
 }
