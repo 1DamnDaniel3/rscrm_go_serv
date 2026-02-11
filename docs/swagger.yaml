@@ -118,6 +118,51 @@ definitions:
         example: +7-999-123-45-67
         type: string
     type: object
+  dto.StudentCreateUpdateDTO:
+    properties:
+      birthdate:
+        type: string
+      contact:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      school_id:
+        type: string
+      skill_level:
+        type: string
+    type: object
+  dto.StudentGroupCreateUpdateDTO:
+    properties:
+      group_id:
+        type: integer
+      id:
+        type: integer
+      school_id:
+        type: string
+      student_id:
+        type: integer
+    type: object
+  dto.StudentResponseDTO:
+    properties:
+      birthdate:
+        type: string
+      contact:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      school_id:
+        type: string
+      skill_level:
+        type: string
+    type: object
   dto.UserAccountResponseDTO:
     properties:
       created_at:
@@ -133,8 +178,6 @@ definitions:
     properties:
       group_id:
         type: integer
-      school_id:
-        type: string
     type: object
   leadhandlers.GroupedLeadOutputDTO:
     properties:
@@ -149,6 +192,25 @@ definitions:
         $ref: '#/definitions/dto.LeadGroupCreateUpdateDTO'
       lead:
         $ref: '#/definitions/dto.LeadCreateUpdateDTO'
+    type: object
+  studenthandlers.GroupedStudentsInputDTO:
+    properties:
+      group_id:
+        type: integer
+    type: object
+  studenthandlers.GroupedStudentsOutputDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.StudentCreateUpdateDTO'
+        type: array
+    type: object
+  studenthandlers.СreateStudentInputDto:
+    properties:
+      group:
+        $ref: '#/definitions/dto.StudentGroupCreateUpdateDTO'
+      student:
+        $ref: '#/definitions/dto.StudentCreateUpdateDTO'
     type: object
   user.AuthCheckResponse:
     properties:
@@ -232,7 +294,7 @@ paths:
       - application/json
       description: Позволяет получить сгруппированных лидов школы
       parameters:
-      - description: Фильтры group_id и school_id
+      - description: 'Фильтры: group_id и school_id(из токена авто)'
         in: body
         name: input
         required: true
@@ -286,6 +348,70 @@ paths:
       summary: Регистрация новой школы
       tags:
       - Auth
+  /api/students/createandgroup:
+    post:
+      consumes:
+      - application/json
+      description: Транзакция на создания ученика с записью в student_groups
+      parameters:
+      - description: Данные для создания студента и привязке к группе
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/studenthandlers.%D0%A1reateStudentInputDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.StudentResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: StudentsAndGroups
+      tags:
+      - Students
+  /api/students/groupedstudents:
+    post:
+      consumes:
+      - application/json
+      description: Позволяет получить сгруппированных учеников школы
+      parameters:
+      - description: 'Фильтры: group_id и school_id(из токена авто)'
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/studenthandlers.GroupedStudentsInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/studenthandlers.GroupedStudentsOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: GroupedStudents
+      tags:
+      - Students
   /api/useraccounts/login:
     post:
       consumes:

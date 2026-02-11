@@ -1,7 +1,6 @@
 package leadhandlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/leadUCs"
@@ -38,7 +37,6 @@ func (h *CreateLeadHandler) CreateLead(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(DTO)
 	lead := mapper.MapDTOToDomain[dto.LeadCreateUpdateDTO, entities.Lead](&DTO.Lead)
 	leadGroup := mapper.MapDTOToDomain[dto.LeadGroupCreateUpdateDTO, entities.LeadGroup](&DTO.LeadGroup)
 

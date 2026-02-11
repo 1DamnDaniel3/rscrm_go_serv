@@ -110,7 +110,7 @@ const docTemplate = `{
                 "summary": "GroupedLeads",
                 "parameters": [
                     {
-                        "description": "Фильтры group_id и school_id",
+                        "description": "Фильтры: group_id и school_id(из токена авто)",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -181,6 +181,102 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/students/createandgroup": {
+            "post": {
+                "description": "Транзакция на создания ученика с записью в student_groups",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "StudentsAndGroups",
+                "parameters": [
+                    {
+                        "description": "Данные для создания студента и привязке к группе",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/studenthandlers.%D0%A1reateStudentInputDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StudentResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/students/groupedstudents": {
+            "post": {
+                "description": "Позволяет получить сгруппированных учеников школы",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "GroupedStudents",
+                "parameters": [
+                    {
+                        "description": "Фильтры: group_id и school_id(из токена авто)",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/studenthandlers.GroupedStudentsInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/studenthandlers.GroupedStudentsOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -429,6 +525,75 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.StudentCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string"
+                },
+                "contact": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "skill_level": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.StudentGroupCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "group_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.StudentResponseDTO": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string"
+                },
+                "contact": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "skill_level": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UserAccountResponseDTO": {
             "type": "object",
             "properties": {
@@ -451,9 +616,6 @@ const docTemplate = `{
             "properties": {
                 "group_id": {
                     "type": "integer"
-                },
-                "school_id": {
-                    "type": "string"
                 }
             }
         },
@@ -476,6 +638,36 @@ const docTemplate = `{
                 },
                 "lead": {
                     "$ref": "#/definitions/dto.LeadCreateUpdateDTO"
+                }
+            }
+        },
+        "studenthandlers.GroupedStudentsInputDTO": {
+            "type": "object",
+            "properties": {
+                "group_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "studenthandlers.GroupedStudentsOutputDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.StudentCreateUpdateDTO"
+                    }
+                }
+            }
+        },
+        "studenthandlers.СreateStudentInputDto": {
+            "type": "object",
+            "properties": {
+                "group": {
+                    "$ref": "#/definitions/dto.StudentGroupCreateUpdateDTO"
+                },
+                "student": {
+                    "$ref": "#/definitions/dto.StudentCreateUpdateDTO"
                 }
             }
         },

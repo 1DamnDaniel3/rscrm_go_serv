@@ -24,7 +24,7 @@ func NewGroupedLeadsHandler(uc leadUCs.IGroupedLeadsUC) *GroupedLeadsHandler {
 // @Tags         Leads
 // @Accept       json
 // @Produce      json
-// @Param        input  body     GroupedLeadInputDTO  true  "Фильтры group_id и school_id"
+// @Param        input  body     GroupedLeadInputDTO  true  "Фильтры: group_id и school_id(из токена авто)"
 // @Success      200	{object} GroupedLeadOutputDTO
 // @Failure      400    {object}  map[string]interface{}
 // @Failure      500    {object}  map[string]interface{}
