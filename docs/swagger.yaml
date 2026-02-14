@@ -1,4 +1,23 @@
 definitions:
+  clienthandlers.GetGroupedClientsInputDTO:
+    properties:
+      group_id:
+        type: integer
+    type: object
+  clienthandlers.GetGroupedClientsOutputDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.ClientCreateUpdateDTO'
+        type: array
+    type: object
+  clienthandlers.СreateGroupedClientInputDto:
+    properties:
+      client:
+        $ref: '#/definitions/dto.ClientCreateUpdateDTO'
+      group:
+        $ref: '#/definitions/dto.ClientGroupCreateUpdateDTO'
+    type: object
   dto.AccountDTO:
     properties:
       email:
@@ -6,6 +25,51 @@ definitions:
         type: string
       password:
         example: secret
+        type: string
+    type: object
+  dto.ClientCreateUpdateDTO:
+    properties:
+      birthdate:
+        type: string
+      contact:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      school_id:
+        type: string
+    type: object
+  dto.ClientGroupCreateUpdateDTO:
+    properties:
+      client_id:
+        type: integer
+      group_id:
+        type: integer
+      id:
+        type: integer
+      school_id:
+        type: string
+    type: object
+  dto.ClientResponseDTO:
+    properties:
+      birthdate:
+        type: string
+      contact:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      school_id:
         type: string
     type: object
   dto.LeadCreateUpdateDTO:
@@ -256,6 +320,38 @@ paths:
       summary: Проверка авторизации
       tags:
       - Auth
+  /api/clients/createandgroup:
+    post:
+      consumes:
+      - application/json
+      description: Позволяет получить сгруппированных лидов школы
+      parameters:
+      - description: 'Фильтры: group_id и school_id(из токена авто)'
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/clienthandlers.%D0%A1reateGroupedClientInputDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ClientResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Createandgroup
+      tags:
+      - Clients
   /api/leads/createandgroup:
     post:
       consumes:
@@ -288,6 +384,38 @@ paths:
       summary: LeadsAndGroups
       tags:
       - Leads
+  /api/leads/groupedclients:
+    post:
+      consumes:
+      - application/json
+      description: Позволяет получить сгруппированных лидов школы
+      parameters:
+      - description: 'Фильтры: group_id и school_id(из токена авто)'
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/clienthandlers.GetGroupedClientsInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/clienthandlers.GetGroupedClientsOutputDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: GetGroupedClients
+      tags:
+      - Clients
   /api/leads/groupedleads:
     post:
       consumes:

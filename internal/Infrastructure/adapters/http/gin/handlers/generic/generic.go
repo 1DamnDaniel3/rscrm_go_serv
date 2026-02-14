@@ -15,6 +15,7 @@ type GenericHandler[T, CreateDTO, ResponceDTO any] struct {
 	JwtService ports.JWTservice
 }
 
+// T - entity, C - CreateDTO, R - ResponseDTO
 func NewGenericHandler[T, C, R any](repo genericPort.Repository[T]) *GenericHandler[T, C, R] {
 	return &GenericHandler[T, C, R]{repo: repo}
 }

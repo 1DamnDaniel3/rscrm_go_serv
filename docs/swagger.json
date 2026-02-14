@@ -36,6 +36,54 @@
                 }
             }
         },
+        "/api/clients/createandgroup": {
+            "post": {
+                "description": "Позволяет получить сгруппированных лидов школы",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Createandgroup",
+                "parameters": [
+                    {
+                        "description": "Фильтры: group_id и school_id(из токена авто)",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/clienthandlers.%D0%A1reateGroupedClientInputDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ClientResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/leads/createandgroup": {
             "post": {
                 "description": "Транзакция на создания лида с записью в lead_groups",
@@ -65,6 +113,54 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.LeadResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/leads/groupedclients": {
+            "post": {
+                "description": "Позволяет получить сгруппированных лидов школы",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "GetGroupedClients",
+                "parameters": [
+                    {
+                        "description": "Фильтры: group_id и school_id(из токена авто)",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/clienthandlers.GetGroupedClientsInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/clienthandlers.GetGroupedClientsOutputDTO"
                         }
                     },
                     "400": {
@@ -336,6 +432,36 @@
         }
     },
     "definitions": {
+        "clienthandlers.GetGroupedClientsInputDTO": {
+            "type": "object",
+            "properties": {
+                "group_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "clienthandlers.GetGroupedClientsOutputDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ClientCreateUpdateDTO"
+                    }
+                }
+            }
+        },
+        "clienthandlers.СreateGroupedClientInputDto": {
+            "type": "object",
+            "properties": {
+                "client": {
+                    "$ref": "#/definitions/dto.ClientCreateUpdateDTO"
+                },
+                "group": {
+                    "$ref": "#/definitions/dto.ClientGroupCreateUpdateDTO"
+                }
+            }
+        },
         "dto.AccountDTO": {
             "type": "object",
             "properties": {
@@ -346,6 +472,75 @@
                 "password": {
                     "type": "string",
                     "example": "secret"
+                }
+            }
+        },
+        "dto.ClientCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string"
+                },
+                "contact": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ClientGroupCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "client_id": {
+                    "type": "integer"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ClientResponseDTO": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string"
+                },
+                "contact": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
                 }
             }
         },
