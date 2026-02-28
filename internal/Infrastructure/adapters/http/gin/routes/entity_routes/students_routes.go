@@ -22,19 +22,31 @@ func StudentRoutes(
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 	students_repo := gormentityrepos.NewGormStudentsRepo(db)
+	gormStudentsQueryService := gormentityrepos.NewGormStudentQueryService(db)
 	studentGroups_repo := gormentityrepos.NewGormStudentGroupsRepo(db)
+	// generic
 	genericStudentsHandler := genericHandler.NewGenericHandler[
 		entities.Student,
 		dto.StudentCreateUpdateDTO,
 		dto.StudentResponseDTO,
 	](students_repo)
+	//groupedstudents
 	getGroupedUC := studentucs.NewGroupedStudentsUC(students_repo)
 	groupedHandler := studenthandlers.NewGetGroupedHandler(getGroupedUC)
 
+	// createandgroup
 	createAndGroupUC := studentucs.NewCreateStudentUC(tx, students_repo, studentGroups_repo)
 	createAndGroupHandler := studenthandlers.NewCreateStudentHandler(createAndGroupUC)
 
+	// students/{id}/clients
+	studnetClientsUC := studentucs.NewGetStudentClientsUC(gormStudentsQueryService)
+	studentClientsHandler := studenthandlers.NewStudentClientsHandler(studnetClientsUC)
+
 	protected := genericrouter.RegisterCRUDRoutes(r, "students", authMiddleware, tenantMiddleware, genericStudentsHandler)
+	protected.GET("/students/:id/clients", studentClientsHandler.GetStudentClients)
 	protected.POST("/students/groupedstudents", groupedHandler.GetGroupedStudents)
 	protected.POST("/students/createandgroup", createAndGroupHandler.CreateStudent)
+
+	// nested routes
+
 }

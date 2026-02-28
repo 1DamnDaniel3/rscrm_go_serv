@@ -6,7 +6,6 @@ import (
 
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/userUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/transactions/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -21,8 +20,8 @@ type RegisterHandler struct {
 // @Tags         Auth
 // @Accept       json
 // @Produce      json
-// @Param        input  body      dto.RegisterInput  true  "Данные для регистрации"
-// @Success      200    {object}  dto.RegisterOutput
+// @Param        input  body      RegisterInput  true  "Данные для регистрации"
+// @Success      200    {object}  RegisterOutput
 // @Failure      400    {object}  map[string]string
 // @Router       /api/ownerschool/register [post]
 func NewRegisterHandler(uc userUCs.IRegisterUseCase) *RegisterHandler {
@@ -30,7 +29,7 @@ func NewRegisterHandler(uc userUCs.IRegisterUseCase) *RegisterHandler {
 }
 
 func (h *RegisterHandler) Register(c *gin.Context) {
-	var input dto.RegisterInput
+	var input RegisterInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -72,9 +71,44 @@ func (h *RegisterHandler) Register(c *gin.Context) {
 
 	// маппим ответ
 
-	output := dto.RegisterOutput{
+	output := RegisterOutput{
 		School_id: outputEnity.Id,
 	}
 
 	c.JSON(http.StatusOK, output)
+}
+
+// ============= DTO =============
+
+// RegisterInput входные данные для регистрации
+type RegisterInput struct {
+	School  SchoolDTO  `json:"school"`
+	Account AccountDTO `json:"account"`
+	Profile ProfileDTO `json:"profile"`
+}
+
+// RegisterOutput данные, возвращаемые после успешной регистрации
+type RegisterOutput struct {
+	School_id string `json:"school_id" example:"bbeb26e7-7a3a-4bcf-8a70-338f362eabd1"`
+}
+
+// SchoolDTO данные о школе
+type SchoolDTO struct {
+	Name  string `json:"name" example:"Right Step"`
+	City  string `json:"city" example:"Тимашевск"`
+	Phone string `json:"phone" example:"+7-999-123-45-67"`
+	Email string `json:"email" example:"popov@gmail.com"`
+}
+
+// AccountDTO данные для аккаунта
+type AccountDTO struct {
+	Email    string `json:"email" example:"popov@gmail.com"`
+	Password string `json:"password" example:"secret"`
+}
+
+// ProfileDTO данные профиля пользователя
+type ProfileDTO struct {
+	FullName  string    `json:"full_name" example:"Артём Попов"`
+	Phone     string    `json:"phone" example:"+7-999-123-45-67"`
+	Birthdate time.Time `json:"birthdate" example:"1985-01-01T00:00:00Z"`
 }

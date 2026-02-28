@@ -11,3 +11,8 @@ type ClientRepo interface {
 	generic.Repository[entities.Client]
 	GetGroupedClients(ctx context.Context, group_id int64, entities *[]entities.Client) error
 }
+
+type ClientsQueryService interface {
+	// GetClientStudents(ctx context.Context, student_id int64, clientsSlice *[]businessobjects.GetStudentClientsBO) error
+	Search(ctx context.Context, input string, clientSlice *[]entities.Client) error
+}

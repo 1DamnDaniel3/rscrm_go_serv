@@ -95,6 +95,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/clients/search": {
+            "get": {
+                "description": "Через ?q= параметр получить clients",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Search",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "q - QueryParameter",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/clienthandlers.ClientSearchHandlerDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/leads/createandgroup": {
             "post": {
                 "description": "Транзакция на создания лида с записью в lead_groups",
@@ -259,7 +305,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterInput"
+                            "$ref": "#/definitions/transactions.RegisterInput"
                         }
                     }
                 ],
@@ -267,7 +313,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.RegisterOutput"
+                            "$ref": "#/definitions/transactions.RegisterOutput"
                         }
                     },
                     "400": {
@@ -277,6 +323,54 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/student-clients/createandgetBO": {
+            "post": {
+                "description": "Нужен, чтобы создать связь, получив при этом в ответ StudentClients бизнес-объект StudentClients",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StudentClient"
+                ],
+                "summary": "CreateRelation",
+                "parameters": [
+                    {
+                        "description": "Обычный studentClient на вход",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.StudentClientCreateUpdateDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/bodtos.BoDTO_StudentClientsReponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -378,6 +472,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/students/{id}/clients": {
+            "get": {
+                "description": "Получить всех клиентов студента с метаданными (is_payer, relation)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "GetStudentClients",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID студента",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/studenthandlers.GetStudentClientsResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/useraccounts/login": {
             "post": {
                 "description": "Вход стандарт email password, запись в httpOnly Cookies JWT",
@@ -443,6 +583,52 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "bodtos.BoDTO_StudentClientsReponse": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string"
+                },
+                "contact": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_payer": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "relation": {
+                    "type": "string"
+                },
+                "relation_id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "clienthandlers.ClientSearchHandlerDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.ClientResponseDTO"
+                    }
+                }
+            }
+        },
         "clienthandlers.GetGroupedClientsInputDTO": {
             "type": "object",
             "properties": {
@@ -470,19 +656,6 @@ const docTemplate = `{
                 },
                 "group": {
                     "$ref": "#/definitions/dto.ClientGroupCreateUpdateDTO"
-                }
-            }
-        },
-        "dto.AccountDTO": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "example": "popov@gmail.com"
-                },
-                "password": {
-                    "type": "string",
-                    "example": "secret"
                 }
             }
         },
@@ -659,64 +832,26 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ProfileDTO": {
+        "dto.StudentClientCreateUpdateDTO": {
             "type": "object",
             "properties": {
-                "birthdate": {
-                    "type": "string",
-                    "example": "1985-01-01T00:00:00Z"
+                "client_id": {
+                    "type": "integer"
                 },
-                "full_name": {
-                    "type": "string",
-                    "example": "Артём Попов"
+                "id": {
+                    "type": "integer"
                 },
-                "phone": {
-                    "type": "string",
-                    "example": "+7-999-123-45-67"
-                }
-            }
-        },
-        "dto.RegisterInput": {
-            "type": "object",
-            "properties": {
-                "account": {
-                    "$ref": "#/definitions/dto.AccountDTO"
+                "is_payer": {
+                    "type": "boolean"
                 },
-                "profile": {
-                    "$ref": "#/definitions/dto.ProfileDTO"
+                "relation": {
+                    "type": "string"
                 },
-                "school": {
-                    "$ref": "#/definitions/dto.SchoolDTO"
-                }
-            }
-        },
-        "dto.RegisterOutput": {
-            "type": "object",
-            "properties": {
                 "school_id": {
-                    "type": "string",
-                    "example": "bbeb26e7-7a3a-4bcf-8a70-338f362eabd1"
-                }
-            }
-        },
-        "dto.SchoolDTO": {
-            "type": "object",
-            "properties": {
-                "city": {
-                    "type": "string",
-                    "example": "Тимашевск"
+                    "type": "string"
                 },
-                "email": {
-                    "type": "string",
-                    "example": "popov@gmail.com"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Right Step"
-                },
-                "phone": {
-                    "type": "string",
-                    "example": "+7-999-123-45-67"
+                "student_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -836,6 +971,17 @@ const docTemplate = `{
                 }
             }
         },
+        "studenthandlers.GetStudentClientsResponseDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bodtos.BoDTO_StudentClientsReponse"
+                    }
+                }
+            }
+        },
         "studenthandlers.GroupedStudentsInputDTO": {
             "type": "object",
             "properties": {
@@ -863,6 +1009,80 @@ const docTemplate = `{
                 },
                 "student": {
                     "$ref": "#/definitions/dto.StudentCreateUpdateDTO"
+                }
+            }
+        },
+        "transactions.AccountDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "popov@gmail.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "secret"
+                }
+            }
+        },
+        "transactions.ProfileDTO": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string",
+                    "example": "1985-01-01T00:00:00Z"
+                },
+                "full_name": {
+                    "type": "string",
+                    "example": "Артём Попов"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+7-999-123-45-67"
+                }
+            }
+        },
+        "transactions.RegisterInput": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "$ref": "#/definitions/transactions.AccountDTO"
+                },
+                "profile": {
+                    "$ref": "#/definitions/transactions.ProfileDTO"
+                },
+                "school": {
+                    "$ref": "#/definitions/transactions.SchoolDTO"
+                }
+            }
+        },
+        "transactions.RegisterOutput": {
+            "type": "object",
+            "properties": {
+                "school_id": {
+                    "type": "string",
+                    "example": "bbeb26e7-7a3a-4bcf-8a70-338f362eabd1"
+                }
+            }
+        },
+        "transactions.SchoolDTO": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string",
+                    "example": "Тимашевск"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "popov@gmail.com"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Right Step"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+7-999-123-45-67"
                 }
             }
         },

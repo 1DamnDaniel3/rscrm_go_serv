@@ -1,4 +1,34 @@
 definitions:
+  bodtos.BoDTO_StudentClientsReponse:
+    properties:
+      birthdate:
+        type: string
+      contact:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      is_payer:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+      relation:
+        type: string
+      relation_id:
+        type: integer
+      school_id:
+        type: string
+    type: object
+  clienthandlers.ClientSearchHandlerDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.ClientResponseDTO'
+        type: array
+    type: object
   clienthandlers.GetGroupedClientsInputDTO:
     properties:
       group_id:
@@ -17,15 +47,6 @@ definitions:
         $ref: '#/definitions/dto.ClientCreateUpdateDTO'
       group:
         $ref: '#/definitions/dto.ClientGroupCreateUpdateDTO'
-    type: object
-  dto.AccountDTO:
-    properties:
-      email:
-        example: popov@gmail.com
-        type: string
-      password:
-        example: secret
-        type: string
     type: object
   dto.ClientCreateUpdateDTO:
     properties:
@@ -140,47 +161,20 @@ definitions:
       password:
         type: string
     type: object
-  dto.ProfileDTO:
+  dto.StudentClientCreateUpdateDTO:
     properties:
-      birthdate:
-        example: "1985-01-01T00:00:00Z"
+      client_id:
+        type: integer
+      id:
+        type: integer
+      is_payer:
+        type: boolean
+      relation:
         type: string
-      full_name:
-        example: Артём Попов
-        type: string
-      phone:
-        example: +7-999-123-45-67
-        type: string
-    type: object
-  dto.RegisterInput:
-    properties:
-      account:
-        $ref: '#/definitions/dto.AccountDTO'
-      profile:
-        $ref: '#/definitions/dto.ProfileDTO'
-      school:
-        $ref: '#/definitions/dto.SchoolDTO'
-    type: object
-  dto.RegisterOutput:
-    properties:
       school_id:
-        example: bbeb26e7-7a3a-4bcf-8a70-338f362eabd1
         type: string
-    type: object
-  dto.SchoolDTO:
-    properties:
-      city:
-        example: Тимашевск
-        type: string
-      email:
-        example: popov@gmail.com
-        type: string
-      name:
-        example: Right Step
-        type: string
-      phone:
-        example: +7-999-123-45-67
-        type: string
+      student_id:
+        type: integer
     type: object
   dto.StudentCreateUpdateDTO:
     properties:
@@ -257,6 +251,13 @@ definitions:
       lead:
         $ref: '#/definitions/dto.LeadCreateUpdateDTO'
     type: object
+  studenthandlers.GetStudentClientsResponseDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/bodtos.BoDTO_StudentClientsReponse'
+        type: array
+    type: object
   studenthandlers.GroupedStudentsInputDTO:
     properties:
       group_id:
@@ -275,6 +276,57 @@ definitions:
         $ref: '#/definitions/dto.StudentGroupCreateUpdateDTO'
       student:
         $ref: '#/definitions/dto.StudentCreateUpdateDTO'
+    type: object
+  transactions.AccountDTO:
+    properties:
+      email:
+        example: popov@gmail.com
+        type: string
+      password:
+        example: secret
+        type: string
+    type: object
+  transactions.ProfileDTO:
+    properties:
+      birthdate:
+        example: "1985-01-01T00:00:00Z"
+        type: string
+      full_name:
+        example: Артём Попов
+        type: string
+      phone:
+        example: +7-999-123-45-67
+        type: string
+    type: object
+  transactions.RegisterInput:
+    properties:
+      account:
+        $ref: '#/definitions/transactions.AccountDTO'
+      profile:
+        $ref: '#/definitions/transactions.ProfileDTO'
+      school:
+        $ref: '#/definitions/transactions.SchoolDTO'
+    type: object
+  transactions.RegisterOutput:
+    properties:
+      school_id:
+        example: bbeb26e7-7a3a-4bcf-8a70-338f362eabd1
+        type: string
+    type: object
+  transactions.SchoolDTO:
+    properties:
+      city:
+        example: Тимашевск
+        type: string
+      email:
+        example: popov@gmail.com
+        type: string
+      name:
+        example: Right Step
+        type: string
+      phone:
+        example: +7-999-123-45-67
+        type: string
     type: object
   user.AuthCheckResponse:
     properties:
@@ -350,6 +402,37 @@ paths:
             additionalProperties: true
             type: object
       summary: Createandgroup
+      tags:
+      - Clients
+  /api/clients/search:
+    get:
+      consumes:
+      - application/json
+      description: Через ?q= параметр получить clients
+      parameters:
+      - description: q - QueryParameter
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/clienthandlers.ClientSearchHandlerDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search
       tags:
       - Clients
   /api/leads/createandgroup:
@@ -459,14 +542,14 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/dto.RegisterInput'
+          $ref: '#/definitions/transactions.RegisterInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.RegisterOutput'
+            $ref: '#/definitions/transactions.RegisterOutput'
         "400":
           description: Bad Request
           schema:
@@ -476,6 +559,70 @@ paths:
       summary: Регистрация новой школы
       tags:
       - Auth
+  /api/student-clients/createandgetBO:
+    post:
+      consumes:
+      - application/json
+      description: Нужен, чтобы создать связь, получив при этом в ответ StudentClients
+        бизнес-объект StudentClients
+      parameters:
+      - description: Обычный studentClient на вход
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.StudentClientCreateUpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/bodtos.BoDTO_StudentClientsReponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: CreateRelation
+      tags:
+      - StudentClient
+  /api/students/{id}/clients:
+    get:
+      consumes:
+      - application/json
+      description: Получить всех клиентов студента с метаданными (is_payer, relation)
+      parameters:
+      - description: ID студента
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/studenthandlers.GetStudentClientsResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: GetStudentClients
+      tags:
+      - Students
   /api/students/createandgroup:
     post:
       consumes:

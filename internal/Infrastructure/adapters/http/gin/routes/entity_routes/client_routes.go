@@ -22,6 +22,7 @@ func ClientRoutes(
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 	clientRepo := gormentityrepos.NewGormClientRepo(db)
+	clientQueryService := gormentityrepos.NewGormClientQueryService(db)
 	clientGroupRepo := gormentityrepos.NewGormClientGroupRepo(db)
 
 	// Get Grouped
@@ -32,6 +33,10 @@ func ClientRoutes(
 	createGroupedUC := clientucs.NewCreateGroupedClientUC(tx, clientGroupRepo, clientRepo)
 	createGropedHandler := clienthandlers.NewCreateGroupedClientHandler(createGroupedUC)
 
+	// Search
+	searchHandler := clienthandlers.NewClientSearchHandler(clientQueryService)
+
+	// Generic
 	genericHandler := generic.NewGenericHandler[
 		entities.Client,
 		dto.ClientCreateUpdateDTO,
@@ -41,5 +46,6 @@ func ClientRoutes(
 	protected := genericrouter.RegisterCRUDRoutes(r, "clients", authMiddleware, tenantMiddleware, genericHandler)
 	protected.POST("clients/groupedclients", groupedHandler.GetGroupedClients)
 	protected.POST("clients/createandgroup", createGropedHandler.CreateGroupedClient)
+	protected.GET("clients/search", searchHandler.Search)
 
 }

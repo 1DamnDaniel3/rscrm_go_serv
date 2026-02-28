@@ -87,7 +87,7 @@ CREATE TABLE students (
   id SERIAL PRIMARY KEY,
   name TEXT,
   birthdate DATE,
-  skill_level VARCHAR(8) CHECK (skill_level IN ('beginner', 'middle', 'pro')), -- новый столбец
+  skill_level VARCHAR(8) CHECK (skill_level IN ('beginner', 'middle', 'pro')), 
   contact TEXT, -- новый столбец
   created_at TIMESTAMP DEFAULT NOW(),
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE

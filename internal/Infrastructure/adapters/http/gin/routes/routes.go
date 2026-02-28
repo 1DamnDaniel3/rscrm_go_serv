@@ -50,6 +50,7 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	entityroutes.SourceRoutes(api, db, authMiddleware, tenandMiddleware)
 
 	// == related tables routes
+	entityroutes.StudentClientRoutes(api, db, tx, authMiddleware, tenandMiddleware)
 
 	entityroutes.LeadGroupsRoutes(api, db, authMiddleware, tenandMiddleware)
 }
