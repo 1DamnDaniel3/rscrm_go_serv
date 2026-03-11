@@ -62,3 +62,38 @@ func (r *GormClientQueryService) Search(ctx context.Context, input string, clien
 		Where("c.school_id = ? AND (c.name ILIKE ?)", schoolID, "%"+input+"%").
 		Find(clientSlice).Error
 }
+
+func (r *GormClientQueryService) GetClientGroups(ctx context.Context,
+	client_id int64, groupSlice *[]entities.Group) error {
+	db := gormutils.DBFromCtx(ctx, r.db)
+	// db = gormutils.ApplyTenantFilter[entities.Client](ctx, db)
+	schoolID, ok := ctx.Value(contextkeys.SchoolID).(string)
+	if !ok {
+		return fmt.Errorf("school_id not found in context")
+	}
+	return db.
+		Table("client_groups cg").
+		Select("g.*").
+		Joins("JOIN groups g ON g.id = cg.group_id").
+		Where("cg.client_id = ? AND g.school_id = ?", client_id, schoolID).
+		Find(groupSlice).Error
+}
+
+func (r *GormClientQueryService) GetClientStudents(
+	ctx context.Context,
+	client_id int64,
+	studentsSlice *[]entities.Student) error {
+	db := gormutils.DBFromCtx(ctx, r.db)
+	schoolID, ok := ctx.Value(contextkeys.SchoolID).(string)
+	if !ok {
+		return fmt.Errorf("school_id not found in context")
+	}
+
+	return db.
+		Table("clients c").
+		Select("s.*, sc.id AS relation_id").
+		Joins("JOIN student_clients sc ON c.id = sc.client_id").
+		Joins("JOIN students s ON sc.student_id = s.id").
+		Where("c.id = ? AND sc.school_id = ?", client_id, schoolID).
+		Scan(studentsSlice).Error
+}

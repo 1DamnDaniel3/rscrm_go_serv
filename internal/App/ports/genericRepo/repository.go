@@ -1,4 +1,4 @@
-package generic
+package genericrepo
 
 import "context"
 

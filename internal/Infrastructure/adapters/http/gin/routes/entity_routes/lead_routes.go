@@ -5,7 +5,8 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
+	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
+
 	leadhandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/leadHandlers"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
@@ -24,22 +25,19 @@ func LeadRoutes(
 	leadRepo := gormentityrepos.NewGormLeadsRepo(db)
 	leadGroupsRepo := gormentityrepos.NewGormLeadGroupsRepo(db)
 
-	// Grouped Leads
-	groupedLeadsUC := leadUCs.NewGroupedLeadsUC(leadRepo)
-	groupedLeadsHandler := leadhandlers.NewGroupedLeadsHandler(groupedLeadsUC)
+	// lead-groups
+	groupedLeadsUC := leadUCs.NewGroupedLeadsUC(leadRepo)                  // Grouped Leads
+	createLeadsUC := leadUCs.NewCreateLeadUC(tx, leadRepo, leadGroupsRepo) // CreateLead
+	leadGroupsHandler := leadhandlers.NewLeadGroupsHandler(createLeadsUC, groupedLeadsUC)
 
-	// CreateLead
-	createLeadsUC := leadUCs.NewCreateLeadUC(tx, leadRepo, leadGroupsRepo)
-	createLeadHandler := leadhandlers.NewCreateLeadHandler(createLeadsUC)
-
-	genericHandler := generic.NewGenericHandler[
+	genericHandler := genericHandler.NewGenericHandler[
 		entities.Lead,
 		dto.LeadCreateUpdateDTO,
 		dto.LeadResponseDTO,
 	](leadRepo)
 
 	protected := genericrouter.RegisterCRUDRoutes(r, "leads", authMiddleware, tenantMiddleware, genericHandler)
-	protected.POST("leads/groupedleads", groupedLeadsHandler.GetGroupedLeads)
-	protected.POST("leads/createandgroup", createLeadHandler.CreateLead)
+	protected.POST("leads/groupedleads", leadGroupsHandler.GetGroupedLeads)
+	protected.POST("leads/createandgroup", leadGroupsHandler.CreateLead)
 
 }

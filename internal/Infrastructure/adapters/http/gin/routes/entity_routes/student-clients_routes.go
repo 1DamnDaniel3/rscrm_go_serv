@@ -5,7 +5,8 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
+	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
+
 	studentclienthandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/studentClientHandlers"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
@@ -24,7 +25,7 @@ func StudentClientRoutes(
 	stud_cliRepo := gormentityrepos.NewGormStudentClientsRepo(db)
 	clientRepo := gormentityrepos.NewGormClientRepo(db)
 
-	stud_cliHandler := generic.NewGenericHandler[
+	stud_cliHandler := genericHandler.NewGenericHandler[
 		entities.StudentClient,
 		dto.StudentClientCreateUpdateDTO,
 		dto.StudentClientResponseDTO,

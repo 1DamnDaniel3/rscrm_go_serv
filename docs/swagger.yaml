@@ -7,6 +7,10 @@ definitions:
         type: string
       created_at:
         type: string
+      groups:
+        items:
+          $ref: '#/definitions/dto.GroupResponseDTO'
+        type: array
       id:
         type: integer
       is_payer:
@@ -29,6 +33,13 @@ definitions:
           $ref: '#/definitions/dto.ClientResponseDTO'
         type: array
     type: object
+  clienthandlers.GetClientStudentsHandlerResponseDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.StudentResponseDTO'
+        type: array
+    type: object
   clienthandlers.GetGroupedClientsInputDTO:
     properties:
       group_id:
@@ -39,6 +50,13 @@ definitions:
       data:
         items:
           $ref: '#/definitions/dto.ClientCreateUpdateDTO'
+        type: array
+    type: object
+  clienthandlers.GetGroupsRequestDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.GroupResponseDTO'
         type: array
     type: object
   clienthandlers.СreateGroupedClientInputDto:
@@ -89,6 +107,19 @@ definitions:
       name:
         type: string
       phone:
+        type: string
+      school_id:
+        type: string
+    type: object
+  dto.GroupResponseDTO:
+    properties:
+      created_at:
+        type: string
+      entity_type:
+        type: string
+      id:
+        type: integer
+      name:
         type: string
       school_id:
         type: string
@@ -372,6 +403,70 @@ paths:
       summary: Проверка авторизации
       tags:
       - Auth
+  /api/clients/{id}/groups:
+    get:
+      consumes:
+      - application/json
+      description: Позволяет получить все группы, в которых состоит клиент
+      parameters:
+      - description: client_id
+        format: int64
+        in: path
+        name: input
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/clienthandlers.GetGroupsRequestDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: GetClientGroups
+      tags:
+      - Clients
+  /api/clients/{id}/students:
+    get:
+      consumes:
+      - application/json
+      description: Позволяет получить всех студентов клиента
+      parameters:
+      - description: client_id
+        format: int64
+        in: path
+        name: input
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/clienthandlers.GetClientStudentsHandlerResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: GetClientStudents
+      tags:
+      - Clients
   /api/clients/createandgroup:
     post:
       consumes:

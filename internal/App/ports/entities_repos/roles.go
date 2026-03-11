@@ -1,10 +1,10 @@
 package entitiesrepos
 
 import (
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/generic"
+	genericrepo "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/genericRepo"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 )
 
 type RolesRepo interface {
-	generic.Repository[entities.Roles]
+	genericrepo.Repository[entities.Roles]
 }

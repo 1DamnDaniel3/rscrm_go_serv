@@ -21,6 +21,12 @@ func NewStudentClientsHandler(uc studentucs.IGetStudentClientsUC) *StudentClient
 	return &StudentClientsHandler{uc}
 }
 
+// =========== DTO ==========
+
+type GetStudentClientsResponseDTO struct {
+	Data []bodtos.BoDTO_StudentClientsReponse `json:"data"`
+}
+
 // @Summary      GetStudentClients
 // @Description  Получить всех клиентов студента с метаданными (is_payer, relation)
 // @Tags         Students
@@ -56,19 +62,16 @@ func (h *StudentClientsHandler) GetStudentClients(c *gin.Context) {
 	for i, bo := range studentClientsBO {
 		clientR := mapper.MapDomainToDTO[entities.Client, dto.ClientResponseDTO](&bo.Client)
 		clientDto := &bodtos.BoDTO_StudentClientsReponse{
-			Relation_id:       bo.Relation_id,
-			ClientResponseDTO: clientR,
-			Is_payer:          bo.Is_payer,
-			Relation:          bo.Relation,
+			Relation_id: bo.Relation_id,
+			ClientAndGroups: bodtos.ClientAndGroups{
+				ClientResponseDTO: clientR,
+				Groups:            []dto.GroupResponseDTO{},
+			},
+			Is_payer: bo.Is_payer,
+			Relation: bo.Relation,
 		}
 		resp.Data[i] = *clientDto
 	}
 
 	c.JSON(http.StatusOK, resp)
-}
-
-// =========== DTO ==========
-
-type GetStudentClientsResponseDTO struct {
-	Data []bodtos.BoDTO_StudentClientsReponse `json:"data"`
 }

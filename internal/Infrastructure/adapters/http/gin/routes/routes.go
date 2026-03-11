@@ -38,7 +38,6 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	tenandMiddleware := middleware.NewTenandMiddleware()
 
 	// == routes ==
-
 	entityroutes.UserAccountRoutes(api, db, hasher, tx, JWTSigner, authMiddleware, tenandMiddleware)
 	entityroutes.UserProfileRoutes(api, db, authMiddleware, tenandMiddleware)
 	entityroutes.SchoolRoutes(api, db, authMiddleware, tenandMiddleware)

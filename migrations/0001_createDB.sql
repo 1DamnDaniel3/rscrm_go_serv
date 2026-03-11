@@ -31,7 +31,9 @@ CREATE TABLE account_roles(
   id SERIAL PRIMARY KEY,
   account_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
   role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_account_role UNIQUE (account_id, role_id)
 );
 
 
@@ -99,7 +101,8 @@ CREATE TABLE student_clients (
   client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE,
   is_payer BOOLEAN DEFAULT TRUE,
   relation TEXT,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+  CONSTRAINT unique_student_client UNIQUE (student_id, client_id)
 );
 
 -- 6. Абонементы
@@ -122,7 +125,9 @@ CREATE TABLE student_subscriptions (
   expires_at DATE,
   remaining_visits INTEGER,
   is_active BOOLEAN,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_student_subscription UNIQUE (student_id, subscription_id)
 );
 
 CREATE TABLE subscription_pauses (
@@ -146,21 +151,30 @@ CREATE TABLE lead_groups (
   id SERIAL PRIMARY KEY,
   lead_id INTEGER REFERENCES leads(id) ON DELETE CASCADE,
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_lead_group UNIQUE (lead_id, group_id)
+
 );
 
 CREATE TABLE client_groups (
   id SERIAL PRIMARY KEY,
   client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE,
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_client_group UNIQUE (client_id, group_id)
+
 );
 
 CREATE TABLE student_groups (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_student_group UNIQUE (student_id, group_id)
+
 );
 
 -- 8. Направления танцев
@@ -210,7 +224,10 @@ CREATE TABLE attendance (
   status TEXT CHECK (status IN ('presence', 'absent', 'sick')),
   marked_by INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
   marked_at TIMESTAMP,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_student_attendance UNIQUE (student_id, lesson_id)
+
 );
 
 -- 12. Платежи
@@ -218,19 +235,23 @@ CREATE TABLE payments (
   id SERIAL PRIMARY KEY,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   subscription_id INTEGER REFERENCES subscriptions(id) ON DELETE CASCADE,
-  amount NUMERIC,
+  amount DECIMAL(10, 2),
   paid_at TIMESTAMP,
   created_by INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_payment UNIQUE (student_id, subscription_id, paid_at) 
 );
 
 CREATE TABLE lesson_payments (
   id SERIAL PRIMARY KEY,
   lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
-  amount NUMERIC,
-  paid_at TIMESTAMP,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  payment_id INTEGER REFERENCES payments(id) ON DELETE CASCADE,
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_lesson_payment UNIQUE (lesson_id, student_id, payment_id) 
+
 );
 
 -- 13. Финансовые отчеты
@@ -251,7 +272,10 @@ CREATE TABLE lesson_subscriptions (
   student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
   subscription_id INTEGER REFERENCES student_subscriptions(id) ON DELETE CASCADE,
   used_at TIMESTAMP DEFAULT NOW(),
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_lesson_subscription UNIQUE (lesson_id, student_id, subscription_id) 
+
 );
 
 -- 15. Оплата тренерам
@@ -459,8 +483,8 @@ ins_payments AS (
     VALUES (1, 1, 500, '2025-05-10', 2, (SELECT id FROM ins_school))
 ),
 ins_lesson_payments AS (
-    INSERT INTO lesson_payments (lesson_id, student_id, amount, paid_at, school_id)
-    VALUES (1, 1, 500, '2025-05-15', (SELECT id FROM ins_school))
+    INSERT INTO lesson_payments (lesson_id, student_id, payment_id, school_id)
+    VALUES (1, 1, 1, (SELECT id FROM ins_school))
 ),
 ins_reports AS (
     INSERT INTO financial_reports (period_start, period_end, total_income, total_expenses, created_at, school_id)

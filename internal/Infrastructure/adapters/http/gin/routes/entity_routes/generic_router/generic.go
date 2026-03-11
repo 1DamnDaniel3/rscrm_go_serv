@@ -1,7 +1,7 @@
 package genericrouter
 
 import (
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
+	generichandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +16,7 @@ func RegisterCRUDRoutes[T any, C any, R any](
 	prefix string,
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
-	handler *generic.GenericHandler[T, C, R]) *gin.RouterGroup {
+	handler *generichandler.GenericHandler[T, C, R]) *gin.RouterGroup {
 
 	routeGroup := r
 	if authMiddleware != nil {

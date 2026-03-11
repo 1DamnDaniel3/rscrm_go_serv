@@ -6,7 +6,7 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
 	clienthandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/clientHandlers"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/generic"
+	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
@@ -36,8 +36,16 @@ func ClientRoutes(
 	// Search
 	searchHandler := clienthandlers.NewClientSearchHandler(clientQueryService)
 
+	// Client Groups
+	clientGroupsUC := clientucs.NewGetClientGroupUC(clientQueryService)
+	clientGroupsHandler := clienthandlers.NewGetClientGroupsHandler(clientGroupsUC)
+
+	// Client Students
+	clientStudentsUC := clientucs.NewGetClientStudentsUC(clientQueryService)
+	clientStudentsHandler := clienthandlers.NewGetClientStudentsHandler(clientStudentsUC)
+
 	// Generic
-	genericHandler := generic.NewGenericHandler[
+	genericHandler := genericHandler.NewGenericHandler[
 		entities.Client,
 		dto.ClientCreateUpdateDTO,
 		dto.ClientResponseDTO,
@@ -47,5 +55,7 @@ func ClientRoutes(
 	protected.POST("clients/groupedclients", groupedHandler.GetGroupedClients)
 	protected.POST("clients/createandgroup", createGropedHandler.CreateGroupedClient)
 	protected.GET("clients/search", searchHandler.Search)
+	protected.GET("clients/:id/groups", clientGroupsHandler.GetGroups)
+	protected.GET("clients/:id/students", clientStudentsHandler.GetClientStudents)
 
 }

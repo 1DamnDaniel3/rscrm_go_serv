@@ -52,10 +52,13 @@ func (h *CreateStudentClientRelHandler) CreateRel(c *gin.Context) {
 	client := mapper.MapDomainToDTO[entities.Client, dto.ClientResponseDTO](&bo.Client)
 
 	output := bodtos.BoDTO_StudentClientsReponse{
-		Relation_id:       bo.Relation_id,
-		ClientResponseDTO: client,
-		Is_payer:          bo.Is_payer,
-		Relation:          bo.Relation,
+		Relation_id: bo.Relation_id,
+		ClientAndGroups: bodtos.ClientAndGroups{
+			ClientResponseDTO: client,
+			Groups:            []dto.GroupResponseDTO{},
+		},
+		Is_payer: bo.Is_payer,
+		Relation: bo.Relation,
 	}
 
 	c.JSON(http.StatusCreated, output)

@@ -4,12 +4,12 @@ import (
 	"context"
 
 	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/generic"
+	genericrepo "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/genericRepo"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 )
 
 type StudentsRepo interface {
-	generic.Repository[entities.Student]
+	genericrepo.Repository[entities.Student]
 	GetGroupedStudents(ctx context.Context, group_id int64, entities *[]entities.Student) error
 }
 

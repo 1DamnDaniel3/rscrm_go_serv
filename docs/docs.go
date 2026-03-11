@@ -141,6 +141,100 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/clients/{id}/groups": {
+            "get": {
+                "description": "Позволяет получить все группы, в которых состоит клиент",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "GetClientGroups",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "client_id",
+                        "name": "input",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/clienthandlers.GetGroupsRequestDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/clients/{id}/students": {
+            "get": {
+                "description": "Позволяет получить всех студентов клиента",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "GetClientStudents",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "client_id",
+                        "name": "input",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/clienthandlers.GetClientStudentsHandlerResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/leads/createandgroup": {
             "post": {
                 "description": "Транзакция на создания лида с записью в lead_groups",
@@ -595,6 +689,12 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GroupResponseDTO"
+                    }
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -629,6 +729,17 @@ const docTemplate = `{
                 }
             }
         },
+        "clienthandlers.GetClientStudentsHandlerResponseDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.StudentResponseDTO"
+                    }
+                }
+            }
+        },
         "clienthandlers.GetGroupedClientsInputDTO": {
             "type": "object",
             "properties": {
@@ -644,6 +755,17 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.ClientCreateUpdateDTO"
+                    }
+                }
+            }
+        },
+        "clienthandlers.GetGroupsRequestDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GroupResponseDTO"
                     }
                 }
             }
@@ -721,6 +843,26 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GroupResponseDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "entity_type": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
                     "type": "string"
                 },
                 "school_id": {

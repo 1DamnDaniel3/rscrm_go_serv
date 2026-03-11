@@ -1,22 +1,20 @@
-package generic
+package generichandler
 
 import (
 	"net/http"
 	"strconv"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
-	genericPort "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/generic"
+	genericrepo "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/genericRepo"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
 	"github.com/gin-gonic/gin"
 )
 
 type GenericHandler[T, CreateDTO, ResponceDTO any] struct {
-	repo       genericPort.Repository[T]
-	JwtService ports.JWTservice
+	repo genericrepo.Repository[T]
 }
 
 // T - entity, C - CreateDTO, R - ResponseDTO
-func NewGenericHandler[T, C, R any](repo genericPort.Repository[T]) *GenericHandler[T, C, R] {
+func NewGenericHandler[T, C, R any](repo genericrepo.Repository[T]) *GenericHandler[T, C, R] {
 	return &GenericHandler[T, C, R]{repo: repo}
 }
 
