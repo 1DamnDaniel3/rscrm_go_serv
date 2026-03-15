@@ -1,7 +1,7 @@
 package entityroutes
 
 import (
-	studentclientsucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentClientsUCs"
+	studentclientUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentUCs/student_clientUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
@@ -32,7 +32,7 @@ func StudentClientRoutes(
 	](stud_cliRepo)
 
 	// create and get BO
-	CreateAndGetBOUC := studentclientsucs.NewCreateRelationUC(tx, stud_cliRepo, clientRepo)
+	CreateAndGetBOUC := studentclientUCs.NewCreateRelationUC(tx, stud_cliRepo, clientRepo)
 	CreateRelationHandler := studentclienthandlers.NewCreateStudentClientRelHandler(CreateAndGetBOUC)
 
 	protected := genericrouter.RegisterCRUDRoutes(r, "student-clients", authMiddleware, tenantMiddleware, stud_cliHandler)

@@ -235,6 +235,17 @@ definitions:
       student_id:
         type: integer
     type: object
+  dto.StudentGroupResponseDTO:
+    properties:
+      group_id:
+        type: integer
+      id:
+        type: integer
+      school_id:
+        type: string
+      student_id:
+        type: integer
+    type: object
   dto.StudentResponseDTO:
     properties:
       birthdate:
@@ -282,12 +293,19 @@ definitions:
       lead:
         $ref: '#/definitions/dto.LeadCreateUpdateDTO'
     type: object
-  studenthandlers.GetStudentClientsResponseDTO:
+  studentclientHandlers.GetStudentClientsResponseDTO:
     properties:
       data:
         items:
           $ref: '#/definitions/bodtos.BoDTO_StudentClientsReponse'
         type: array
+    type: object
+  studentgroupHandlers.СreateStudentInputDto:
+    properties:
+      group:
+        $ref: '#/definitions/dto.StudentGroupCreateUpdateDTO'
+      student:
+        $ref: '#/definitions/dto.StudentCreateUpdateDTO'
     type: object
   studenthandlers.GroupedStudentsInputDTO:
     properties:
@@ -300,13 +318,6 @@ definitions:
         items:
           $ref: '#/definitions/dto.StudentCreateUpdateDTO'
         type: array
-    type: object
-  studenthandlers.СreateStudentInputDto:
-    properties:
-      group:
-        $ref: '#/definitions/dto.StudentGroupCreateUpdateDTO'
-      student:
-        $ref: '#/definitions/dto.StudentCreateUpdateDTO'
     type: object
   transactions.AccountDTO:
     properties:
@@ -704,7 +715,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/studenthandlers.GetStudentClientsResponseDTO'
+            $ref: '#/definitions/studentclientHandlers.GetStudentClientsResponseDTO'
         "400":
           description: Bad Request
           schema:
@@ -729,7 +740,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/studenthandlers.%D0%A1reateStudentInputDto'
+          $ref: '#/definitions/studentgroupHandlers.%D0%A1reateStudentInputDto'
       produces:
       - application/json
       responses:
@@ -824,4 +835,42 @@ paths:
       summary: Логаут
       tags:
       - Auth
+  /students/{studId}/groups/{groupId}:
+    post:
+      consumes:
+      - application/json
+      description: Adds a student to a group using their IDs from the path
+      parameters:
+      - description: ID of the student
+        in: path
+        name: studId
+        required: true
+        type: integer
+      - description: ID of the group
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.StudentGroupResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add student to group
+      tags:
+      - Students
 swagger: "2.0"

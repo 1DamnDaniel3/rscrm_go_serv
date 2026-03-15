@@ -3,7 +3,7 @@ package clienthandlers
 import (
 	"net/http"
 
-	clientucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs"
+	clientgroupsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs/client_groupUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
@@ -11,10 +11,10 @@ import (
 )
 
 type CreateGroupedClientHandler struct {
-	uc clientucs.ICreateGroupedClientUC
+	uc clientgroupsUCs.ICreateGroupedClientUC
 }
 
-func NewCreateGroupedClientHandler(uc clientucs.ICreateGroupedClientUC) *CreateGroupedClientHandler {
+func NewCreateGroupedClientHandler(uc clientgroupsUCs.ICreateGroupedClientUC) *CreateGroupedClientHandler {
 	return &CreateGroupedClientHandler{uc}
 }
 

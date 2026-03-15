@@ -1,4 +1,4 @@
-package studentucs
+package studentgroupUCs
 
 import (
 	"context"

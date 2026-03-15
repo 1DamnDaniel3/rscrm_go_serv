@@ -1,7 +1,8 @@
 package entityroutes
 
 import (
-	clientucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs"
+	clientgroupsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs/client_groupUCs"
+	clientstudentsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs/client_studentUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
@@ -26,22 +27,22 @@ func ClientRoutes(
 	clientGroupRepo := gormentityrepos.NewGormClientGroupRepo(db)
 
 	// Get Grouped
-	groupedUC := clientucs.NewGroupedClientsUC(clientRepo)
+	groupedUC := clientgroupsUCs.NewGroupedClientsUC(clientRepo)
 	groupedHandler := clienthandlers.NewGroupedClientsHandler(groupedUC)
 
 	// Create Grouped
-	createGroupedUC := clientucs.NewCreateGroupedClientUC(tx, clientGroupRepo, clientRepo)
+	createGroupedUC := clientgroupsUCs.NewCreateGroupedClientUC(tx, clientGroupRepo, clientRepo)
 	createGropedHandler := clienthandlers.NewCreateGroupedClientHandler(createGroupedUC)
 
 	// Search
 	searchHandler := clienthandlers.NewClientSearchHandler(clientQueryService)
 
 	// Client Groups
-	clientGroupsUC := clientucs.NewGetClientGroupUC(clientQueryService)
+	clientGroupsUC := clientgroupsUCs.NewGetClientGroupUC(clientQueryService)
 	clientGroupsHandler := clienthandlers.NewGetClientGroupsHandler(clientGroupsUC)
 
 	// Client Students
-	clientStudentsUC := clientucs.NewGetClientStudentsUC(clientQueryService)
+	clientStudentsUC := clientstudentsUCs.NewGetClientStudentsUC(clientQueryService)
 	clientStudentsHandler := clienthandlers.NewGetClientStudentsHandler(clientStudentsUC)
 
 	// Generic

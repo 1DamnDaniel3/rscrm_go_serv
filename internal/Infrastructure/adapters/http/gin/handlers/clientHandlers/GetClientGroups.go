@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	clientucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs"
+	clientgroupsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs/client_groupUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
@@ -12,10 +12,10 @@ import (
 )
 
 type GetClientGroupsHandler struct {
-	uc clientucs.IGetClientGroupUC
+	uc clientgroupsUCs.IGetClientGroupUC
 }
 
-func NewGetClientGroupsHandler(uc clientucs.IGetClientGroupUC) *GetClientGroupsHandler {
+func NewGetClientGroupsHandler(uc clientgroupsUCs.IGetClientGroupUC) *GetClientGroupsHandler {
 	return &GetClientGroupsHandler{uc}
 }
 

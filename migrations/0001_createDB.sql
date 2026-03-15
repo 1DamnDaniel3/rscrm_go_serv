@@ -33,7 +33,7 @@ CREATE TABLE account_roles(
   role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_account_role UNIQUE (account_id, role_id)
+  CONSTRAINT unique_account_role UNIQUE (account_id, role_id, school_id)
 );
 
 
@@ -102,7 +102,7 @@ CREATE TABLE student_clients (
   is_payer BOOLEAN DEFAULT TRUE,
   relation TEXT,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
-  CONSTRAINT unique_student_client UNIQUE (student_id, client_id)
+  CONSTRAINT unique_student_client UNIQUE (student_id, client_id, school_id)
 );
 
 -- 6. Абонементы
@@ -127,7 +127,7 @@ CREATE TABLE student_subscriptions (
   is_active BOOLEAN,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_student_subscription UNIQUE (student_id, subscription_id)
+  CONSTRAINT unique_student_subscription UNIQUE (student_id, subscription_id, school_id)
 );
 
 CREATE TABLE subscription_pauses (
@@ -153,7 +153,7 @@ CREATE TABLE lead_groups (
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_lead_group UNIQUE (lead_id, group_id)
+  CONSTRAINT unique_lead_group UNIQUE (lead_id, group_id, school_id)
 
 );
 
@@ -163,7 +163,7 @@ CREATE TABLE client_groups (
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_client_group UNIQUE (client_id, group_id)
+  CONSTRAINT unique_client_group UNIQUE (client_id, group_id, school_id)
 
 );
 
@@ -173,7 +173,7 @@ CREATE TABLE student_groups (
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_student_group UNIQUE (student_id, group_id)
+  CONSTRAINT unique_student_group UNIQUE (student_id, group_id, school_id)
 
 );
 
@@ -212,7 +212,7 @@ CREATE TABLE lessons (
   duration_minutes INTEGER,
   is_canceled BOOLEAN DEFAULT FALSE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
-  UNIQUE(school_id, lesson_date, start_time, group_id)
+  UNIQUE(lesson_date, start_time, group_id, school_id)
 
 );
 
@@ -226,7 +226,7 @@ CREATE TABLE attendance (
   marked_at TIMESTAMP,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_student_attendance UNIQUE (student_id, lesson_id)
+  CONSTRAINT unique_student_attendance UNIQUE (student_id, lesson_id, school_id)
 
 );
 
@@ -240,7 +240,7 @@ CREATE TABLE payments (
   created_by INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_payment UNIQUE (student_id, subscription_id, paid_at) 
+  CONSTRAINT unique_payment UNIQUE (student_id, subscription_id, paid_at, school_id) 
 );
 
 CREATE TABLE lesson_payments (
@@ -250,7 +250,7 @@ CREATE TABLE lesson_payments (
   payment_id INTEGER REFERENCES payments(id) ON DELETE CASCADE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_lesson_payment UNIQUE (lesson_id, student_id, payment_id) 
+  CONSTRAINT unique_lesson_payment UNIQUE (lesson_id, student_id, payment_id, school_id) 
 
 );
 
@@ -274,7 +274,7 @@ CREATE TABLE lesson_subscriptions (
   used_at TIMESTAMP DEFAULT NOW(),
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_lesson_subscription UNIQUE (lesson_id, student_id, subscription_id) 
+  CONSTRAINT unique_lesson_subscription UNIQUE (lesson_id, student_id, subscription_id, school_id) 
 
 );
 

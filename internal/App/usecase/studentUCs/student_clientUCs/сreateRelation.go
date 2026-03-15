@@ -1,4 +1,4 @@
-package studentclientsucs
+package studentclientUCs
 
 import (
 	"context"

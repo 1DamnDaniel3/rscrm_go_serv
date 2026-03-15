@@ -490,7 +490,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/studenthandlers.%D0%A1reateStudentInputDto"
+                            "$ref": "#/definitions/studentgroupHandlers.%D0%A1reateStudentInputDto"
                         }
                     }
                 ],
@@ -592,7 +592,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/studenthandlers.GetStudentClientsResponseDTO"
+                            "$ref": "#/definitions/studentclientHandlers.GetStudentClientsResponseDTO"
                         }
                     },
                     "400": {
@@ -671,6 +671,63 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/students/{studId}/groups/{groupId}": {
+            "post": {
+                "description": "Adds a student to a group using their IDs from the path",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Add student to group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the student",
+                        "name": "studId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID of the group",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StudentGroupResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -1040,6 +1097,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.StudentGroupResponseDTO": {
+            "type": "object",
+            "properties": {
+                "group_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.StudentResponseDTO": {
             "type": "object",
             "properties": {
@@ -1113,7 +1187,7 @@ const docTemplate = `{
                 }
             }
         },
-        "studenthandlers.GetStudentClientsResponseDTO": {
+        "studentclientHandlers.GetStudentClientsResponseDTO": {
             "type": "object",
             "properties": {
                 "data": {
@@ -1121,6 +1195,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/bodtos.BoDTO_StudentClientsReponse"
                     }
+                }
+            }
+        },
+        "studentgroupHandlers.СreateStudentInputDto": {
+            "type": "object",
+            "properties": {
+                "group": {
+                    "$ref": "#/definitions/dto.StudentGroupCreateUpdateDTO"
+                },
+                "student": {
+                    "$ref": "#/definitions/dto.StudentCreateUpdateDTO"
                 }
             }
         },
@@ -1140,17 +1225,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/dto.StudentCreateUpdateDTO"
                     }
-                }
-            }
-        },
-        "studenthandlers.СreateStudentInputDto": {
-            "type": "object",
-            "properties": {
-                "group": {
-                    "$ref": "#/definitions/dto.StudentGroupCreateUpdateDTO"
-                },
-                "student": {
-                    "$ref": "#/definitions/dto.StudentCreateUpdateDTO"
                 }
             }
         },

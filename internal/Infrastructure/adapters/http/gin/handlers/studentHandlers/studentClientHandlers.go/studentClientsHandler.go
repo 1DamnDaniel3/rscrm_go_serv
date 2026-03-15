@@ -1,11 +1,11 @@
-package studenthandlers
+package studentclientHandlers
 
 import (
 	"net/http"
 	"strconv"
 
 	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
-	studentucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentUCs"
+	studentclientUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentUCs/student_clientUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	bodtos "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/bo_dtos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
@@ -14,10 +14,10 @@ import (
 )
 
 type StudentClientsHandler struct {
-	uc studentucs.IGetStudentClientsUC
+	uc studentclientUCs.IGetStudentClientsUC
 }
 
-func NewStudentClientsHandler(uc studentucs.IGetStudentClientsUC) *StudentClientsHandler {
+func NewStudentClientsHandler(uc studentclientUCs.IGetStudentClientsUC) *StudentClientsHandler {
 	return &StudentClientsHandler{uc}
 }
 

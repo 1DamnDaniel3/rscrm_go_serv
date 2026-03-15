@@ -1,4 +1,4 @@
-package clientucs
+package clientgroupsUCs
 
 import (
 	"context"

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
-	studentclientsucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentClientsUCs"
+	studentclientUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentUCs/student_clientUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	bodtos "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/bo_dtos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
@@ -13,10 +13,10 @@ import (
 )
 
 type CreateStudentClientRelHandler struct {
-	uc studentclientsucs.ICreateRelationUC
+	uc studentclientUCs.ICreateRelationUC
 }
 
-func NewCreateStudentClientRelHandler(uc studentclientsucs.ICreateRelationUC) *CreateStudentClientRelHandler {
+func NewCreateStudentClientRelHandler(uc studentclientUCs.ICreateRelationUC) *CreateStudentClientRelHandler {
 	return &CreateStudentClientRelHandler{uc}
 }
 

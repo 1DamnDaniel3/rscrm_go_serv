@@ -2,10 +2,14 @@ package entityroutes
 
 import (
 	studentucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentUCs"
+	studentclientUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentUCs/student_clientUCs"
+	studentgroupUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentUCs/student_groupUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
 	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
+	studentclientHandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/studentHandlers/studentClientHandlers.go"
+	studentgroupHandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/studentHandlers/studentGroupHandlers.go"
 
 	studenthandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/studentHandlers"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
@@ -31,28 +35,27 @@ func StudentRoutes(
 		dto.StudentCreateUpdateDTO,
 		dto.StudentResponseDTO,
 	](students_repo)
-	genericStudentGroupHandler := genericHandler.NewGenericHandler[ // student-groups
-		entities.StudentGroup,
-		dto.StudentGroupCreateUpdateDTO,
-		dto.StudentGroupResponseDTO,
-	](studentGroups_repo)
 
-	// === student-group ===
-	createAndGroupUC := studentucs.NewCreateStudentUC(tx, students_repo, studentGroups_repo) // create
-	getGroupedUC := studentucs.NewGroupedStudentsUC(students_repo)                           // getGrouped
+	// === student-group === studentucs
+	createAndGroupUC := studentgroupUCs.NewCreateStudentUC(tx, students_repo, studentGroups_repo) // create
 
-	studentGroupHandler := studenthandlers.NewStudentGroupHandler(
-		studentGroups_repo, createAndGroupUC, getGroupedUC) // student-group handler
+	getGroupedUC := studentucs.NewGroupedStudentsUC(students_repo) // getGrouped
+	getGroupedHandler := studenthandlers.NewGetGroupedStudentsHandler(getGroupedUC)
+
+	createStudGroupRelationUC := studentgroupUCs.NewCreateStudentGroupRelationUC(studentGroups_repo)
+
+	studentGroupHandler := studentgroupHandlers.NewStudentGroupHandler(
+		createAndGroupUC, createStudGroupRelationUC) // student-group handler
 
 	// students/{id}/clients
-	studnetClientsUC := studentucs.NewGetStudentClientsUC(gormStudentsQueryService)
-	studentClientsHandler := studenthandlers.NewStudentClientsHandler(studnetClientsUC)
+	studnetClientsUC := studentclientUCs.NewGetStudentClientsUC(gormStudentsQueryService)
+	studentClientsHandler := studentclientHandlers.NewStudentClientsHandler(studnetClientsUC)
 
 	protected := genericrouter.RegisterCRUDRoutes(r, "students", authMiddleware, tenantMiddleware, genericStudentsHandler)
-	protected.POST("/students/groupedstudents", studentGroupHandler.GetGroupedStudents)
+	protected.POST("/students/groupedstudents", getGroupedHandler.GetGroupedStudents)
 	protected.POST("/students/createandgroup", studentGroupHandler.CreateStudent)
 
 	// nested routes
 	protected.GET("/students/:id/clients", studentClientsHandler.GetStudentClients)
-	protected.POST("students/:studId/groups/:groupId", genericStudentGroupHandler.Create)
+	protected.POST("/students/:studId/groups/:groupId", studentGroupHandler.CreateRelation)
 }
