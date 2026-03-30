@@ -8,7 +8,7 @@ type ScheduleCreateUpdateDTO struct {
 	Direction_id     int64     `json:"direction_id"`
 	Teacher_id       int64     `json:"teacher_id"`
 	Weekday          int       `json:"weekday"`
-	Start_time       time.Time `json:"start_time"`
+	Start_time       string    `json:"start_time"`
 	Duration_minutes int       `json:"duration_minutes"`
 	School_id        string    `json:"school_id"`
 	Active_from      time.Time `json:"active_from"`
@@ -21,7 +21,7 @@ type ScheduleResponseDTO struct {
 	Direction_id     int64     `json:"direction_id"`
 	Teacher_id       int64     `json:"teacher_id"`
 	Weekday          int       `json:"weekday"`
-	Start_time       time.Time `json:"start_time"`
+	Start_time       string    `json:"start_time"`
 	Duration_minutes int       `json:"duration_minutes"`
 	School_id        string    `json:"school_id"`
 	Active_from      time.Time `json:"active_from"`

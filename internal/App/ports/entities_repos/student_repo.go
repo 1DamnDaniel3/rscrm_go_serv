@@ -14,5 +14,7 @@ type StudentsRepo interface {
 }
 
 type StudentQueryService interface {
+	GetStudentGroups(ctx context.Context, student_id int64, groupSlice *[]entities.Group) error
 	GetStudentClients(ctx context.Context, student_id int64, clientsSlice *[]businessobjects.GetStudentClientsBO) error
+	Search(ctx context.Context, input string, studentSlice *[]entities.Student) error
 }

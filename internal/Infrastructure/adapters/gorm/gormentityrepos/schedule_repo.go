@@ -7,14 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type GormSourceRepository struct {
-	*genericAdapter.GormRepository[entities.Source]
+type GormScheduleRepo struct {
+	*genericAdapter.GormRepository[entities.Schedule]
 	db *gorm.DB
 }
 
-func NewGormSourceRepository(db *gorm.DB) entitiesrepos.SourceRepo {
-	return &GormSourceRepository{
-		GormRepository: genericAdapter.NewGormRepository[entities.Source](db),
+func NewGormScheduleRepo(db *gorm.DB) entitiesrepos.ScheduleRepo {
+	return &GormScheduleRepo{
+		GormRepository: genericAdapter.NewGormRepository[entities.Schedule](db),
 		db:             db,
 	}
 }

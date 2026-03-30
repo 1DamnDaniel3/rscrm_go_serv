@@ -255,7 +255,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/leadhandlers.%D0%A1reateLeadInputDto"
+                            "$ref": "#/definitions/leadgroupHandlers.%D0%A1reateLeadInputDto"
                         }
                     }
                 ],
@@ -360,6 +360,83 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/leadhandlers.GroupedLeadOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lessons/fetch": {
+            "get": {
+                "description": "Предоставляет актуальные Lesson, перед отдачей генерирует недостающие и удаляет старые",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "FetchLessons",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/lessonhandlers.GetLessonHandlerResDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/lessons/generate": {
+            "get": {
+                "description": "Сгенерировать занятия по шаблону расписания",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "GenerateLessonsFromSchedule",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "400": {
@@ -566,6 +643,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/students/search": {
+            "get": {
+                "description": "Через ?q= параметр получить students",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Search",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "q - QueryParameter",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/studenthandlers.StudentSearchHandlerDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/students/{id}/clients": {
             "get": {
                 "description": "Получить всех клиентов студента с метаданными (is_payer, relation)",
@@ -593,6 +716,52 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/studentclientHandlers.GetStudentClientsResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/students/{id}/groups": {
+            "get": {
+                "description": "Получить все группы студента",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "GetGroupsByStudent",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id - идентификатор ученика, чьи группы искать",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/studenthandlers.GetClientGroupsResponceDTO"
                         }
                     },
                     "400": {
@@ -675,6 +844,120 @@ const docTemplate = `{
                 }
             }
         },
+        "/leads/{leadId}/groups/{groupId}": {
+            "delete": {
+                "description": "Удалить запись связи lead_groups",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Leads"
+                ],
+                "summary": "Delete relation lead_groups",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the lead",
+                        "name": "leadId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID of the group",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StudentGroupResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/students/{leadId}/groups/{groupId}": {
+            "post": {
+                "description": "Adds a lead to a group using their IDs from the path",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Leads"
+                ],
+                "summary": "Add lead to group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the lead",
+                        "name": "leadId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID of the group",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.LeadGroupResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/students/{studId}/groups/{groupId}": {
             "post": {
                 "description": "Adds a student to a group using their IDs from the path",
@@ -730,10 +1013,103 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Удалить запись связи student_groups",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Students"
+                ],
+                "summary": "Delete relation student_groups",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the student",
+                        "name": "studId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID of the group",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StudentGroupResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
+        "bodtos.BoDTO_ClientStudentsReponse": {
+            "type": "object",
+            "properties": {
+                "birthdate": {
+                    "type": "string"
+                },
+                "contact": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GroupResponseDTO"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "relation": {
+                    "type": "string"
+                },
+                "relation_id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "skill_level": {
+                    "type": "string"
+                }
+            }
+        },
         "bodtos.BoDTO_StudentClientsReponse": {
             "type": "object",
             "properties": {
@@ -792,7 +1168,7 @@ const docTemplate = `{
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.StudentResponseDTO"
+                        "$ref": "#/definitions/bodtos.BoDTO_ClientStudentsReponse"
                     }
                 }
             }
@@ -982,6 +1358,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.LeadGroupResponseDTO": {
+            "type": "object",
+            "properties": {
+                "group_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lead_id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.LeadResponseDTO": {
             "type": "object",
             "properties": {
@@ -1017,6 +1410,38 @@ const docTemplate = `{
                 },
                 "trial_date": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.LessonResponseDTO": {
+            "type": "object",
+            "properties": {
+                "direction_id": {
+                    "type": "integer"
+                },
+                "duration_minutes": {
+                    "type": "integer"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_canceled": {
+                    "type": "boolean"
+                },
+                "lesson_date": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "teacher_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1157,6 +1582,17 @@ const docTemplate = `{
                 }
             }
         },
+        "leadgroupHandlers.СreateLeadInputDto": {
+            "type": "object",
+            "properties": {
+                "group": {
+                    "$ref": "#/definitions/dto.LeadGroupCreateUpdateDTO"
+                },
+                "lead": {
+                    "$ref": "#/definitions/dto.LeadCreateUpdateDTO"
+                }
+            }
+        },
         "leadhandlers.GroupedLeadInputDTO": {
             "type": "object",
             "properties": {
@@ -1176,14 +1612,14 @@ const docTemplate = `{
                 }
             }
         },
-        "leadhandlers.СreateLeadInputDto": {
+        "lessonhandlers.GetLessonHandlerResDTO": {
             "type": "object",
             "properties": {
-                "group": {
-                    "$ref": "#/definitions/dto.LeadGroupCreateUpdateDTO"
-                },
-                "lead": {
-                    "$ref": "#/definitions/dto.LeadCreateUpdateDTO"
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.LessonResponseDTO"
+                    }
                 }
             }
         },
@@ -1209,6 +1645,17 @@ const docTemplate = `{
                 }
             }
         },
+        "studenthandlers.GetClientGroupsResponceDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GroupResponseDTO"
+                    }
+                }
+            }
+        },
         "studenthandlers.GroupedStudentsInputDTO": {
             "type": "object",
             "properties": {
@@ -1224,6 +1671,17 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.StudentCreateUpdateDTO"
+                    }
+                }
+            }
+        },
+        "studenthandlers.StudentSearchHandlerDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.StudentResponseDTO"
                     }
                 }
             }

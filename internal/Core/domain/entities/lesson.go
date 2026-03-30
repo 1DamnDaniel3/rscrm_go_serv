@@ -8,7 +8,6 @@ type Lesson struct {
 	Direction_id     int64
 	Teacher_id       int64
 	Lesson_date      time.Time
-	Start_time       time.Time
 	Duration_minutes int
 	Is_canceled      bool
 	School_id        string

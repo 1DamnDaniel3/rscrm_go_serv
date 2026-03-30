@@ -3,8 +3,8 @@ package clientstudentsUCs
 import (
 	"context"
 
+	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 )
 
 type GetClientStudentsUC struct {
@@ -12,14 +12,14 @@ type GetClientStudentsUC struct {
 }
 
 type IGetClientStudentsUC interface {
-	Execute(ctx context.Context, client_id int64, studentSlice *[]entities.Student) error
+	Execute(ctx context.Context, client_id int64, studentSlice *[]businessobjects.GetClientStudentsBO) error
 }
 
-func NewGetClientStudentsUC(queryService entitiesrepos.ClientsQueryService) *GetClientStudentsUC {
+func NewGetClientStudentsUC(queryService entitiesrepos.ClientsQueryService) IGetClientStudentsUC {
 	return &GetClientStudentsUC{queryService}
 }
 
 func (uc *GetClientStudentsUC) Execute(ctx context.Context,
-	client_id int64, studentSlice *[]entities.Student) error {
+	client_id int64, studentSlice *[]businessobjects.GetClientStudentsBO) error {
 	return uc.queryService.GetClientStudents(ctx, client_id, studentSlice)
 }

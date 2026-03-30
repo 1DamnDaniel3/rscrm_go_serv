@@ -107,9 +107,9 @@ func (h *StudentGroupHandler) CreateRelation(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// CreateStudentGroup godoc
-// @Summary      Add student to group
-// @Description  Adds a student to a group using their IDs from the path
+// DeleteStudentGroupRelation godoc
+// @Summary      Delete relation student_groups
+// @Description  Удалить запись связи student_groups
 // @Tags         Students
 // @Accept       json
 // @Produce      json
@@ -118,7 +118,7 @@ func (h *StudentGroupHandler) CreateRelation(c *gin.Context) {
 // @Success      201 {object} dto.StudentGroupResponseDTO
 // @Failure      400 {object} map[string]string
 // @Failure      500 {object} map[string]string
-// @Router       /students/{studId}/groups/{groupId} [post]
+// @Router       /students/{studId}/groups/{groupId} [delete]
 func (h *StudentGroupHandler) DeleteRelation(c *gin.Context) {
 
 	studentID, err := strconv.ParseInt(c.Param("studId"), 10, 64)
@@ -132,18 +132,13 @@ func (h *StudentGroupHandler) DeleteRelation(c *gin.Context) {
 		return
 	}
 
-	studGroup := entities.StudentGroup{
-		Student_id: studentID,
-		Group_id:   groupID,
+	studGroup, err := h.crudUCs.Delete(c.Request.Context(), studentID, groupID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	// if err := h.crudUCs.Delete(c.Request.Context(), ); err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// 	return
-	// }
-
-	resp := mapper.MapDomainToDTO[entities.StudentGroup, dto.StudentGroupResponseDTO](&studGroup)
+	resp := mapper.MapDomainToDTO[entities.StudentGroup, dto.StudentGroupResponseDTO](studGroup)
 
 	c.JSON(http.StatusOK, resp)
-
 }

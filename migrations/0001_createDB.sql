@@ -192,13 +192,18 @@ CREATE TABLE schedules (
   id SERIAL PRIMARY KEY,
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
   direction_id INTEGER REFERENCES dance_styles(id) ON DELETE SET NULL,
-  teacher_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
+  employee_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
   weekday INTEGER,
   start_time TIME,
   duration_minutes INTEGER,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
   active_from DATE,
-  active_to DATE
+  active_to DATE,
+
+  CONSTRAINT unique_schedule UNIQUE(group_id, direction_id, weekday, start_time, school_id),
+  CONSTRAINT unique_group_time UNIQUE(group_id, weekday, start_time, school_id),
+  CONSTRAINT unique_teacher_time UNIQUE(employee_id, weekday, start_time, school_id)
+  -- накладки в расписании проверять при создании
 );
 
 -- 10. Занятия
@@ -206,14 +211,12 @@ CREATE TABLE lessons (
   id SERIAL PRIMARY KEY,
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
   direction_id INTEGER REFERENCES dance_styles(id) ON DELETE SET NULL,
-  teacher_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
-  lesson_date DATE,
-  start_time TIME,
+  employee_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
+  lesson_date TIMESTAMP,
   duration_minutes INTEGER,
   is_canceled BOOLEAN DEFAULT FALSE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
-  UNIQUE(lesson_date, start_time, group_id, school_id)
-
+  CONSTRAINT unique_lesson UNIQUE(lesson_date, employee_id, group_id, school_id)
 );
 
 -- 11. Посещаемость
@@ -230,31 +233,56 @@ CREATE TABLE attendance (
 
 );
 
--- 12. Платежи
-CREATE TABLE payments (
+-- Транзакции - расходы/доходы, тип
+CREATE TABLE transactions (
   id SERIAL PRIMARY KEY,
-  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
-  subscription_id INTEGER REFERENCES subscriptions(id) ON DELETE CASCADE,
-  amount DECIMAL(10, 2),
-  paid_at TIMESTAMP,
-  created_by INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_payment UNIQUE (student_id, subscription_id, paid_at, school_id) 
+  type TEXT CHECK (type IN ('income', 'expense')),
+  category TEXT, --lesson or subscription_payment or rent
+
+  amount DECIMAL(10,2),
+
+  reference_type TEXT, -- lesson/subscription
+  reference_id INTEGER, 
+
+  created_at TIMESTAMP,
+  created_by INTEGER REFERENCES user_accounts(id),
+
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 
-CREATE TABLE lesson_payments (
+-- Участники транзации
+CREATE TABLE transaction_participants (
   id SERIAL PRIMARY KEY,
-  lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
-  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
-  payment_id INTEGER REFERENCES payments(id) ON DELETE CASCADE,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
-  CONSTRAINT unique_lesson_payment UNIQUE (lesson_id, student_id, payment_id, school_id) 
+  transaction_id INTEGER REFERENCES transactions(id) ON DELETE CASCADE,
 
+  role TEXT CHECK (role IN ('payer', 'beneficiary', 'receiver')),
+
+  entity_type TEXT,
+  entity_id INTEGER
 );
 
--- 13. Финансовые отчеты
+-- Зарплаты
+CREATE TABLE salary_accruals (
+  id SERIAL PRIMARY KEY,
+
+  employee_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
+
+  period_start DATE,
+  period_end DATE,
+
+  amount DECIMAL(10,2),
+
+  status TEXT CHECK (status IN ('calculated', 'approved', 'paid')),
+
+  calculated_at TIMESTAMP DEFAULT NOW(),
+  approved_at TIMESTAMP,
+
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+);
+
+-- 14. Финансовые отчеты
 CREATE TABLE financial_reports (
   id SERIAL PRIMARY KEY,
   period_start DATE,
@@ -265,7 +293,7 @@ CREATE TABLE financial_reports (
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 
--- 14. Привязка занятий к абонементам
+-- 15. Привязка занятий к абонементам
 CREATE TABLE lesson_subscriptions (
   id SERIAL PRIMARY KEY,
   lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
@@ -278,8 +306,8 @@ CREATE TABLE lesson_subscriptions (
 
 );
 
--- 15. Оплата тренерам
-CREATE TABLE teacher_rate_policies (
+-- 16. Политика оплаты сотрудникам
+CREATE TABLE employee_rate_policies (
   id SERIAL PRIMARY KEY,
   name TEXT,
   description TEXT,
@@ -287,18 +315,18 @@ CREATE TABLE teacher_rate_policies (
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 
-CREATE TABLE teacher_rates (
+CREATE TABLE employee_rates (
   id SERIAL PRIMARY KEY,
-  teacher_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
-  policy_id INTEGER REFERENCES teacher_rate_policies(id) ON DELETE CASCADE,
+  employee_id INTEGER REFERENCES user_accounts(id) ON DELETE CASCADE,
+  policy_id INTEGER REFERENCES employee_rate_policies(id) ON DELETE CASCADE,
   active_from DATE,
   active_to DATE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 
-CREATE TABLE teacher_rate_rules (
+CREATE TABLE employee_rate_rules (
   id SERIAL PRIMARY KEY,
-  policy_id INTEGER REFERENCES teacher_rate_policies(id) ON DELETE CASCADE,
+  policy_id INTEGER REFERENCES employee_rate_policies(id) ON DELETE CASCADE,
   rule_type TEXT CHECK (
     rule_type IN ('fixed', 'per_lesson', 'per_student', 'threshold', 'percent')
   ),
@@ -313,7 +341,7 @@ CREATE TABLE teacher_rate_rules (
 ---------------------------------------------------- Индексы --------------------------------------------
 
 
---- Индексы для внешних ключей (если они не создаются автоматически)
+--- Индексы для внешних ключей
 -- Индексы для внешних ключей с HASH индексами
 CREATE INDEX idx_user_accounts_school_id ON user_accounts USING HASH(school_id);
 CREATE INDEX idx_statuses_school_id ON statuses USING HASH(school_id); 
@@ -335,10 +363,13 @@ CREATE INDEX idx_payments_school_id ON payments USING HASH(school_id);
 CREATE INDEX idx_lesson_payments_school_id ON lesson_payments USING HASH(school_id);
 CREATE INDEX idx_financial_reports_school_id ON financial_reports USING HASH(school_id);
 CREATE INDEX idx_lesson_subscriptions_school_id ON lesson_subscriptions USING HASH(school_id);
-CREATE INDEX idx_teacher_rate_policies_school_id ON teacher_rate_policies USING HASH(school_id);
-CREATE INDEX idx_teacher_rates_school_id ON teacher_rates USING HASH(school_id);
+CREATE INDEX idx_employee_rate_policies_school_id ON employee_rate_policies USING HASH(school_id);
+CREATE INDEX idx_employee_rates_school_id ON employee_rates USING HASH(school_id);
 
-CREATE INDEX idx_teacher_rate_rules_policy_id ON teacher_rate_rules(policy_id);
+CREATE INDEX idx_employee_rate_rules_policy_id ON employee_rate_rules(policy_id);
+
+
+CREATE INDEX idx_lesson_date ON lessons(lesson_date);
 
 
 ----------------------------------------------------- ДАМП заполнения --------------------------
@@ -376,7 +407,7 @@ ins_account_roles AS (
     (3, 3, (SELECT id FROM ins_school)),  -- manager
     (4, 4, (SELECT id FROM ins_school)),  -- teacher
     (5, 5, (SELECT id FROM ins_school)),  -- accountant
-    (6, 6, (SELECT id FROM ins_school))  -- receptionist
+    (6, 6, (SELECT id FROM ins_school))   -- receptionist
 ),
 ins_profiles AS (
     INSERT INTO user_profiles (account_id, phone, full_name, birthdate, school_id)
@@ -467,7 +498,7 @@ ins_styles AS (
     VALUES ('Современные танцы', '2025-01-01', '2025-12-31', FALSE, (SELECT id FROM ins_school))
 ),
 ins_lessons AS (
-    INSERT INTO lessons (group_id, direction_id, teacher_id, start_time, duration_minutes, is_canceled, school_id)
+    INSERT INTO lessons (group_id, direction_id, employee_id, lesson_date, duration_minutes, is_canceled, school_id)
     VALUES (1, 1, 3, '2025-05-15 18:00', 60, FALSE, (SELECT id FROM ins_school))
 ),
 ins_lesson_sub AS (
@@ -491,14 +522,14 @@ ins_reports AS (
     VALUES ('2025-05-01', '2025-05-31', 500, 0, NOW(), (SELECT id FROM ins_school))
 ),
 ins_policy AS (
-    INSERT INTO teacher_rate_policies (name, description, created_at, school_id)
+    INSERT INTO employee_rate_policies (name, description, created_at, school_id)
     VALUES ('Фикс + за ученика', '2000 фикс + 200 за ученика', NOW(), (SELECT id FROM ins_school))
 ),
-ins_teacher_rates AS (
-    INSERT INTO teacher_rates (teacher_id, policy_id, active_from, active_to, school_id)
+ins_employee_rates AS (
+    INSERT INTO employee_rates (employee_id, policy_id, active_from, active_to, school_id)
     VALUES (3, 1, '2025-01-01', '2025-12-31', (SELECT id FROM ins_school))
 )
-INSERT INTO teacher_rate_rules (policy_id, rule_type, threshold, base_amount, per_student, percent_of_income, school_id)
+INSERT INTO employee_rate_rules (policy_id, rule_type, threshold, base_amount, per_student, percent_of_income, school_id)
 VALUES
     (1, 'fixed', NULL, 2000, NULL, NULL, (SELECT id FROM ins_school)),
     (1, 'per_student', NULL, NULL, 200, NULL, (SELECT id FROM ins_school));
@@ -528,15 +559,17 @@ DROP INDEX IF EXISTS idx_payments_school_id;
 DROP INDEX IF EXISTS idx_lesson_payments_school_id;
 DROP INDEX IF EXISTS idx_financial_reports_school_id;
 DROP INDEX IF EXISTS idx_lesson_subscriptions_school_id;
-DROP INDEX IF EXISTS idx_teacher_rate_policies_school_id;
-DROP INDEX IF EXISTS idx_teacher_rates_school_id;
-DROP INDEX IF EXISTS idx_teacher_rate_rules_policy_id;
+DROP INDEX IF EXISTS idx_employee_rate_policies_school_id;
+DROP INDEX IF EXISTS idx_employee_rates_school_id;
+DROP INDEX IF EXISTS idx_employee_rate_rules_policy_id;
+
+DROP INDEX IF EXISTS idx_lesson_date;
 
 -- ====================== Таблицы 
 
-DROP TABLE IF EXISTS teacher_rate_rules CASCADE;
-DROP TABLE IF EXISTS teacher_rates CASCADE;
-DROP TABLE IF EXISTS teacher_rate_policies CASCADE;
+DROP TABLE IF EXISTS employee_rate_rules CASCADE;
+DROP TABLE IF EXISTS employee_rates CASCADE;
+DROP TABLE IF EXISTS employee_rate_policies CASCADE;
 
 DROP TABLE IF EXISTS lesson_subscriptions CASCADE;
 DROP TABLE IF EXISTS financial_reports CASCADE;

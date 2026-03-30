@@ -8,7 +8,7 @@ type Schedule struct {
 	Direction_id     int64
 	Teacher_id       int64
 	Weekday          int
-	Start_time       time.Time
+	Start_time       string
 	Duration_minutes int
 	School_id        string
 	Active_from      time.Time

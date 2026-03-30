@@ -3,6 +3,7 @@ package entitiesrepos
 import (
 	"context"
 
+	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
 	genericrepo "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/genericRepo"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 )
@@ -13,7 +14,7 @@ type ClientRepo interface {
 }
 
 type ClientsQueryService interface {
-	GetClientStudents(ctx context.Context, client_id int64, studentsSlice *[]entities.Student) error
+	GetClientStudents(ctx context.Context, client_id int64, studentsSlice *[]businessobjects.GetClientStudentsBO) error
 	GetClientGroups(ctx context.Context, client_id int64, groupSlice *[]entities.Group) error
 	Search(ctx context.Context, input string, clientSlice *[]entities.Client) error
 }

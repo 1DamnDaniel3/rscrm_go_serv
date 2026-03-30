@@ -47,6 +47,8 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	entityroutes.GroupRoutes(api, db, authMiddleware, tenandMiddleware)
 	entityroutes.StatusRoutes(api, db, authMiddleware, tenandMiddleware)
 	entityroutes.SourceRoutes(api, db, authMiddleware, tenandMiddleware)
+	entityroutes.ScheduleRoutes(api, db, tx, authMiddleware, tenandMiddleware)
+	entityroutes.LessonRoutes(api, db, tx, authMiddleware, tenandMiddleware)
 
 	// == related tables routes
 	entityroutes.StudentClientRoutes(api, db, tx, authMiddleware, tenandMiddleware)

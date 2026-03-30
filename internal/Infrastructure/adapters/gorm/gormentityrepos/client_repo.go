@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/contextkeys"
@@ -82,7 +83,7 @@ func (r *GormClientQueryService) GetClientGroups(ctx context.Context,
 func (r *GormClientQueryService) GetClientStudents(
 	ctx context.Context,
 	client_id int64,
-	studentsSlice *[]entities.Student) error {
+	studentsSlice *[]businessobjects.GetClientStudentsBO) error {
 	db := gormutils.DBFromCtx(ctx, r.db)
 	schoolID, ok := ctx.Value(contextkeys.SchoolID).(string)
 	if !ok {
@@ -91,7 +92,7 @@ func (r *GormClientQueryService) GetClientStudents(
 
 	return db.
 		Table("clients c").
-		Select("s.*, sc.id AS relation_id").
+		Select("s.*, sc.id AS relation_id, sc.relation").
 		Joins("JOIN student_clients sc ON c.id = sc.client_id").
 		Joins("JOIN students s ON sc.student_id = s.id").
 		Where("c.id = ? AND sc.school_id = ?", client_id, schoolID).

@@ -10,12 +10,18 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/contextkeys"
 	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type GormRepository[T any] struct {
 	db *gorm.DB
 }
 
+func NewGormRepository[T any](db *gorm.DB) *GormRepository[T] {
+	return &GormRepository[T]{db: db}
+}
+
+// ==================================================== Create
 func (r *GormRepository[T]) Create(ctx context.Context, entity *T) error {
 
 	db := r.DBFromCtx(ctx)
@@ -40,12 +46,52 @@ func (r *GormRepository[T]) Create(ctx context.Context, entity *T) error {
 	return db.Create(entity).Error
 }
 
+// ==================================================== CreateMany
+func (r *GormRepository[T]) CreateMany(ctx context.Context, entities *[]T) error {
+	db := r.DBFromCtx(ctx)
+
+	// school_id из контекста
+	schoolID, ok := ctx.Value(contextkeys.SchoolID).(string)
+	if !ok {
+		return fmt.Errorf("school_id not found in context")
+	}
+
+	val := reflect.ValueOf(entities).Elem()
+
+	for i := 0; i < val.Len(); i++ {
+		entityVal := val.Index(i)
+
+		// Устанавливаем school_id если есть поле
+		if field := entityVal.FieldByName("School_id"); field.IsValid() && field.CanSet() {
+			field.SetString(schoolID)
+		}
+
+		// BeforeCreate хук
+		entityPtr := entityVal.Addr().Interface()
+		if beforeCreate, ok := entityPtr.(services.BeforeCreate); ok {
+			if err := beforeCreate.BeforeCreate(); err != nil {
+				return err
+			}
+		}
+	}
+
+	return db.
+		Clauses(clause.OnConflict{
+			DoNothing: true,
+		}).
+		CreateInBatches(entities, 500).
+		Error
+}
+
+// ==================================================== GetById
 func (r *GormRepository[T]) GetByID(ctx context.Context, id any, entity *T) error {
 	db := r.DBFromCtx(ctx)
 	db = r.ApplyTenantFilter(ctx, db)
 
 	return db.First(entity, "id = ?", id).Error
 }
+
+// ==================================================== GetAllWhere
 
 func (r *GormRepository[T]) GetAllWhere(ctx context.Context, filters map[string]interface{}, entities *[]T) error {
 	db := r.DBFromCtx(ctx)
@@ -56,12 +102,16 @@ func (r *GormRepository[T]) GetAllWhere(ctx context.Context, filters map[string]
 	return db.Where(filters).Find(entities).Error
 }
 
+// ==================================================== GetAll
+
 func (r *GormRepository[T]) GetAll(ctx context.Context, entities *[]T) error {
 	db := r.DBFromCtx(ctx)
 	db = r.ApplyTenantFilter(ctx, db)
 
 	return db.Find(entities).Error
 }
+
+// ==================================================== Update
 
 func (r *GormRepository[T]) Update(ctx context.Context, id any, fields map[string]interface{}) error {
 	if len(fields) == 0 {
@@ -89,6 +139,8 @@ func (r *GormRepository[T]) Update(ctx context.Context, id any, fields map[strin
 	return nil
 }
 
+// ==================================================== Delete
+
 func (r *GormRepository[T]) Delete(ctx context.Context, id any, entity *T) error {
 	db := r.DBFromCtx(ctx)
 	db = r.ApplyTenantFilter(ctx, db)
@@ -109,8 +161,21 @@ func (r *GormRepository[T]) Delete(ctx context.Context, id any, entity *T) error
 	return nil
 }
 
-func NewGormRepository[T any](db *gorm.DB) *GormRepository[T] {
-	return &GormRepository[T]{db: db}
+// ==================================================== FindRelation
+
+// FindRelation by map where keys is column name(string) value is ID (int64 usually)
+// expample: relationMap := map[string]any{"user_id": user.ID, "school_id: user.School_ID"}
+func (r *GormRepository[T]) FindRelation(ctx context.Context, relationMap map[string]any) (*T, error) {
+	db := r.DBFromCtx(ctx)
+	db = r.ApplyTenantFilter(ctx, db)
+
+	var entity T
+	err := db.Where(relationMap).First(&entity).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &entity, nil
 }
 
 // --- ========================================== utils ========================================== ---

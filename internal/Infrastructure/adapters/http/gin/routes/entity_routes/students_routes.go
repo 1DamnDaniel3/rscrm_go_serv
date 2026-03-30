@@ -26,9 +26,11 @@ func StudentRoutes(
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
+	// REPO
 	students_repo := gormentityrepos.NewGormStudentsRepo(db)
-	gormStudentsQueryService := gormentityrepos.NewGormStudentQueryService(db)
+	studentsQueryService := gormentityrepos.NewGormStudentQueryService(db)
 	studentGroups_repo := gormentityrepos.NewGormStudentGroupsRepo(db)
+
 	// generic
 	genericStudentsHandler := genericHandler.NewGenericHandler[ // student
 		entities.Student,
@@ -36,26 +38,40 @@ func StudentRoutes(
 		dto.StudentResponseDTO,
 	](students_repo)
 
-	// === student-group === studentucs
+	// UCs and Handlers
+
+	// === student-group ===
 	createAndGroupUC := studentgroupUCs.NewCreateStudentUC(tx, students_repo, studentGroups_repo) // create
+	relationCRUDucs := studentgroupUCs.NewStudentGroupCRUDucs(studentGroups_repo)                 // crud
 
 	getGroupedUC := studentucs.NewGroupedStudentsUC(students_repo) // getGrouped
 	getGroupedHandler := studenthandlers.NewGetGroupedStudentsHandler(getGroupedUC)
 
-	createStudGroupRelationUC := studentgroupUCs.NewCreateStudentGroupRelationUC(studentGroups_repo)
+	getGroupsByStudentUC := studentucs.NewGetStudentGroupUC(studentsQueryService) // get groups by student
+	getGroupsByStudentHandler := studenthandlers.NewGetStudentGroupsHandler(getGroupsByStudentUC)
+
+	searchStudentsUC := studentucs.NewSearchStudentsUC(studentsQueryService)
+	searchHandler := studenthandlers.NewSearchStudentHandler(searchStudentsUC)
 
 	studentGroupHandler := studentgroupHandlers.NewStudentGroupHandler(
-		createAndGroupUC, createStudGroupRelationUC) // student-group handler
+		createAndGroupUC, relationCRUDucs) // student-group handler
 
 	// students/{id}/clients
-	studnetClientsUC := studentclientUCs.NewGetStudentClientsUC(gormStudentsQueryService)
+	studnetClientsUC := studentclientUCs.NewGetStudentClientsUC(studentsQueryService)
 	studentClientsHandler := studentclientHandlers.NewStudentClientsHandler(studnetClientsUC)
 
 	protected := genericrouter.RegisterCRUDRoutes(r, "students", authMiddleware, tenantMiddleware, genericStudentsHandler)
+
+	protected.GET("/students/search", searchHandler.Search)
 	protected.POST("/students/groupedstudents", getGroupedHandler.GetGroupedStudents)
 	protected.POST("/students/createandgroup", studentGroupHandler.CreateStudent)
 
-	// nested routes
+	// ==== nested routes
+
+	// student_clients
 	protected.GET("/students/:id/clients", studentClientsHandler.GetStudentClients)
+	// student_groups
+	protected.GET("/students/:id/groups", getGroupsByStudentHandler.GetClientGroups)
 	protected.POST("/students/:studId/groups/:groupId", studentGroupHandler.CreateRelation)
+	protected.DELETE("/students/:studId/groups/:groupId", studentGroupHandler.DeleteRelation)
 }

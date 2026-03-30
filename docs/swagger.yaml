@@ -1,4 +1,29 @@
 definitions:
+  bodtos.BoDTO_ClientStudentsReponse:
+    properties:
+      birthdate:
+        type: string
+      contact:
+        type: string
+      created_at:
+        type: string
+      groups:
+        items:
+          $ref: '#/definitions/dto.GroupResponseDTO'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      relation:
+        type: string
+      relation_id:
+        type: integer
+      school_id:
+        type: string
+      skill_level:
+        type: string
+    type: object
   bodtos.BoDTO_StudentClientsReponse:
     properties:
       birthdate:
@@ -37,7 +62,7 @@ definitions:
     properties:
       data:
         items:
-          $ref: '#/definitions/dto.StudentResponseDTO'
+          $ref: '#/definitions/bodtos.BoDTO_ClientStudentsReponse'
         type: array
     type: object
   clienthandlers.GetGroupedClientsInputDTO:
@@ -160,6 +185,17 @@ definitions:
       school_id:
         type: string
     type: object
+  dto.LeadGroupResponseDTO:
+    properties:
+      group_id:
+        type: integer
+      id:
+        type: integer
+      lead_id:
+        type: integer
+      school_id:
+        type: string
+    type: object
   dto.LeadResponseDTO:
     properties:
       converted_to_client_at:
@@ -184,6 +220,27 @@ definitions:
         type: integer
       trial_date:
         type: string
+    type: object
+  dto.LessonResponseDTO:
+    properties:
+      direction_id:
+        type: integer
+      duration_minutes:
+        type: integer
+      group_id:
+        type: integer
+      id:
+        type: integer
+      is_canceled:
+        type: boolean
+      lesson_date:
+        type: string
+      school_id:
+        type: string
+      start_time:
+        type: string
+      teacher_id:
+        type: integer
     type: object
   dto.LoginDTO:
     properties:
@@ -274,6 +331,13 @@ definitions:
       school_id:
         type: string
     type: object
+  leadgroupHandlers.СreateLeadInputDto:
+    properties:
+      group:
+        $ref: '#/definitions/dto.LeadGroupCreateUpdateDTO'
+      lead:
+        $ref: '#/definitions/dto.LeadCreateUpdateDTO'
+    type: object
   leadhandlers.GroupedLeadInputDTO:
     properties:
       group_id:
@@ -286,12 +350,12 @@ definitions:
           $ref: '#/definitions/dto.LeadCreateUpdateDTO'
         type: array
     type: object
-  leadhandlers.СreateLeadInputDto:
+  lessonhandlers.GetLessonHandlerResDTO:
     properties:
-      group:
-        $ref: '#/definitions/dto.LeadGroupCreateUpdateDTO'
-      lead:
-        $ref: '#/definitions/dto.LeadCreateUpdateDTO'
+      data:
+        items:
+          $ref: '#/definitions/dto.LessonResponseDTO'
+        type: array
     type: object
   studentclientHandlers.GetStudentClientsResponseDTO:
     properties:
@@ -307,6 +371,13 @@ definitions:
       student:
         $ref: '#/definitions/dto.StudentCreateUpdateDTO'
     type: object
+  studenthandlers.GetClientGroupsResponceDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.GroupResponseDTO'
+        type: array
+    type: object
   studenthandlers.GroupedStudentsInputDTO:
     properties:
       group_id:
@@ -317,6 +388,13 @@ definitions:
       data:
         items:
           $ref: '#/definitions/dto.StudentCreateUpdateDTO'
+        type: array
+    type: object
+  studenthandlers.StudentSearchHandlerDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.StudentResponseDTO'
         type: array
     type: object
   transactions.AccountDTO:
@@ -552,7 +630,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/leadhandlers.%D0%A1reateLeadInputDto'
+          $ref: '#/definitions/leadgroupHandlers.%D0%A1reateLeadInputDto'
       produces:
       - application/json
       responses:
@@ -637,6 +715,59 @@ paths:
       summary: GroupedLeads
       tags:
       - Leads
+  /api/lessons/fetch:
+    get:
+      consumes:
+      - application/json
+      description: Предоставляет актуальные Lesson, перед отдачей генерирует недостающие
+        и удаляет старые
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/lessonhandlers.GetLessonHandlerResDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: FetchLessons
+      tags:
+      - Lessons
+  /api/lessons/generate:
+    get:
+      consumes:
+      - application/json
+      description: Сгенерировать занятия по шаблону расписания
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: GenerateLessonsFromSchedule
+      tags:
+      - Lessons
   /api/ownerschool/register:
     post:
       consumes:
@@ -729,6 +860,37 @@ paths:
       summary: GetStudentClients
       tags:
       - Students
+  /api/students/{id}/groups:
+    get:
+      consumes:
+      - application/json
+      description: Получить все группы студента
+      parameters:
+      - description: id - идентификатор ученика, чьи группы искать
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/studenthandlers.GetClientGroupsResponceDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: GetGroupsByStudent
+      tags:
+      - Students
   /api/students/createandgroup:
     post:
       consumes:
@@ -793,6 +955,37 @@ paths:
       summary: GroupedStudents
       tags:
       - Students
+  /api/students/search:
+    get:
+      consumes:
+      - application/json
+      description: Через ?q= параметр получить students
+      parameters:
+      - description: q - QueryParameter
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/studenthandlers.StudentSearchHandlerDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Search
+      tags:
+      - Students
   /api/useraccounts/login:
     post:
       consumes:
@@ -835,7 +1028,120 @@ paths:
       summary: Логаут
       tags:
       - Auth
+  /leads/{leadId}/groups/{groupId}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить запись связи lead_groups
+      parameters:
+      - description: ID of the lead
+        in: path
+        name: leadId
+        required: true
+        type: integer
+      - description: ID of the group
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.StudentGroupResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete relation lead_groups
+      tags:
+      - Leads
+  /students/{leadId}/groups/{groupId}:
+    post:
+      consumes:
+      - application/json
+      description: Adds a lead to a group using their IDs from the path
+      parameters:
+      - description: ID of the lead
+        in: path
+        name: leadId
+        required: true
+        type: integer
+      - description: ID of the group
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.LeadGroupResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add lead to group
+      tags:
+      - Leads
   /students/{studId}/groups/{groupId}:
+    delete:
+      consumes:
+      - application/json
+      description: Удалить запись связи student_groups
+      parameters:
+      - description: ID of the student
+        in: path
+        name: studId
+        required: true
+        type: integer
+      - description: ID of the group
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.StudentGroupResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete relation student_groups
+      tags:
+      - Students
     post:
       consumes:
       - application/json

@@ -13,10 +13,10 @@ type StudentGroupCRUDucs struct {
 
 type IStudentGroupCRUDucs interface {
 	Create(ctx context.Context, studentGroup *entities.StudentGroup) error
-	Delete(ctx context.Context, id int64, studentGroup *entities.StudentGroup) error
+	Delete(ctx context.Context, stud_id int64, group_id int64) (*entities.StudentGroup, error)
 }
 
-func NewCreateStudentGroupRelationUC(repo entitiesrepos.StudentGroupsRepo) IStudentGroupCRUDucs {
+func NewStudentGroupCRUDucs(repo entitiesrepos.StudentGroupsRepo) IStudentGroupCRUDucs {
 	return &StudentGroupCRUDucs{repo}
 }
 
@@ -31,10 +31,20 @@ func (uc *StudentGroupCRUDucs) Create(ctx context.Context, studentGroup *entitie
 	return nil
 }
 
-func (uc *StudentGroupCRUDucs) Delete(ctx context.Context, id int64, studentGroup *entities.StudentGroup) error {
-	if err := uc.repo.Delete(ctx, id, studentGroup); err != nil {
-		return err
+func (uc *StudentGroupCRUDucs) Delete(ctx context.Context, stud_id int64, group_id int64) (*entities.StudentGroup, error) {
+
+	relationMap := map[string]any{
+		"student_id": stud_id,
+		"group_id":   group_id,
+	}
+	relation, err := uc.repo.FindRelation(ctx, relationMap)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	if err := uc.repo.Delete(ctx, relation.ID, relation); err != nil {
+		return nil, err
+	}
+
+	return relation, nil
 }

@@ -53,10 +53,10 @@ func ClientRoutes(
 	](clientRepo)
 
 	protected := genericrouter.RegisterCRUDRoutes(r, "clients", authMiddleware, tenantMiddleware, genericHandler)
-	protected.POST("clients/groupedclients", groupedHandler.GetGroupedClients)
-	protected.POST("clients/createandgroup", createGropedHandler.CreateGroupedClient)
-	protected.GET("clients/search", searchHandler.Search)
-	protected.GET("clients/:id/groups", clientGroupsHandler.GetGroups)
-	protected.GET("clients/:id/students", clientStudentsHandler.GetClientStudents)
+	protected.POST("/clients/groupedclients", groupedHandler.GetGroupedClients)
+	protected.POST("/clients/createandgroup", createGropedHandler.CreateGroupedClient)
+	protected.GET("/clients/search", searchHandler.Search)
+	protected.GET("/clients/:id/groups", clientGroupsHandler.GetGroups)
+	protected.GET("/clients/:id/students", clientStudentsHandler.GetClientStudents)
 
 }
