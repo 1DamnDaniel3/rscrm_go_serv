@@ -12,7 +12,7 @@ import (
 type RegisterUseCase struct {
 	tx               services.Transaction
 	userRepo         entitiesrepos.UserAccountRepository
-	profileRepo      entitiesrepos.ProfileRepo
+	profileRepo      entitiesrepos.UserProfileRepo
 	schoolRepo       entitiesrepos.SchoolRepository
 	accountRolesRepo entitiesrepos.AccountRolesRepo
 
@@ -31,7 +31,7 @@ type IRegisterUseCase interface {
 func NewRegisterUseCase(
 	tx services.Transaction,
 	userRepo entitiesrepos.UserAccountRepository,
-	profileRepo entitiesrepos.ProfileRepo,
+	profileRepo entitiesrepos.UserProfileRepo,
 	schoolRepo entitiesrepos.SchoolRepository,
 	accountRolesRepo entitiesrepos.AccountRolesRepo,
 

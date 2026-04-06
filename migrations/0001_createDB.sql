@@ -43,7 +43,9 @@ CREATE TABLE user_profiles (
   phone TEXT,
   full_name TEXT,
   birthdate DATE,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE, 
+
+  CONSTRAINT unique_account_profile UNIQUE (id, account_id, school_id)
 );
 
 -- 3. Источники привлечения клиентов

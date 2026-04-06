@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/valuetypes"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/contextkeys"
 )
 
 type User struct {
@@ -13,14 +14,19 @@ type User struct {
 }
 
 func GetUserFromCtx(ctx context.Context) (*User, error) {
-	id, ok := ctx.Value("id").(int64)
-	if !ok {
-		return nil, fmt.Errorf("user_id not found in context. policy_utils layer error")
-	}
-	roles, ok := ctx.Value("roles").([]valuetypes.Role)
-	if !ok {
-		return nil, fmt.Errorf("user_roles not found in context. policy_utils layer error")
+	userCtx, ok := ctx.Value(contextkeys.User).(*valuetypes.UserContext)
+	if !ok || userCtx == nil {
+		return nil, fmt.Errorf("user context not found in context")
 	}
 
-	return &User{ID: id, Roles: roles}, nil
+	// Преобразуем роли в []valuetypes.Role
+	roles := make([]valuetypes.Role, len(userCtx.Roles))
+	for i, r := range userCtx.Roles {
+		roles[i] = valuetypes.Role(r)
+	}
+
+	return &User{
+		ID:    userCtx.UserID,
+		Roles: roles,
+	}, nil
 }

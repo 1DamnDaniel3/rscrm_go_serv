@@ -24,7 +24,7 @@ func (r *GormUserProfileRepo) Register(ctx context.Context, entity *entities.Use
 	return tx.Create(entity).Error
 }
 
-func NewGormUserProfileRepo(db *gorm.DB) entitiesrepos.ProfileRepo {
+func NewGormUserProfileRepo(db *gorm.DB) entitiesrepos.UserProfileRepo {
 	if db == nil {
 		panic("NewGormUserProfileRepo: db is nil — database not initialized")
 	}

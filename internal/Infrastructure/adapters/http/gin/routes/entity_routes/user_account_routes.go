@@ -33,20 +33,21 @@ func UserAccountRoutes(
 
 	accRolesRepo := gormentityrepos.NewGormAccountRolesRepo(db)
 	rolesRepo := gormentityrepos.NewGormRolesRepo(db)
-	// ==/== usecases
+	// ==/== login
 	// userAccountCrudUC := genericcruduc.NewCRUDUseCase(userRepo, userAccountPolicies.CRUD)
 	loginUseCase := userUC.NewLoginUseCase(hasher, userRepo, accRolesRepo, rolesRepo, JwtSigner)
-	registerUC := userUC.NewRegisterUseCase(tx, userRepo, profileRepo, schoolRepo, accRolesRepo, hasher)
+	loginHandler := user.NewLoginHandler(loginUseCase)
 
-	// ==/== handlers
+	// ==/== register
+	registerUC := userUC.NewRegisterUseCase(tx, userRepo, profileRepo, schoolRepo, accRolesRepo, hasher)
+	registerHandler := transactions.NewRegisterHandler(registerUC)
+
 	// genericUserHandler := generichandler.NewGenericHandler[
 	// 	entities.UserAccount,
 	// 	dto.UserAccountCreateDTO,
 	// 	dto.UserAccountResponseDTO,
 	// ](userAccountCrudUC)
 
-	loginHandler := user.NewLoginHandler(loginUseCase)
-	registerHandler := transactions.NewRegisterHandler(registerUC)
 	authCheckHandler := user.NewAuthCheckHandler(JwtSigner)
 
 	// ==/== routes
@@ -57,6 +58,8 @@ func UserAccountRoutes(
 	r.POST("/ownerschool/register", registerHandler.Register)
 	r.POST("/user_accounts/login", loginHandler.Login)
 	r.GET("/user_accounts/logout", loginHandler.Logout)
+
+	// protected := genericrouter.GetProtectedRouterGroup(r, authMiddleware, tenantMiddleware)
 
 	// r.POST("/user_accounts/create")
 }
