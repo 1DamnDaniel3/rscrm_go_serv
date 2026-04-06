@@ -2,7 +2,7 @@ package dto
 
 import "time"
 
-type TeacherRatePolicyCreateUpdateDTO struct {
+type EmployeeRatePolicyCreateUpdateDTO struct {
 	ID          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -10,7 +10,7 @@ type TeacherRatePolicyCreateUpdateDTO struct {
 	School_id   string    `json:"school_id"`
 }
 
-type TeacherRatePolicyResponseDTO struct {
+type EmployeeRatePolicyResponseDTO struct {
 	ID          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`

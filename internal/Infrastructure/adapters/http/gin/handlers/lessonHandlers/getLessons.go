@@ -3,7 +3,7 @@ package lessonhandlers
 import (
 	"net/http"
 
-	lessonsucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/lessonsUCs"
+	lessonsucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/lessonsUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"

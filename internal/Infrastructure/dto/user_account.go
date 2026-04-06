@@ -3,14 +3,14 @@ package dto
 import "time"
 
 type UserAccountResponseDTO struct {
-	ID         int64     `json:"id"`
+	Id         int64     `json:"id"`
 	Email      string    `json:"email"`
 	Created_at time.Time `json:"created_at"`
 	School_id  string    `json:"school_id"`
 }
 
 type UserAccountCreateDTO struct {
-	ID         int64     `json:"id"`
+	Id         int64     `json:"id"`
 	Email      string    `json:"email"`
 	Password   string    `json:"password"`
 	Role       string    `json:"role"`

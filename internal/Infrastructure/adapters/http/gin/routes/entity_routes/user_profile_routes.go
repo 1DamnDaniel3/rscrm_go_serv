@@ -1,13 +1,7 @@
 package entityroutes
 
 import (
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
-
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
-	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -18,13 +12,19 @@ func UserProfileRoutes(
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	profileRepo := gormentityrepos.NewGormUserProfileRepo(db)
+	// profileRepo := gormentityrepos.NewGormUserProfileRepo(db)
 
-	genericHandler := genericHandler.NewGenericHandler[
-		entities.UserProfile,
-		dto.UserProfileCreateUpdateDTO,
-		dto.UserProfileResponseDTO,
-	](profileRepo)
+	// policies
+	// crudPolicy := userprofilepolicies.NewUserProfieCrudPolicy()
+	// profilePolicy := userprofilepolicies.NewUserProfilePolicy(crudPolicy)
+	// profileCrudUC := genericcruduc.NewCRUDUseCase(profileRepo, profilePolicy.CRUD)
 
-	genericrouter.RegisterCRUDRoutes(r, "user_profiles", authMiddleware, tenantMiddleware, genericHandler)
+	// genericHandler := generichandler.NewGenericHandler[
+	// 	entities.UserProfile,
+	// 	dto.UserProfileCreateUpdateDTO,
+	// 	dto.UserProfileResponseDTO,
+	// ](profileCrudUC)
+
+	// genericrouter.RegisterCRUDRoutes(r, "user_profiles", authMiddleware, tenantMiddleware, genericHandler)
+
 }

@@ -3,7 +3,7 @@ package leadhandlers
 import (
 	"net/http"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/leadUCs"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/leadUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"

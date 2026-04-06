@@ -4,18 +4,18 @@ import (
 	"net/http"
 	"strconv"
 
-	genericrepo "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/genericRepo"
+	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
 	"github.com/gin-gonic/gin"
 )
 
 type GenericHandler[T, CreateDTO, ResponceDTO any] struct {
-	repo genericrepo.Repository[T]
+	uc genericcruduc.ICRUDUseCase[T]
 }
 
 // T - entity, C - CreateDTO, R - ResponseDTO
-func NewGenericHandler[T, C, R any](repo genericrepo.Repository[T]) *GenericHandler[T, C, R] {
-	return &GenericHandler[T, C, R]{repo: repo}
+func NewGenericHandler[T, C, R any](uc genericcruduc.ICRUDUseCase[T]) *GenericHandler[T, C, R] {
+	return &GenericHandler[T, C, R]{uc}
 }
 
 type ResponceArrayDTO[T any] struct {
@@ -34,7 +34,7 @@ func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
 
 	entity := mapper.MapDTOToDomain[C, T](&dto)
 
-	if err := h.repo.Create(ctx, entity); err != nil {
+	if err := h.uc.Create(ctx, entity); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -60,7 +60,7 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 	// get school_id from token
 	ctx := c.Request.Context()
 
-	err := h.repo.Update(ctx, id, fields)
+	err := h.uc.Update(ctx, id, fields)
 	if err != nil {
 		if err.Error() == "entity not found or access denied" {
 			c.JSON(http.StatusForbidden, gin.H{
@@ -88,7 +88,7 @@ func (h *GenericHandler[T, C, R]) GetByID(c *gin.Context) {
 
 	var entity T
 
-	if err := h.repo.GetByID(ctx, idParam, &entity); err != nil {
+	if err := h.uc.GetByID(ctx, idParam, &entity); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -110,7 +110,7 @@ func (h *GenericHandler[T, C, R]) GetAllWhere(c *gin.Context) {
 
 	var entities []T
 
-	if err := h.repo.GetAllWhere(ctx, fieldsMap, &entities); err != nil {
+	if err := h.uc.GetAllWhere(ctx, fieldsMap, &entities); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -135,7 +135,7 @@ func (h *GenericHandler[T, C, R]) GetAll(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var entities []T
-	if err := h.repo.GetAll(ctx, &entities); err != nil {
+	if err := h.uc.GetAll(ctx, &entities); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -161,7 +161,7 @@ func (h *GenericHandler[T, C, R]) Delete(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var entity T
-	err := h.repo.Delete(ctx, idParam, &entity)
+	err := h.uc.Delete(ctx, idParam, &entity)
 	if err != nil {
 		if err.Error() == "entity not found or access denied" {
 			c.JSON(http.StatusForbidden, gin.H{

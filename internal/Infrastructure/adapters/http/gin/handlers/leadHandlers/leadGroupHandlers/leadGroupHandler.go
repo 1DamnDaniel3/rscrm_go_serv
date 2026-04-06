@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	leadgroupucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/leadUCs/leadGroupUCs"
+	leadgroupucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/leadUCs/leadGroupUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"

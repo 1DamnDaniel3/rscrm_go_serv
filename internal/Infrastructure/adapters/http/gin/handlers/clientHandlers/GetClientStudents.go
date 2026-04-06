@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
-	clientstudentsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs/client_studentUCs"
+	clientstudentsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/clientUCs/client_studentUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	bodtos "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/bo_dtos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"

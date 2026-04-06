@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/userUCs"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/userUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
@@ -18,6 +18,14 @@ type AuthHandler struct {
 
 func NewLoginHandler(uc userUCs.ILoginUC) *AuthHandler {
 	return &AuthHandler{uc}
+}
+
+// === DTO ===
+
+type LoginResponse struct {
+	Message string                      `json:"message" example:"success"`
+	User    *dto.UserAccountResponseDTO `json:"user"`
+	Roles   []string                    `json:"roles"`
 }
 
 // Login godoc
@@ -102,12 +110,4 @@ func (r *AuthHandler) Logout(c *gin.Context) {
 		true,
 	)
 	c.Status(http.StatusNoContent)
-}
-
-// === DTO ===
-
-type LoginResponse struct {
-	Message string                      `json:"message" example:"success"`
-	User    *dto.UserAccountResponseDTO `json:"user"`
-	Roles   []string                    `json:"roles"`
 }

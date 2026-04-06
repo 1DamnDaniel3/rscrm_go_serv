@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	studentgroupUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/studentUCs/student_groupUCs"
+	studentgroupUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/studentUCs/student_groupUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"

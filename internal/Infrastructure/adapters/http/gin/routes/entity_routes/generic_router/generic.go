@@ -34,3 +34,19 @@ func RegisterCRUDRoutes[T any, C any, R any](
 
 	return routeGroup
 }
+
+// build protected router group with authMiddleware and tenantMiddleware
+func GetProtectedRouterGroup(
+	r *gin.RouterGroup,
+	authMiddleware *middleware.AuthMiddleware,
+	tenantMiddleware *middleware.TenantMiddleware) *gin.RouterGroup {
+
+	routeGroup := r
+	if authMiddleware != nil {
+		routeGroup = r.Group("")
+		routeGroup.Use(authMiddleware.TryAuth())
+		routeGroup.Use(tenantMiddleware.TryTenand())
+	}
+	return routeGroup
+
+}

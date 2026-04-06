@@ -4,7 +4,7 @@ import (
 	"context"
 
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
-	lessonshedulesucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/lessonsUCs/lessonShedulesUCs"
+	lessonshedulesucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/lessonsUCs/lessonShedulesUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 )
 

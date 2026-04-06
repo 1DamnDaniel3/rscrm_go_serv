@@ -211,12 +211,12 @@ CREATE TABLE lessons (
   id SERIAL PRIMARY KEY,
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
   direction_id INTEGER REFERENCES dance_styles(id) ON DELETE SET NULL,
-  employee_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
+  teacher_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
   lesson_date TIMESTAMP,
   duration_minutes INTEGER,
   is_canceled BOOLEAN DEFAULT FALSE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
-  CONSTRAINT unique_lesson UNIQUE(lesson_date, employee_id, group_id, school_id)
+  CONSTRAINT unique_lesson UNIQUE(lesson_date, teacher_id, group_id, school_id)
 );
 
 -- 11. Посещаемость
@@ -240,7 +240,7 @@ CREATE TABLE transactions (
   type TEXT CHECK (type IN ('income', 'expense')),
   category TEXT, --lesson or subscription_payment or rent
 
-  amount DECIMAL(10,2),
+  amount INTEGER,
 
   reference_type TEXT, -- lesson/subscription
   reference_id INTEGER, 
@@ -257,10 +257,12 @@ CREATE TABLE transaction_participants (
 
   transaction_id INTEGER REFERENCES transactions(id) ON DELETE CASCADE,
 
-  role TEXT CHECK (role IN ('payer', 'beneficiary', 'receiver')),
+  role TEXT CHECK (role IN ('payer', 'beneficiary')),
 
   entity_type TEXT,
-  entity_id INTEGER
+  entity_id INTEGER,
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+
 );
 
 -- Зарплаты
@@ -272,7 +274,7 @@ CREATE TABLE salary_accruals (
   period_start DATE,
   period_end DATE,
 
-  amount DECIMAL(10,2),
+  amount INTEGER,
 
   status TEXT CHECK (status IN ('calculated', 'approved', 'paid')),
 
@@ -282,13 +284,24 @@ CREATE TABLE salary_accruals (
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 
+-- 17. Детализация зарплаты
+CREATE TABLE salary_accrual_items (
+  id SERIAL PRIMARY KEY,
+  accrual_id INTEGER REFERENCES salary_accruals(id) ON DELETE CASCADE,
+  source_type TEXT CHECK (source_type IN ('fixed', 'per_student', 'per_lesson', 'percent', 'bonus')),
+  source_id INTEGER, -- ссылка на lesson, policy, transaction, если нужно
+  amount INTEGER NOT NULL, -- salary_accruals.amount = SUM(items)
+  
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+);
+
 -- 14. Финансовые отчеты
 CREATE TABLE financial_reports (
   id SERIAL PRIMARY KEY,
   period_start DATE,
   period_end DATE,
-  total_income NUMERIC,
-  total_expenses NUMERIC,
+  total_income INTEGER,
+  total_expenses INTEGER,
   created_at TIMESTAMP DEFAULT NOW(),
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
@@ -331,9 +344,9 @@ CREATE TABLE employee_rate_rules (
     rule_type IN ('fixed', 'per_lesson', 'per_student', 'threshold', 'percent')
   ),
   threshold INTEGER,
-  base_amount NUMERIC,
-  per_student NUMERIC,
-  percent_of_income NUMERIC,
+  base_amount INTEGER,
+  per_student INTEGER,
+  percent_of_income DECIMAL(10, 2),
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 
@@ -359,8 +372,6 @@ CREATE INDEX idx_dance_styles_school_id ON dance_styles USING HASH(school_id);
 CREATE INDEX idx_schedules_school_id ON schedules USING HASH(school_id);
 CREATE INDEX idx_lessons_school_id ON lessons USING HASH(school_id);
 CREATE INDEX idx_attendance_school_id ON attendance USING HASH(school_id);
-CREATE INDEX idx_payments_school_id ON payments USING HASH(school_id);
-CREATE INDEX idx_lesson_payments_school_id ON lesson_payments USING HASH(school_id);
 CREATE INDEX idx_financial_reports_school_id ON financial_reports USING HASH(school_id);
 CREATE INDEX idx_lesson_subscriptions_school_id ON lesson_subscriptions USING HASH(school_id);
 CREATE INDEX idx_employee_rate_policies_school_id ON employee_rate_policies USING HASH(school_id);
@@ -498,7 +509,7 @@ ins_styles AS (
     VALUES ('Современные танцы', '2025-01-01', '2025-12-31', FALSE, (SELECT id FROM ins_school))
 ),
 ins_lessons AS (
-    INSERT INTO lessons (group_id, direction_id, employee_id, lesson_date, duration_minutes, is_canceled, school_id)
+    INSERT INTO lessons (group_id, direction_id, teacher_id, lesson_date, duration_minutes, is_canceled, school_id)
     VALUES (1, 1, 3, '2025-05-15 18:00', 60, FALSE, (SELECT id FROM ins_school))
 ),
 ins_lesson_sub AS (
@@ -509,13 +520,33 @@ ins_attendance AS (
     INSERT INTO attendance (student_id, lesson_id, status, marked_by, marked_at, school_id)
     VALUES (1, 1, 'presence', 3, NOW(), (SELECT id FROM ins_school))
 ),
-ins_payments AS (
-    INSERT INTO payments (student_id, subscription_id, amount, paid_at, created_by, school_id)
-    VALUES (1, 1, 500, '2025-05-10', 2, (SELECT id FROM ins_school))
+ins_transactions AS (
+    INSERT INTO transactions (type, category, amount, reference_type, reference_id, created_at, created_by, school_id)
+    VALUES 
+        ('income', 'subscription_payment', 500, 'subscription', 1, '2025-05-10', 2, (SELECT id FROM ins_school))
+    RETURNING id
 ),
-ins_lesson_payments AS (
-    INSERT INTO lesson_payments (lesson_id, student_id, payment_id, school_id)
-    VALUES (1, 1, 1, (SELECT id FROM ins_school))
+ins_transaction_participants AS (
+    INSERT INTO transaction_participants (transaction_id, role, entity_type, entity_id, school_id)
+    VALUES
+        ((SELECT id FROM ins_transactions), 'payer', 'client', 1, (SELECT id FROM ins_school)),        -- кто платит
+        ((SELECT id FROM ins_transactions), 'beneficiary', 'student', 1, (SELECT id FROM ins_school)) -- за кого
+),
+-- Начисление зарплаты
+ins_salary_accrual AS (
+    INSERT INTO salary_accruals (employee_id, period_start, period_end, amount, status, calculated_at, school_id)
+    VALUES 
+        (3, '2025-05-01', '2025-05-31', 2200, 'calculated', NOW(), (SELECT id FROM ins_school))
+    RETURNING id
+),
+-- Детализация зарплаты
+ins_salary_accrual_items AS (
+    INSERT INTO salary_accrual_items (accrual_id, source_type, source_id, amount, school_id)
+    VALUES 
+        -- фиксированная часть
+        ((SELECT id FROM ins_salary_accrual), 'fixed', 1, 2000, (SELECT id FROM ins_school)),
+        -- за учеников: допустим 1 ученик в мае
+        ((SELECT id FROM ins_salary_accrual), 'per_student', 1, 200, (SELECT id FROM ins_school))
 ),
 ins_reports AS (
     INSERT INTO financial_reports (period_start, period_end, total_income, total_expenses, created_at, school_id)
@@ -555,8 +586,6 @@ DROP INDEX IF EXISTS idx_dance_styles_school_id;
 DROP INDEX IF EXISTS idx_schedules_school_id;
 DROP INDEX IF EXISTS idx_lessons_school_id;
 DROP INDEX IF EXISTS idx_attendance_school_id;
-DROP INDEX IF EXISTS idx_payments_school_id;
-DROP INDEX IF EXISTS idx_lesson_payments_school_id;
 DROP INDEX IF EXISTS idx_financial_reports_school_id;
 DROP INDEX IF EXISTS idx_lesson_subscriptions_school_id;
 DROP INDEX IF EXISTS idx_employee_rate_policies_school_id;
@@ -574,8 +603,11 @@ DROP TABLE IF EXISTS employee_rate_policies CASCADE;
 DROP TABLE IF EXISTS lesson_subscriptions CASCADE;
 DROP TABLE IF EXISTS financial_reports CASCADE;
 
-DROP TABLE IF EXISTS lesson_payments CASCADE;
-DROP TABLE IF EXISTS payments CASCADE;
+DROP TABLE IF EXISTS salary_accrual_items CASCADE;
+DROP TABLE IF EXISTS salary_accruals CASCADE;
+
+DROP TABLE IF EXISTS transaction_participants CASCADE;
+DROP TABLE IF EXISTS transactions CASCADE;
 
 DROP TABLE IF EXISTS attendance CASCADE;
 

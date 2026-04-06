@@ -1,13 +1,8 @@
 package entityroutes
 
 import (
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
-	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -20,14 +15,14 @@ func ScheduleRoutes(
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 
-	scheduleRepo := gormentityrepos.NewGormScheduleRepo(db)
+	// scheduleRepo := gormentityrepos.NewGormScheduleRepo(db)
 
-	genericHandler := genericHandler.NewGenericHandler[
-		entities.Schedule,
-		dto.ScheduleCreateUpdateDTO,
-		dto.ScheduleResponseDTO,
-	](scheduleRepo)
+	// genericHandler := genericHandler.NewGenericHandler[
+	// 	entities.Schedule,
+	// 	dto.ScheduleCreateUpdateDTO,
+	// 	dto.ScheduleResponseDTO,
+	// ](scheduleCrudUC)
 
-	genericrouter.RegisterCRUDRoutes(r, "schedules", authMiddleware, tenantMiddleware, genericHandler)
+	// genericrouter.RegisterCRUDRoutes(r, "schedules", authMiddleware, tenantMiddleware, genericHandler)
 
 }

@@ -1,13 +1,7 @@
 package entityroutes
 
 import (
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
-
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
-	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -18,13 +12,13 @@ func SchoolRoutes(
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	schoolRepo := gormentityrepos.NewGormSchoolRepo(db)
+	// schoolRepo := gormentityrepos.NewGormSchoolRepo(db)
 
-	genericHandler := genericHandler.NewGenericHandler[
-		entities.School,
-		dto.SchoolCreateUpdateDTO,
-		dto.SchoolResponseDTO,
-	](schoolRepo)
+	// genericHandler := genericHandler.NewGenericHandler[
+	// 	entities.School,
+	// 	dto.SchoolCreateUpdateDTO,
+	// 	dto.SchoolResponseDTO,
+	// ](school_crud_UC)
 
-	genericrouter.RegisterCRUDRoutes(r, "schools", authMiddleware, tenantMiddleware, genericHandler)
+	// genericrouter.RegisterCRUDRoutes(r, "schools", authMiddleware, tenantMiddleware, genericHandler)
 }

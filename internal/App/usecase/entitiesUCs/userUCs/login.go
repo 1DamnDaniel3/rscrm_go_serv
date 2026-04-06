@@ -75,5 +75,6 @@ func (uc *LoginUC) Execute(input *entities.UserAccount) (*entities.UserAccount, 
 	if err != nil {
 		return nil, "", make([]string, 0), err
 	}
+
 	return account, token, accountRoleNames, nil
 }

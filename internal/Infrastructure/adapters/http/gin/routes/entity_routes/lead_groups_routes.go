@@ -1,13 +1,7 @@
 package entityroutes
 
 import (
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
-
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
-	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -18,13 +12,13 @@ func LeadGroupsRoutes(
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	lead_groups_repo := gormentityrepos.NewGormLeadGroupsRepo(db)
+	// lead_groups_repo := gormentityrepos.NewGormLeadGroupsRepo(db)
 
-	genericHandler := genericHandler.NewGenericHandler[
-		entities.LeadGroup,
-		dto.LeadGroupCreateUpdateDTO,
-		dto.LeadGroupResponseDTO,
-	](lead_groups_repo)
+	// genericHandler := genericHandler.NewGenericHandler[
+	// 	entities.LeadGroup,
+	// 	dto.LeadGroupCreateUpdateDTO,
+	// 	dto.LeadGroupResponseDTO,
+	// ](lead_groups_crudUC)
 
-	genericrouter.RegisterCRUDRoutes(r, "lead_groups", authMiddleware, tenantMiddleware, genericHandler)
+	// genericrouter.RegisterCRUDRoutes(r, "lead_groups", authMiddleware, tenantMiddleware, genericHandler)
 }

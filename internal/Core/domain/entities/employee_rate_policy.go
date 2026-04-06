@@ -2,7 +2,7 @@ package entities
 
 import "time"
 
-type TeacherRatePolicy struct {
+type EmployeeRatePolicy struct {
 	ID          int64
 	Name        string
 	Description string
@@ -10,7 +10,7 @@ type TeacherRatePolicy struct {
 	School_id   string
 }
 
-func (l *TeacherRatePolicy) BeforeCreate() error {
+func (l *EmployeeRatePolicy) BeforeCreate() error {
 	if l.Created_at.IsZero() {
 		l.Created_at = time.Now()
 	}

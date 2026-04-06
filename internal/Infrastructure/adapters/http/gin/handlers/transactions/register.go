@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/userUCs"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/userUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

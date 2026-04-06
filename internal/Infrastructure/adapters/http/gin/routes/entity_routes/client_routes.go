@@ -1,16 +1,13 @@
 package entityroutes
 
 import (
-	clientgroupsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs/client_groupUCs"
-	clientstudentsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/clientUCs/client_studentUCs"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
+	clientgroupsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/clientUCs/client_groupUCs"
+	clientstudentsUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/clientUCs/client_studentUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
 	clienthandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/clientHandlers"
-	genericHandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -46,13 +43,15 @@ func ClientRoutes(
 	clientStudentsHandler := clienthandlers.NewGetClientStudentsHandler(clientStudentsUC)
 
 	// Generic
-	genericHandler := genericHandler.NewGenericHandler[
-		entities.Client,
-		dto.ClientCreateUpdateDTO,
-		dto.ClientResponseDTO,
-	](clientRepo)
+	// genericHandler := genericHandler.NewGenericHandler[
+	// 	entities.Client,
+	// 	dto.ClientCreateUpdateDTO,
+	// 	dto.ClientResponseDTO,
+	// ](clientCrudUC)
 
-	protected := genericrouter.RegisterCRUDRoutes(r, "clients", authMiddleware, tenantMiddleware, genericHandler)
+	// protected := genericrouter.RegisterCRUDRoutes(r, "clients", authMiddleware, tenantMiddleware, genericHandler)
+	protected := genericrouter.GetProtectedRouterGroup(r, authMiddleware, tenantMiddleware)
+
 	protected.POST("/clients/groupedclients", groupedHandler.GetGroupedClients)
 	protected.POST("/clients/createandgroup", createGropedHandler.CreateGroupedClient)
 	protected.GET("/clients/search", searchHandler.Search)
