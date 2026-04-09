@@ -1,4 +1,4 @@
-package employeeratepolicypolicies
+package clientpolicies
 
 import (
 	"context"
@@ -14,7 +14,7 @@ type IClientCrudPolicy interface {
 	crudpolicy.ICRUDPolicy
 }
 
-func NewEmployeeRatePolicyPolicy() IClientCrudPolicy {
+func NewClientCrudPolicy() IClientCrudPolicy {
 	return &ClientCrudPolicy{}
 }
 

@@ -15,8 +15,6 @@ type RegisterUseCase struct {
 	profileRepo      entitiesrepos.UserProfileRepo
 	schoolRepo       entitiesrepos.SchoolRepository
 	accountRolesRepo entitiesrepos.AccountRolesRepo
-
-	passwordHasher ports.PasswordHasher
 }
 
 type IRegisterUseCase interface {
@@ -36,7 +34,7 @@ func NewRegisterUseCase(
 	accountRolesRepo entitiesrepos.AccountRolesRepo,
 
 	passwordHasher ports.PasswordHasher) *RegisterUseCase {
-	return &RegisterUseCase{tx, userRepo, profileRepo, schoolRepo, accountRolesRepo, passwordHasher}
+	return &RegisterUseCase{tx, userRepo, profileRepo, schoolRepo, accountRolesRepo}
 }
 
 func (uc *RegisterUseCase) Execute(ctx context.Context,

@@ -32,7 +32,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.AuthCheckResponse"
+                            "$ref": "#/definitions/userhandlers.AuthCheckResponse"
                         }
                     },
                     "401": {
@@ -781,6 +781,106 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/user_accounts/createemployee": {
+            "post": {
+                "description": "Добавить сотрудника с ролями.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employee"
+                ],
+                "summary": "Создать сотрудника",
+                "parameters": [
+                    {
+                        "description": "Данные для регистрации сотрудника",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userhandlers.CreateEmployeeAccountInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/userhandlers.CreateEmployeeAccountResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user_accounts/{id}/profile": {
+            "get": {
+                "description": "Получить свой профиль пользователя по account_id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Логин",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "account_id по которому ищем профиль в пути маршрута",
+                        "name": "input",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserProfileResponseDTO"
+                        },
+                        "headers": {
+                            "Set-Cookie": {
+                                "type": "string",
+                                "description": "JWT-токен"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/useraccounts/login": {
             "post": {
                 "description": "Вход стандарт email password, запись в httpOnly Cookies JWT",
@@ -809,7 +909,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.LoginResponse"
+                            "$ref": "#/definitions/userhandlers.LoginResponse"
                         },
                         "headers": {
                             "Set-Cookie": {
@@ -1437,9 +1537,6 @@ const docTemplate = `{
                 "school_id": {
                     "type": "string"
                 },
-                "start_time": {
-                    "type": "string"
-                },
                 "teacher_id": {
                     "type": "integer"
                 }
@@ -1565,6 +1662,26 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UserAccountCreateDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UserAccountResponseDTO": {
             "type": "object",
             "properties": {
@@ -1578,6 +1695,46 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "school_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserProfileCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "integer"
+                },
+                "birthdate": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserProfileResponseDTO": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "integer"
+                },
+                "birthdate": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "phone": {
                     "type": "string"
                 }
             }
@@ -1760,7 +1917,7 @@ const docTemplate = `{
                 }
             }
         },
-        "user.AuthCheckResponse": {
+        "userhandlers.AuthCheckResponse": {
             "type": "object",
             "properties": {
                 "isAuthenticated": {
@@ -1772,7 +1929,41 @@ const docTemplate = `{
                 }
             }
         },
-        "user.LoginResponse": {
+        "userhandlers.CreateEmployeeAccountInputDTO": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "$ref": "#/definitions/dto.UserAccountCreateDTO"
+                },
+                "profile": {
+                    "$ref": "#/definitions/dto.UserProfileCreateUpdateDTO"
+                },
+                "role_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "userhandlers.CreateEmployeeAccountResponse": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "$ref": "#/definitions/dto.UserAccountResponseDTO"
+                },
+                "profile": {
+                    "$ref": "#/definitions/dto.UserProfileResponseDTO"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "userhandlers.LoginResponse": {
             "type": "object",
             "properties": {
                 "message": {

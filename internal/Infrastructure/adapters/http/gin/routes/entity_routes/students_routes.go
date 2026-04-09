@@ -1,13 +1,18 @@
 package entityroutes
 
 import (
+	studentpolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/student_policies"
 	studentucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/studentUCs"
 	studentclientUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/studentUCs/student_clientUCs"
 	studentgroupUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/studentUCs/student_groupUCs"
+	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
+	generichandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
 	studentclientHandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/studentHandlers/studentClientHandlers.go"
 	studentgroupHandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/studentHandlers/studentGroupHandlers.go"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 
 	studenthandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/studentHandlers"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
@@ -23,17 +28,23 @@ func StudentRoutes(
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	// REPO
+	// ==/== repo
 	students_repo := gormentityrepos.NewGormStudentsRepo(db)
 	studentsQueryService := gormentityrepos.NewGormStudentQueryService(db)
 	studentGroups_repo := gormentityrepos.NewGormStudentGroupsRepo(db)
 
+	// ==/== policies
+	crudPolicy := studentpolicies.NewStudentCrudPolicy()
+	studentPolicies := studentpolicies.NewStudentPolicies(crudPolicy)
+
+	studentCrudUC := genericcruduc.NewCRUDUseCase(students_repo, studentPolicies.CRUD)
+
 	// generic
-	// genericStudentsHandler := genericHandler.NewGenericHandler[ // student
-	// 	entities.Student,
-	// 	dto.StudentCreateUpdateDTO,
-	// 	dto.StudentResponseDTO,
-	// ](students_repo)
+	genericStudentsHandler := generichandler.NewGenericHandler[ // student
+		entities.Student,
+		dto.StudentCreateUpdateDTO,
+		dto.StudentResponseDTO,
+	](studentCrudUC)
 
 	// UCs and Handlers
 
@@ -57,9 +68,9 @@ func StudentRoutes(
 	studnetClientsUC := studentclientUCs.NewGetStudentClientsUC(studentsQueryService)
 	studentClientsHandler := studentclientHandlers.NewStudentClientsHandler(studnetClientsUC)
 
-	// protected := genericrouter.RegisterCRUDRoutes(r, "students", authMiddleware, tenantMiddleware, genericStudentsHandler)
+	protected := genericrouter.RegisterCRUDRoutes(r, "students", authMiddleware, tenantMiddleware, genericStudentsHandler)
 
-	protected := genericrouter.GetProtectedRouterGroup(r, authMiddleware, tenantMiddleware)
+	// protected := genericrouter.GetProtectedRouterGroup(r, authMiddleware, tenantMiddleware)
 
 	protected.GET("/students/search", searchHandler.Search)
 	protected.POST("/students/groupedstudents", getGroupedHandler.GetGroupedStudents)

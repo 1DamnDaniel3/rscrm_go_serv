@@ -14,7 +14,7 @@ type ILessonCrudPolicy interface {
 	crudpolicy.ICRUDPolicy
 }
 
-func NewEmployeeRatePolicyPolicy() ILessonCrudPolicy {
+func NewLessonCrudPolicy() ILessonCrudPolicy {
 	return &LessonCrudPolicy{}
 }
 

@@ -194,7 +194,7 @@ CREATE TABLE schedules (
   id SERIAL PRIMARY KEY,
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
   direction_id INTEGER REFERENCES dance_styles(id) ON DELETE SET NULL,
-  employee_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
+  teacher_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
   weekday INTEGER,
   start_time TIME,
   duration_minutes INTEGER,
@@ -204,7 +204,7 @@ CREATE TABLE schedules (
 
   CONSTRAINT unique_schedule UNIQUE(group_id, direction_id, weekday, start_time, school_id),
   CONSTRAINT unique_group_time UNIQUE(group_id, weekday, start_time, school_id),
-  CONSTRAINT unique_teacher_time UNIQUE(employee_id, weekday, start_time, school_id)
+  CONSTRAINT unique_teacher_time UNIQUE(teacher_id, weekday, start_time, school_id)
   -- накладки в расписании проверять при создании
 );
 
@@ -218,6 +218,7 @@ CREATE TABLE lessons (
   duration_minutes INTEGER,
   is_canceled BOOLEAN DEFAULT FALSE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+  
   CONSTRAINT unique_lesson UNIQUE(lesson_date, teacher_id, group_id, school_id)
 );
 

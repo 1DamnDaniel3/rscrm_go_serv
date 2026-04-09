@@ -14,7 +14,7 @@ type IScheduleCrudPolicy interface {
 	crudpolicy.ICRUDPolicy
 }
 
-func NewEmployeeRatePolicyPolicy() IScheduleCrudPolicy {
+func NewScheduleCrudPolicy() IScheduleCrudPolicy {
 	return &ScheduleCrudPolicy{}
 }
 

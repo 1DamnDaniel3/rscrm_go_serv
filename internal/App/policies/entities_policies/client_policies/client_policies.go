@@ -1,4 +1,4 @@
-package employeeratepolicypolicies
+package clientpolicies
 
 type ClientPolicies struct {
 	CRUD IClientCrudPolicy

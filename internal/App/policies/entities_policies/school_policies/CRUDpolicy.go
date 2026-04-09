@@ -14,7 +14,7 @@ type ISchoolCrudPolicy interface {
 	crudpolicy.ICRUDPolicy
 }
 
-func NewEmployeeRatePolicyPolicy() ISchoolCrudPolicy {
+func NewSchoolCrudPolicy() ISchoolCrudPolicy {
 	return &SchoolCrudPolicy{}
 }
 
@@ -27,7 +27,13 @@ func (p *SchoolCrudPolicy) CanCreate(ctx context.Context) error {
 
 // READ — owner + accountant
 func (p *SchoolCrudPolicy) CanRead(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner)
+	return policyutils.RequireRoles(ctx,
+		valuetypes.Owner,
+		valuetypes.Accountant,
+		valuetypes.Manager,
+		valuetypes.Teacher,
+		valuetypes.Receptionist,
+	)
 }
 
 // UPDATE — только owner

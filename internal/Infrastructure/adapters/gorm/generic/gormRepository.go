@@ -27,15 +27,15 @@ func (r *GormRepository[T]) Create(ctx context.Context, entity *T) error {
 
 	db := r.DBFromCtx(ctx)
 	// Получаем school_id из контекста
-	schoolID, ok := ctx.Value(contextkeys.SchoolID).(string)
-	if !ok {
-		return fmt.Errorf("school_id not found in context")
+	userCtx, ok := ctx.Value(contextkeys.User).(*valuetypes.UserContext)
+	if !ok || userCtx.SchoolID == "" {
+		return fmt.Errorf("School Id is missing. genericGormRepo.Create")
 	}
 
 	// Через reflect подставляем school_id, если такое поле есть
 	val := reflect.ValueOf(entity).Elem()
 	if field := val.FieldByName("School_id"); field.IsValid() && field.CanSet() {
-		field.SetString(schoolID)
+		field.SetString(userCtx.SchoolID)
 	}
 
 	if beforeCreate, ok := any(entity).(services.BeforeCreate); ok {
@@ -52,9 +52,10 @@ func (r *GormRepository[T]) CreateMany(ctx context.Context, entities *[]T) error
 	db := r.DBFromCtx(ctx)
 
 	// school_id из контекста
-	schoolID, ok := ctx.Value(contextkeys.SchoolID).(string)
-	if !ok {
-		return fmt.Errorf("school_id not found in context")
+	userCtx, ok := ctx.Value(contextkeys.User).(*valuetypes.UserContext)
+	if !ok || userCtx.SchoolID == "" {
+		return fmt.Errorf("School Id is missing. genericGormRepo.CreateMany")
+
 	}
 
 	val := reflect.ValueOf(entities).Elem()
@@ -64,7 +65,7 @@ func (r *GormRepository[T]) CreateMany(ctx context.Context, entities *[]T) error
 
 		// Устанавливаем school_id если есть поле
 		if field := entityVal.FieldByName("School_id"); field.IsValid() && field.CanSet() {
-			field.SetString(schoolID)
+			field.SetString(userCtx.SchoolID)
 		}
 
 		// BeforeCreate хук

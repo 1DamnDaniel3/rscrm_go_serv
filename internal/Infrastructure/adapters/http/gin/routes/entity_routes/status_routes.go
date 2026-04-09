@@ -1,7 +1,14 @@
 package entityroutes
 
 import (
+	statuspolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/status_policies"
+	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
+	generichandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
+	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -12,13 +19,20 @@ func StatusRoutes(
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	// statusRepo := gormentityrepos.NewGormStatusRepository(db)
+	// ==/== repo
+	statusRepo := gormentityrepos.NewGormStatusRepository(db)
 
-	// genericHandler := genericHandler.NewGenericHandler[
-	// 	entities.Status,
-	// 	dto.StatusCreateUpdateDTO,
-	// 	dto.StatusResponseDTO,
-	// ](status_crud_uc)
+	// ==/== repo
+	crudPolicy := statuspolicies.NewStatusCrudPolicy()
+	statusPolicies := statuspolicies.NewStatusPolicies(crudPolicy)
 
-	// genericrouter.RegisterCRUDRoutes(r, "statuses", authMiddleware, tenantMiddleware, genericHandler)
+	statusCrudUC := genericcruduc.NewCRUDUseCase(statusRepo, statusPolicies.CRUD)
+
+	genericHandler := generichandler.NewGenericHandler[
+		entities.Status,
+		dto.StatusCreateUpdateDTO,
+		dto.StatusResponseDTO,
+	](statusCrudUC)
+
+	genericrouter.RegisterCRUDRoutes(r, "statuses", authMiddleware, tenantMiddleware, genericHandler)
 }

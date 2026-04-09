@@ -1,4 +1,4 @@
-package user
+package userhandlers
 
 import (
 	"net/http"

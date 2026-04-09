@@ -1,4 +1,4 @@
-package statuspolicies
+package studentpolicies
 
 import (
 	"context"
@@ -8,34 +8,34 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/valuetypes"
 )
 
-type StatusCrudPolicy struct{}
+type StudentCrudPolicy struct{}
 
-type IStatusCrudPolicy interface {
+type IStudentCrudPolicy interface {
 	crudpolicy.ICRUDPolicy
 }
 
-func NewStatusCrudPolicy() IStatusCrudPolicy {
-	return &StatusCrudPolicy{}
+func NewStudentCrudPolicy() IStudentCrudPolicy {
+	return &StudentCrudPolicy{}
 }
 
 // ---====== methods ======---
 
 // CREATE — только owner
-func (p *StatusCrudPolicy) CanCreate(ctx context.Context) error {
+func (p *StudentCrudPolicy) CanCreate(ctx context.Context) error {
 	return policyutils.RequireRoles(ctx, valuetypes.Owner)
 }
 
 // READ — owner + accountant
-func (p *StatusCrudPolicy) CanRead(ctx context.Context) error {
+func (p *StudentCrudPolicy) CanRead(ctx context.Context) error {
 	return policyutils.RequireRoles(ctx, valuetypes.Owner, valuetypes.Accountant)
 }
 
 // UPDATE — только owner
-func (p *StatusCrudPolicy) CanUpdate(ctx context.Context) error {
+func (p *StudentCrudPolicy) CanUpdate(ctx context.Context) error {
 	return policyutils.RequireRoles(ctx, valuetypes.Owner)
 }
 
 // DELETE — только owner
-func (p *StatusCrudPolicy) CanDelete(ctx context.Context) error {
+func (p *StudentCrudPolicy) CanDelete(ctx context.Context) error {
 	return policyutils.RequireRoles(ctx, valuetypes.Owner)
 }

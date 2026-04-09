@@ -14,7 +14,7 @@ type IGroupCrudPolicy interface {
 	crudpolicy.ICRUDPolicy
 }
 
-func NewEmployeeRatePolicyPolicy() IGroupCrudPolicy {
+func NewGroupCrudPolicy() IGroupCrudPolicy {
 	return &GroupCrudPolicy{}
 }
 
