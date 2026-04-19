@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	leadgroupucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/leadUCs/leadGroupUCs"
+	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
@@ -12,17 +13,18 @@ import (
 )
 
 type LeadGroupHandler struct {
-	createUC leadgroupucs.ICreateLeadUC
-	crudUCs  leadgroupucs.ILeadGroupCRUDucs
+	createUC  leadgroupucs.ICreateLeadUC
+	crudUCs   leadgroupucs.ILeadGroupCRUDucs
+	genericUC genericcruduc.ICRUDUseCase[entities.LeadGroup]
 }
 
 func NewLeadGroupHandler(
 	createUC leadgroupucs.ICreateLeadUC,
 	crudUCs leadgroupucs.ILeadGroupCRUDucs,
+	genericUC genericcruduc.ICRUDUseCase[entities.LeadGroup],
 ) *LeadGroupHandler {
 	return &LeadGroupHandler{
-
-		createUC, crudUCs}
+		createUC, crudUCs, genericUC}
 }
 
 // ========= DTO =========
@@ -97,7 +99,7 @@ func (h *LeadGroupHandler) CreateRelation(c *gin.Context) {
 		Group_id: groupID,
 	}
 
-	if err := h.crudUCs.Create(c.Request.Context(), &leadGroup); err != nil {
+	if err := h.genericUC.Create(c.Request.Context(), &leadGroup); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

@@ -3,13 +3,11 @@ package gormentityrepos
 import (
 	"context"
 	"errors"
-	"fmt"
 
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policytypes"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/valuetypes"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/contextkeys"
 	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
 	genericAdapter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/generic"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormutils"
@@ -22,32 +20,11 @@ type GormUserAccountRepo struct {
 	hasher ports.PasswordHasher
 }
 
-func (r *GormUserAccountRepo) Create(ctx context.Context, entity *entities.UserAccount) error {
-
-	db := gormutils.DBFromCtx(ctx, r.db)
-
-	userCtx, ok := ctx.Value(contextkeys.User).(*valuetypes.UserContext)
-	if !ok || userCtx.SchoolID == "" {
-		return fmt.Errorf("School Id is missing. genericGormRepo.Create")
-	}
-
-	var err error
-	entity.Password, err = r.hasher.Hash(entity.Password)
-	if err != nil {
-		return err
-	}
-
-	entity.School_id = userCtx.SchoolID
-
-	return db.Create(entity).Error
-}
-
-func (r *GormUserAccountRepo) GetByEmail(email string) (*entities.UserAccount, error) {
-	var user entities.UserAccount
-	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
-		return nil, err
-	}
-	return &user, nil
+func NewGormUserAccountRepo(db *gorm.DB, hasher ports.PasswordHasher) entitiesrepos.UserAccountRepository {
+	return &GormUserAccountRepo{
+		GormRepository: genericAdapter.NewGormRepository[entities.UserAccount](db),
+		db:             db,
+		hasher:         hasher}
 }
 
 func (r *GormUserAccountRepo) Register(ctx context.Context, entity *entities.UserAccount) error {
@@ -63,9 +40,34 @@ func (r *GormUserAccountRepo) Register(ctx context.Context, entity *entities.Use
 	return tx.Create(entity).Error
 }
 
-func NewGormUserAccountRepo(db *gorm.DB, hasher ports.PasswordHasher) entitiesrepos.UserAccountRepository {
-	return &GormUserAccountRepo{
-		GormRepository: genericAdapter.NewGormRepository[entities.UserAccount](db),
-		db:             db,
-		hasher:         hasher}
+func (r *GormUserAccountRepo) GetByEmail(email string) (*entities.UserAccount, error) {
+	var user entities.UserAccount
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// ======================================== OVERRIDE =============================================
+
+func (r *GormUserAccountRepo) Create(
+	ctx context.Context,
+	entity *entities.UserAccount,
+	scope *policytypes.Scope,
+) error {
+
+	db := gormutils.DBFromCtx(ctx, r.db)
+
+	// scope
+	if scope != nil && !scope.IsGlobal {
+		entity.School_id = scope.School_id
+	}
+
+	var err error
+	entity.Password, err = r.hasher.Hash(entity.Password)
+	if err != nil {
+		return err
+	}
+
+	return db.Create(entity).Error
 }

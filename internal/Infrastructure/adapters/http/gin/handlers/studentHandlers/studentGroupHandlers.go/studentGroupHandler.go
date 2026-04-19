@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	studentgroupUCs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/studentUCs/student_groupUCs"
+	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/mapper"
@@ -12,17 +13,18 @@ import (
 )
 
 type StudentGroupHandler struct {
-	createUC studentgroupUCs.ICreateStudentUC
-	crudUCs  studentgroupUCs.IStudentGroupCRUDucs
+	createUC  studentgroupUCs.ICreateStudentUC
+	crudUCs   studentgroupUCs.IStudentGroupCRUDucs
+	genericUC genericcruduc.ICRUDUseCase[entities.StudentGroup]
 }
 
 func NewStudentGroupHandler(
 	createUC studentgroupUCs.ICreateStudentUC,
 	crudUCs studentgroupUCs.IStudentGroupCRUDucs,
+	genericUC genericcruduc.ICRUDUseCase[entities.StudentGroup],
 ) *StudentGroupHandler {
 	return &StudentGroupHandler{
-
-		createUC, crudUCs}
+		createUC, crudUCs, genericUC}
 }
 
 // ========= DTO =========
@@ -97,7 +99,7 @@ func (h *StudentGroupHandler) CreateRelation(c *gin.Context) {
 		Group_id:   groupID,
 	}
 
-	if err := h.crudUCs.Create(c.Request.Context(), &studGroup); err != nil {
+	if err := h.genericUC.Create(c.Request.Context(), &studGroup); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

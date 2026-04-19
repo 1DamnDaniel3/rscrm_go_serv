@@ -2,9 +2,11 @@ package sourcepolicies
 
 import (
 	"context"
+	"fmt"
 
 	crudpolicy "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/crud_policy"
 	policyutils "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policy_utils"
+	policytypes "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policytypes"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/valuetypes"
 )
 
@@ -20,22 +22,70 @@ func NewSourceCrudPolicy() ISourceCrudPolicy {
 
 // ---====== methods ======---
 
-// CREATE — только owner
-func (p *SourceCrudPolicy) CanCreate(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner, valuetypes.Manager)
+// CREATE — запрещено всем (кроме Admin)
+func (p *SourceCrudPolicy) CanCreate(ctx context.Context) (*policytypes.Scope, error) {
+	user, _ := policyutils.GetUserFromCtx(ctx)
+
+	if policyutils.HasAnyRole(user, valuetypes.Admin) {
+		return &policytypes.Scope{IsGlobal: true}, nil
+	}
+
+	return nil, fmt.Errorf("forbidden")
 }
 
-// READ — owner + accountant
-func (p *SourceCrudPolicy) CanRead(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner, valuetypes.Manager)
+// CREATE MANY — то же самое
+func (p *SourceCrudPolicy) CanCreateMany(ctx context.Context) (*policytypes.Scope, error) {
+	return p.CanCreate(ctx)
 }
 
-// UPDATE — только owner
-func (p *SourceCrudPolicy) CanUpdate(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner, valuetypes.Manager)
+// READ ONE — Owner + Manager + Admin
+func (p *SourceCrudPolicy) CanReadOne(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if policyutils.HasAnyRole(user,
+		valuetypes.Owner,
+		valuetypes.Manager,
+		valuetypes.Admin,
+	) {
+		return &policytypes.Scope{
+			IsGlobal: true,
+		}, nil
+	}
+
+	return nil, fmt.Errorf("forbidden")
 }
 
-// DELETE — только owner
-func (p *SourceCrudPolicy) CanDelete(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner, valuetypes.Manager)
+// READ ALL
+func (p *SourceCrudPolicy) CanReadAll(ctx context.Context) (*policytypes.Scope, error) {
+	return p.CanReadOne(ctx)
+}
+
+// READ ALL WHERE
+func (p *SourceCrudPolicy) CanReadAllWhere(ctx context.Context) (*policytypes.Scope, error) {
+	return p.CanReadOne(ctx)
+}
+
+// UPDATE — запрещено всем (кроме Admin)
+func (p *SourceCrudPolicy) CanUpdate(ctx context.Context) (*policytypes.Scope, error) {
+	user, _ := policyutils.GetUserFromCtx(ctx)
+
+	if policyutils.HasAnyRole(user, valuetypes.Admin) {
+		return &policytypes.Scope{IsGlobal: true}, nil
+	}
+
+	return nil, fmt.Errorf("forbidden")
+}
+
+// DELETE — запрещено всем (кроме Admin)
+func (p *SourceCrudPolicy) CanDelete(ctx context.Context) (*policytypes.Scope, error) {
+	user, _ := policyutils.GetUserFromCtx(ctx)
+
+	if policyutils.HasAnyRole(user, valuetypes.Admin) {
+		return &policytypes.Scope{IsGlobal: true}, nil
+	}
+
+	return nil, fmt.Errorf("forbidden")
 }

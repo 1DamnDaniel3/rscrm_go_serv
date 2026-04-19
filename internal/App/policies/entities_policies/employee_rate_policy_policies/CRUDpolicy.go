@@ -2,9 +2,11 @@ package employeeratepolicypolicies
 
 import (
 	"context"
+	"fmt"
 
 	crudpolicy "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/crud_policy"
 	policyutils "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policy_utils"
+	policytypes "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policytypes"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/valuetypes"
 )
 
@@ -18,24 +20,94 @@ func NewEmployeeRatePolicyPolicy() IEmployeeRatePolicyCrudPolicy {
 	return &EmployeeRatePolicyCrudPolicy{}
 }
 
-// ---====== methods ======---
+// ==================================================== CREATE
 
-// CREATE — только owner
-func (p *EmployeeRatePolicyCrudPolicy) CanCreate(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner)
+func (p *EmployeeRatePolicyCrudPolicy) CanCreate(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// only owner can create employee rate policies
+	if !policyutils.HasAnyRole(user, valuetypes.Owner) {
+		return nil, fmt.Errorf("forbidden")
+	}
+
+	return &policytypes.Scope{
+		IsGlobal:  false,
+		School_id: user.School_id,
+	}, nil
 }
 
-// READ — owner + accountant
-func (p *EmployeeRatePolicyCrudPolicy) CanRead(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner, valuetypes.Accountant)
+func (p *EmployeeRatePolicyCrudPolicy) CanCreateMany(ctx context.Context) (*policytypes.Scope, error) {
+	return p.CanCreate(ctx)
 }
 
-// UPDATE — только owner
-func (p *EmployeeRatePolicyCrudPolicy) CanUpdate(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner)
+// ==================================================== READ ONE
+
+func (p *EmployeeRatePolicyCrudPolicy) CanReadOne(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// owner + accountant can read
+	if !policyutils.HasAnyRole(user, valuetypes.Owner, valuetypes.Accountant) {
+		return nil, fmt.Errorf("forbidden")
+	}
+
+	return &policytypes.Scope{
+		IsGlobal:  false,
+		School_id: user.School_id,
+	}, nil
 }
 
-// DELETE — только owner
-func (p *EmployeeRatePolicyCrudPolicy) CanDelete(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner)
+// ==================================================== READ ALL
+
+func (p *EmployeeRatePolicyCrudPolicy) CanReadAll(ctx context.Context) (*policytypes.Scope, error) {
+	return p.CanReadOne(ctx)
+}
+
+// ==================================================== READ ALL WHERE
+
+func (p *EmployeeRatePolicyCrudPolicy) CanReadAllWhere(ctx context.Context) (*policytypes.Scope, error) {
+	return p.CanReadOne(ctx)
+}
+
+// ==================================================== UPDATE
+
+func (p *EmployeeRatePolicyCrudPolicy) CanUpdate(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// only owner can modify financial rules
+	if !policyutils.HasAnyRole(user, valuetypes.Owner) {
+		return nil, fmt.Errorf("forbidden")
+	}
+
+	return &policytypes.Scope{
+		IsGlobal:  false,
+		School_id: user.School_id,
+	}, nil
+}
+
+// ==================================================== DELETE
+
+func (p *EmployeeRatePolicyCrudPolicy) CanDelete(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// only owner can delete financial policies
+	if !policyutils.HasAnyRole(user, valuetypes.Owner) {
+		return nil, fmt.Errorf("forbidden")
+	}
+
+	return &policytypes.Scope{
+		IsGlobal:  false,
+		School_id: user.School_id,
+	}, nil
 }

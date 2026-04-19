@@ -1,63 +1,45 @@
 package entityroutes
 
 import (
-	leadpolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/lead_policies"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/leadUCs"
-	leadgroupucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/leadUCs/leadGroupUCs"
-	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/services"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	generichandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
-	leadgroupHandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/leadHandlers/leadGroupHandlers"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
+	infrastructure "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure"
 
-	leadhandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/leadHandlers"
+	leadbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/lead_builders"
+	leadgroupbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/lead_group_builders"
+
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
+
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func LeadRoutes(
 	r *gin.RouterGroup,
-	db *gorm.DB,
-	tx services.Transaction,
+	app *infrastructure.AppContainer,
+	leadUCs *leadbuilders.LeadUseCases,
+	leadGroupUCs *leadgroupbuilders.LeadGroupsUseCaseBuilder,
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	// ==/== repo
-	leadRepo := gormentityrepos.NewGormLeadsRepo(db)
-	leadGroupsRepo := gormentityrepos.NewGormLeadGroupsRepo(db)
 
-	// ==/== policies
-	crudPolicy := leadpolicies.NewLeadCrudPolicy()
-	leadPolicies := leadpolicies.NewLeadPolicies(crudPolicy)
+	// ================= Handlers =================
+	handlers := leadbuilders.NewLeadHandlerBuilder(
+		leadUCs,
+		leadGroupUCs,
+	)
 
-	crudUC := genericcruduc.NewCRUDUseCase(leadRepo, leadPolicies.CRUD)
+	// ================= Routes =================
+	protected := genericrouter.RegisterCRUDRoutes(
+		r,
+		"leads",
+		authMiddleware,
+		tenantMiddleware,
+		handlers.CRUDHandler,
+	)
 
-	groupedLeadsUC := leadUCs.NewGroupedLeadsUC(leadRepo) // Grouped Leads
-	getGroupedLeadsHandler := leadhandlers.NewGetGroupedLeadsHandler(groupedLeadsUC)
-
-	// lead-groups
-	createLeadsUC := leadgroupucs.NewCreateLeadUC(tx, leadRepo, leadGroupsRepo) // CreateLead
-	leadGroupCrudUC := leadgroupucs.NewLeadGroupCRUDucs(leadGroupsRepo)
-	leadGroupCrudHandler := leadgroupHandlers.NewLeadGroupHandler(createLeadsUC, leadGroupCrudUC)
-
-	genericHandler := generichandler.NewGenericHandler[
-		entities.Lead,
-		dto.LeadCreateUpdateDTO,
-		dto.LeadResponseDTO,
-	](crudUC)
-
-	protected := genericrouter.RegisterCRUDRoutes(r, "leads", authMiddleware, tenantMiddleware, genericHandler)
-	// protected := genericrouter.GetProtectedRouterGroup(r, authMiddleware, tenantMiddleware)
-
-	protected.POST("/leads/groupedleads", getGroupedLeadsHandler.GetGroupedLeads)
-	protected.POST("/leads/createandgroup", leadGroupCrudHandler.CreateLead)
+	protected.POST("/leads/groupedleads", handlers.GroupedLeadsHandler.GetGroupedLeads)
+	protected.POST("/leads/createandgroup", handlers.LeadGroupHandler.CreateLead)
 
 	// nested
-	protected.POST("/leads/:leadId/groups/:groupId", leadGroupCrudHandler.CreateRelation)
-	protected.DELETE("/leads/:leadId/groups/:groupId", leadGroupCrudHandler.DeleteRelation)
-
+	protected.POST("/leads/:leadId/groups/:groupId", handlers.LeadGroupHandler.CreateRelation)
+	protected.DELETE("/leads/:leadId/groups/:groupId", handlers.LeadGroupHandler.DeleteRelation)
 }

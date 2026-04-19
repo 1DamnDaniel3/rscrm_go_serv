@@ -45,12 +45,12 @@ func (uc *LoginUC) Execute(input *entities.UserAccount) (*entities.UserAccount, 
 	filters["school_id"] = account.School_id
 	filters["account_id"] = account.Id
 	ctx := context.Background()
-	if err := uc.accRolesRepo.GetAllWhere(ctx, filters, &accountRoleIds); err != nil {
+	if err := uc.accRolesRepo.GetAllWhere(ctx, filters, &accountRoleIds, nil); err != nil {
 		return nil, "", make([]string, 0), err
 	}
 
 	allRoles := &[]entities.Roles{} // Получаем вообще все роли
-	if err := uc.rolesRepo.GetAll(ctx, allRoles); err != nil {
+	if err := uc.rolesRepo.GetAll(ctx, allRoles, nil); err != nil {
 		return nil, "", make([]string, 0), err
 	}
 	allRolesMap := make(map[int64]string) //складываем в map

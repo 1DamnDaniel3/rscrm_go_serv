@@ -247,6 +247,21 @@ definitions:
       password:
         type: string
     type: object
+  dto.SchoolResponseDTO:
+    properties:
+      city:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
   dto.StudentClientCreateUpdateDTO:
     properties:
       client_id:
@@ -499,7 +514,7 @@ definitions:
         $ref: '#/definitions/dto.UserAccountCreateDTO'
       profile:
         $ref: '#/definitions/dto.UserProfileCreateUpdateDTO'
-      role_ids:
+      roles:
         items:
           type: integer
         type: array
@@ -855,6 +870,37 @@ paths:
       summary: Регистрация новой школы
       tags:
       - Auth
+  /api/schools/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GetSchool by ID. Role Access only Owner(own school) and Admin
+      parameters:
+      - description: id школы в параметрах
+        in: path
+        name: input
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SchoolResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: GetSchoolByID
+      tags:
+      - School
   /api/student-clients/createandgetBO:
     post:
       consumes:

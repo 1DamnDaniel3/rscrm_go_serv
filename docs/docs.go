@@ -499,6 +499,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/schools/{id}": {
+            "get": {
+                "description": "GetSchool by ID. Role Access only Owner(own school) and Admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "School"
+                ],
+                "summary": "GetSchoolByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id школы в параметрах",
+                        "name": "input",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SchoolResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/student-clients/createandgetBO": {
             "post": {
                 "description": "Нужен, чтобы создать связь, получив при этом в ответ StudentClients бизнес-объект StudentClients",
@@ -1553,6 +1599,29 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SchoolResponseDTO": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.StudentClientCreateUpdateDTO": {
             "type": "object",
             "properties": {
@@ -1938,7 +2007,7 @@ const docTemplate = `{
                 "profile": {
                     "$ref": "#/definitions/dto.UserProfileCreateUpdateDTO"
                 },
-                "role_ids": {
+                "roles": {
                     "type": "array",
                     "items": {
                         "type": "integer"

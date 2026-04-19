@@ -1,40 +1,35 @@
 package entityroutes
 
 import (
-	schoolpolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/school_policies"
-	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	generichandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
+	infrastructure "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure"
+
+	schoolbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/school_builders"
+
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
+
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func SchoolRoutes(
 	r *gin.RouterGroup,
-	db *gorm.DB,
+	app *infrastructure.AppContainer,
+	useCases *schoolbuilders.SchoolUseCases,
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	// ==/== repo
-	schoolRepo := gormentityrepos.NewGormSchoolRepo(db)
-	// ==/== policies
-	schoolCrudPolicy := schoolpolicies.NewSchoolCrudPolicy()
-	schoolPolicies := schoolpolicies.NewSchoolPolicies(schoolCrudPolicy)
 
-	schoolCrudUC := genericcruduc.NewCRUDUseCase(schoolRepo, schoolPolicies.CRUD)
+	// ================= Handlers =================
+	schoolHandlers := schoolbuilders.NewSchoolHandlerBuilder(
+		useCases,
+	)
 
-	genericHandler := generichandler.NewGenericHandler[
-		entities.School,
-		dto.SchoolCreateUpdateDTO,
-		dto.SchoolResponseDTO,
-	](schoolCrudUC)
+	// ================= Routes =================
+	protected := genericrouter.GetProtectedRouterGroup(
+		r,
+		authMiddleware,
+		tenantMiddleware,
+	)
 
-	protected := genericrouter.RegisterCRUDRoutes(r, "schools", authMiddleware, tenantMiddleware, genericHandler)
-	// protected := genericrouter.GetProtectedRouterGroup(r, authMiddleware, tenantMiddleware)
-
-	protected.GET("/schools/:id", genericHandler.GetByID)
+	protected.GET("/schools/:id", schoolHandlers.CRUDHandler.GetByID)
 }

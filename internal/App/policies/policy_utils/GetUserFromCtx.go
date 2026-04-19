@@ -4,16 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policytypes"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/valuetypes"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/contextkeys"
 )
 
-type User struct {
-	ID    int64
-	Roles []valuetypes.Role
-}
-
-func GetUserFromCtx(ctx context.Context) (*User, error) {
+func GetUserFromCtx(ctx context.Context) (*policytypes.User, error) {
 	userCtx, ok := ctx.Value(contextkeys.User).(*valuetypes.UserContext)
 	if !ok || userCtx == nil {
 		return nil, fmt.Errorf("user context not found in context")
@@ -25,8 +21,9 @@ func GetUserFromCtx(ctx context.Context) (*User, error) {
 		roles[i] = valuetypes.Role(r)
 	}
 
-	return &User{
-		ID:    userCtx.UserID,
-		Roles: roles,
+	return &policytypes.User{
+		ID:        userCtx.UserID,
+		Roles:     roles,
+		School_id: userCtx.SchoolID,
 	}, nil
 }

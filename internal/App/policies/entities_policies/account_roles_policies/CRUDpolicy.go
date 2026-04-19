@@ -2,9 +2,11 @@ package accountrolespolicies
 
 import (
 	"context"
+	"fmt"
 
 	crudpolicy "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/crud_policy"
 	policyutils "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policy_utils"
+	policytypes "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policytypes"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/valuetypes"
 )
 
@@ -18,26 +20,80 @@ func NewAccountRolesCrudPolicy() IAccountRolesCrudPolicy {
 	return &AccountRolesCrudPolicy{}
 }
 
-// ---====== methods ======---
+// ==================================================== CREATE
+func (p *AccountRolesCrudPolicy) CanCreate(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-// CREATE — только owner
-func (p *AccountRolesCrudPolicy) CanCreate(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner)
+	if !policyutils.HasAnyRole(user, valuetypes.Owner) {
+		return nil, fmt.Errorf("forbidden")
+	}
+
+	return &policytypes.Scope{
+		IsGlobal:  false,
+		School_id: user.School_id,
+	}, nil
 }
 
-func (p *AccountRolesCrudPolicy) CanRead(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx,
-		valuetypes.Owner,
-		valuetypes.Accountant,
-	)
+// ==================================================== READ ONE
+func (p *AccountRolesCrudPolicy) CanReadOne(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if !policyutils.HasAnyRole(user, valuetypes.Owner) {
+		return nil, fmt.Errorf("forbidden")
+	}
+
+	return &policytypes.Scope{
+		IsGlobal:  false,
+		School_id: user.School_id,
+	}, nil
 }
 
-// UPDATE — только owner
-func (p *AccountRolesCrudPolicy) CanUpdate(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner)
+// ==================================================== READ ALL
+func (p *AccountRolesCrudPolicy) CanReadAll(ctx context.Context) (*policytypes.Scope, error) {
+	return p.CanReadOne(ctx)
 }
 
-// DELETE — только owner
-func (p *AccountRolesCrudPolicy) CanDelete(ctx context.Context) error {
-	return policyutils.RequireRoles(ctx, valuetypes.Owner)
+// ==================================================== READ ALL WHERE
+func (p *AccountRolesCrudPolicy) CanReadAllWhere(ctx context.Context) (*policytypes.Scope, error) {
+	return p.CanReadOne(ctx)
+}
+
+// ==================================================== UPDATE
+func (p *AccountRolesCrudPolicy) CanUpdate(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if !policyutils.HasAnyRole(user, valuetypes.Owner) {
+		return nil, fmt.Errorf("forbidden")
+	}
+
+	return &policytypes.Scope{
+		IsGlobal:  false,
+		School_id: user.School_id,
+	}, nil
+}
+
+// ==================================================== DELETE
+func (p *AccountRolesCrudPolicy) CanDelete(ctx context.Context) (*policytypes.Scope, error) {
+	user, err := policyutils.GetUserFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if !policyutils.HasAnyRole(user, valuetypes.Owner) {
+		return nil, fmt.Errorf("forbidden")
+	}
+
+	return &policytypes.Scope{
+		IsGlobal:  false,
+		School_id: user.School_id,
+	}, nil
 }

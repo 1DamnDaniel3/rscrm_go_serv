@@ -3,6 +3,7 @@ package lessonsucs
 import (
 	"context"
 
+	lessonpolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/lesson_policies"
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
 	lessonshedulesucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/lessonsUCs/lessonShedulesUCs"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
@@ -12,6 +13,8 @@ type GetLessonsUC struct {
 	repo       entitiesrepos.LessonsRepo
 	generateUC lessonshedulesucs.ICreateLessonsFromShceduleUC
 	cleanupUC  ICleanupOldLessonsUC
+
+	policy lessonpolicies.ILessonCrudPolicy
 }
 
 type IGetLessonsUC interface {
@@ -22,8 +25,9 @@ func NewGetLessonsUC(
 	repo entitiesrepos.LessonsRepo,
 	generateUC lessonshedulesucs.ICreateLessonsFromShceduleUC,
 	cleanupUC ICleanupOldLessonsUC,
+	policy lessonpolicies.ILessonCrudPolicy,
 ) IGetLessonsUC {
-	return &GetLessonsUC{repo, generateUC, cleanupUC}
+	return &GetLessonsUC{repo, generateUC, cleanupUC, policy}
 }
 
 func (uc *GetLessonsUC) Execute(ctx context.Context) ([]entities.Lesson, error) {
@@ -38,7 +42,12 @@ func (uc *GetLessonsUC) Execute(ctx context.Context) ([]entities.Lesson, error) 
 
 	lessons := []entities.Lesson{}
 
-	if err := uc.repo.GetAll(ctx, &lessons); err != nil {
+	scope, err := uc.policy.CanReadAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := uc.repo.GetAll(ctx, &lessons, scope); err != nil {
 		return nil, err
 	}
 

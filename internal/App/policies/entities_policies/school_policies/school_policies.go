@@ -4,7 +4,9 @@ type SchoolPolicies struct {
 	CRUD ISchoolCrudPolicy
 }
 
-func NewSchoolPolicies(crud ISchoolCrudPolicy) *SchoolPolicies {
+func NewSchoolPolicies(
+	crud ISchoolCrudPolicy,
+) *SchoolPolicies {
 	return &SchoolPolicies{
 		CRUD: crud,
 	}

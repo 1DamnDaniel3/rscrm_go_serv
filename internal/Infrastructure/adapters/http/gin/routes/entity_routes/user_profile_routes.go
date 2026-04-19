@@ -1,54 +1,36 @@
 package entityroutes
 
 import (
-	userprofilepolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/user_profile_policies"
-	profileucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/userUCs/profile_ucs"
-	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormentityrepos"
-	generichandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
-	profilehandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/user_handlers/profile_handlers"
+	infrastructure "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure"
+	userprofilebuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/user_profile_builders"
+
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
+
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func UserProfileRoutes(
 	r *gin.RouterGroup,
-	db *gorm.DB,
+	app *infrastructure.AppContainer,
+	useCases *userprofilebuilders.UserProfileUseCases,
 	authMiddleware *middleware.AuthMiddleware,
 	tenantMiddleware *middleware.TenantMiddleware,
 ) {
-	profileRepo := gormentityrepos.NewGormUserProfileRepo(db)
 
-	// policies
-	crudPolicy := userprofilepolicies.NewUserProfieCrudPolicy()
-	getSelfProfilePolicy := userprofilepolicies.NewReadProfilePolicy()
+	// ================= handlers =================
+	handlers := userprofilebuilders.NewUserProfileHandlerBuilder(useCases)
 
-	profilePolicy := userprofilepolicies.NewUserProfilePolicy(
-		crudPolicy,
-		getSelfProfilePolicy,
+	// ================= protected =================
+	protected := genericrouter.GetProtectedRouterGroup(
+		r,
+		authMiddleware,
+		tenantMiddleware,
 	)
 
-	// crud uc
-	profileCrudUC := genericcruduc.NewCRUDUseCase(profileRepo, profilePolicy.CRUD)
-
-	// ==/== get self profile
-	getSelfProfileUC := profileucs.NewGetSelfProfileUC(profileRepo, *profilePolicy)
-	getSelfProfileHandler := profilehandlers.NewGetSelfProfileHandler(getSelfProfileUC)
-
-	genericHandler := generichandler.NewGenericHandler[
-		entities.UserProfile,
-		dto.UserProfileCreateUpdateDTO,
-		dto.UserProfileResponseDTO,
-	](profileCrudUC)
-
-	protected := genericrouter.RegisterCRUDRoutes(r, "user_profiles", authMiddleware, tenantMiddleware, genericHandler)
-
-	// protected := genericrouter.GetProtectedRouterGroup(r, authMiddleware, tenantMiddleware)
-
-	protected.GET("/user_account/:id/profile", getSelfProfileHandler.GetSelfProfile)
-
+	// ================= routes =================
+	protected.GET(
+		"/user_account/:id/profile",
+		handlers.CRUDHandler.GetByID,
+	)
 }
