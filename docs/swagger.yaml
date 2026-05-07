@@ -51,6 +51,15 @@ definitions:
       school_id:
         type: string
     type: object
+  bodtos.BoDTO_User:
+    properties:
+      account:
+        $ref: '#/definitions/dto.UserAccountResponseDTO'
+      roles:
+        items:
+          type: string
+        type: array
+    type: object
   clienthandlers.ClientSearchHandlerDTO:
     properties:
       data:
@@ -90,6 +99,28 @@ definitions:
         $ref: '#/definitions/dto.ClientCreateUpdateDTO'
       group:
         $ref: '#/definitions/dto.ClientGroupCreateUpdateDTO'
+    type: object
+  dto.AccountRolesCreateUpdateDTO:
+    properties:
+      account_id:
+        type: integer
+      id:
+        type: integer
+      role_id:
+        type: integer
+      school_id:
+        type: string
+    type: object
+  dto.AccountRolesResponseDTO:
+    properties:
+      account_id:
+        type: integer
+      id:
+        type: integer
+      role_id:
+        type: integer
+      school_id:
+        type: string
     type: object
   dto.ClientCreateUpdateDTO:
     properties:
@@ -247,21 +278,6 @@ definitions:
       password:
         type: string
     type: object
-  dto.SchoolResponseDTO:
-    properties:
-      city:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      phone:
-        type: string
-    type: object
   dto.StudentClientCreateUpdateDTO:
     properties:
       client_id:
@@ -369,6 +385,8 @@ definitions:
         type: integer
       phone:
         type: string
+      school_id:
+        type: string
     type: object
   dto.UserProfileResponseDTO:
     properties:
@@ -381,6 +399,8 @@ definitions:
       id:
         type: integer
       phone:
+        type: string
+      school_id:
         type: string
     type: object
   leadgroupHandlers.СreateLeadInputDto:
@@ -500,13 +520,17 @@ definitions:
         example: +7-999-123-45-67
         type: string
     type: object
+  userhandlers.AccsWithRolesResponseDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/bodtos.BoDTO_User'
+        type: array
+    type: object
   userhandlers.AuthCheckResponse:
     properties:
       isAuthenticated:
         type: boolean
-      user:
-        additionalProperties: true
-        type: object
     type: object
   userhandlers.CreateEmployeeAccountInputDTO:
     properties:
@@ -530,17 +554,27 @@ definitions:
           type: integer
         type: array
     type: object
-  userhandlers.LoginResponse:
+  userhandlers.GetMeResponse:
     properties:
-      message:
-        example: success
-        type: string
+      data:
+        $ref: '#/definitions/bodtos.BoDTO_User'
+    type: object
+  userhandlers.LoginRespData:
+    properties:
+      account:
+        $ref: '#/definitions/dto.UserAccountResponseDTO'
       roles:
         items:
           type: string
         type: array
-      user:
-        $ref: '#/definitions/dto.UserAccountResponseDTO'
+    type: object
+  userhandlers.LoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/userhandlers.LoginRespData'
+      message:
+        example: success
+        type: string
     type: object
 info:
   contact: {}
@@ -549,21 +583,21 @@ paths:
     get:
       consumes:
       - application/json
-      description: Приходит кука с токеном, высылается 200, если токен ещё валиден
+      description: По токену ищется актуальная инфа пользователя из БД.
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/userhandlers.AuthCheckResponse'
-        "401":
-          description: Unauthorized
+            $ref: '#/definitions/userhandlers.GetMeResponse'
+        "500":
+          description: Internal Server Error
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Проверка авторизации
+      summary: Инфа аккаунта пользователя
       tags:
       - Auth
   /api/clients/{id}/groups:
@@ -870,37 +904,6 @@ paths:
       summary: Регистрация новой школы
       tags:
       - Auth
-  /api/schools/{id}:
-    get:
-      consumes:
-      - application/json
-      description: GetSchool by ID. Role Access only Owner(own school) and Admin
-      parameters:
-      - description: id школы в параметрах
-        in: path
-        name: input
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.SchoolResponseDTO'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: GetSchoolByID
-      tags:
-      - School
   /api/student-clients/createandgetBO:
     post:
       consumes:
@@ -1091,38 +1094,97 @@ paths:
       summary: Search
       tags:
       - Students
-  /api/user_accounts/{id}/profile:
-    get:
+  /api/user_account/{acc_id}/roles/{role_id}:
+    delete:
       consumes:
       - application/json
-      description: Получить свой профиль пользователя по account_id
+      description: Admin может убирать роли всем, Owner только внутри школы. Себе
+        нельзя удалить роль. Роли admin и owner не стираются.
       parameters:
-      - description: account_id по которому ищем профиль в пути маршрута
-        format: int64
-        in: path
+      - description: Данные для выдачи роли
+        in: body
         name: input
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/dto.AccountRolesCreateUpdateDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
-          headers:
-            Set-Cookie:
-              description: JWT-токен
-              type: string
           schema:
-            $ref: '#/definitions/dto.UserProfileResponseDTO'
+            $ref: '#/definitions/dto.AccountRolesResponseDTO'
         "400":
           description: Bad Request
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Логин
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Убрать роль сотруднику
       tags:
-      - Account
+      - AccountRoles
+  /api/user_accounts/allwithroles:
+    get:
+      consumes:
+      - application/json
+      description: Сотрудники школы с ролями для owner и абсолютно все для admin.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/userhandlers.AccsWithRolesResponseDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Аккаунты сотрудников с их ролями
+      tags:
+      - Auth
+  /api/user_accounts/assignroles:
+    post:
+      consumes:
+      - application/json
+      description: Admin может раздавать роли всем, Owner только внутри школы. Себе
+        нельзя выдать роль.
+      parameters:
+      - description: Данные для выдачи роли
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AccountRolesCreateUpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.AccountRolesResponseDTO'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Добавить роль сотруднику
+      tags:
+      - AccountRoles
   /api/user_accounts/createemployee:
     post:
       consumes:
@@ -1294,8 +1356,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/dto.StudentGroupResponseDTO'
         "400":

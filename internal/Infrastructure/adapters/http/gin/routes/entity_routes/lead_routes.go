@@ -6,7 +6,6 @@ import (
 	leadbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/lead_builders"
 	leadgroupbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/lead_group_builders"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 
 	"github.com/gin-gonic/gin"
@@ -17,8 +16,6 @@ func LeadRoutes(
 	app *infrastructure.AppContainer,
 	leadUCs *leadbuilders.LeadUseCases,
 	leadGroupUCs *leadgroupbuilders.LeadGroupsUseCaseBuilder,
-	authMiddleware *middleware.AuthMiddleware,
-	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 
 	// ================= Handlers =================
@@ -31,8 +28,8 @@ func LeadRoutes(
 	protected := genericrouter.RegisterCRUDRoutes(
 		r,
 		"leads",
-		authMiddleware,
-		tenantMiddleware,
+		app.AuthMiddleware,
+		app.TenantMiddleware,
 		handlers.CRUDHandler,
 	)
 

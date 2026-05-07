@@ -55,6 +55,7 @@ func (p *ScheduleCrudPolicy) CanReadOne(ctx context.Context) (*policytypes.Scope
 		valuetypes.Owner,
 		valuetypes.Manager,
 		valuetypes.Teacher,
+		valuetypes.Receptionist,
 	) {
 		return &policytypes.Scope{
 			IsGlobal:  false,

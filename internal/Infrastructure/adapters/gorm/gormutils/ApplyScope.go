@@ -12,22 +12,29 @@ import (
 func ApplyScope(
 	db *gorm.DB,
 	scope *policytypes.Scope,
-	foreignKey string, // например: "teacher_id", "created_by", "account_id"
-) *gorm.DB {
+	userForeignKey string,
+	schoolColumn string,
+) (*gorm.DB, error) {
 
 	if scope == nil || scope.IsGlobal {
-		return db
+		return db, nil
 	}
 
 	// ===================== SCHOOL FILTER =====================
 	if scope.School_id != "" {
-		db = db.Where("school_id = ?", scope.School_id)
+		if schoolColumn == "" {
+			return nil, fmt.Errorf("ApplyScope: schoolColumn is required when scope.School_id is set")
+		}
+		db = db.Where(fmt.Sprintf("%s = ?", schoolColumn), scope.School_id)
 	}
 
 	// ===================== USER FILTER =====================
-	if scope.User_id != 0 && foreignKey != "" {
-		db = db.Where(fmt.Sprintf("%s = ?", foreignKey), scope.User_id)
+	if scope.User_id != 0 {
+		if userForeignKey == "" {
+			return nil, fmt.Errorf("ApplyScope: userForeignKey is required when scope.User_id is set")
+		}
+		db = db.Where(fmt.Sprintf("%s = ?", userForeignKey), scope.User_id)
 	}
 
-	return db
+	return db, nil
 }

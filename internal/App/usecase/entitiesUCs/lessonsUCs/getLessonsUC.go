@@ -2,6 +2,7 @@ package lessonsucs
 
 import (
 	"context"
+	"fmt"
 
 	lessonpolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/lesson_policies"
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
@@ -33,11 +34,11 @@ func NewGetLessonsUC(
 func (uc *GetLessonsUC) Execute(ctx context.Context) ([]entities.Lesson, error) {
 
 	if err := uc.generateUC.Execute(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("lesson generating error: %v", err)
 	}
 
 	if err := uc.cleanupUC.Execute(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cleanup error: %v", err)
 	}
 
 	lessons := []entities.Lesson{}
@@ -48,7 +49,7 @@ func (uc *GetLessonsUC) Execute(ctx context.Context) ([]entities.Lesson, error) 
 	}
 
 	if err := uc.repo.GetAll(ctx, &lessons, scope); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read err: %v", err)
 	}
 
 	return lessons, nil

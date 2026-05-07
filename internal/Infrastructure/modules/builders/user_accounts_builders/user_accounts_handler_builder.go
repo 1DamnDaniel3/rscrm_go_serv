@@ -21,6 +21,9 @@ type UserAccountHandlerBuilder struct {
 	LoginHandler     *userhandlers.AuthHandler
 	RegisterHandler  *transactions.RegisterHandler
 	AuthCheckHandler *userhandlers.AuthCheckHandler
+	GetMeHandler     *userhandlers.GetMeHandler
+
+	GetAllAccountsWithRolesHandler *userhandlers.GetAllAccountsWithRolesHandler
 
 	CreateEmployeeHandler *userhandlers.CreateEmployeeAccountHandler
 }
@@ -49,6 +52,17 @@ func NewUserAccountHandlerBuilder(
 
 		AuthCheckHandler: userhandlers.NewAuthCheckHandler(
 			app.JWT,
+			uc.CRUD,
+		),
+
+		// ================= GETME =================
+		GetMeHandler: userhandlers.NewGetMeHandler(
+			uc.GetMe,
+		),
+
+		// ================= GET ALL ACCS WITH ROLES =================
+		GetAllAccountsWithRolesHandler: userhandlers.NewGetAllAccountsWithRolesHandler(
+			uc.GetAllAccountsWithRolesUC,
 		),
 
 		// ================= EMPLOYEE =================

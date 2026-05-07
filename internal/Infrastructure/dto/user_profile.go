@@ -8,6 +8,7 @@ type UserProfileCreateUpdateDTO struct {
 	Phone      string    `json:"phone"`
 	Full_name  string    `json:"full_name"`
 	Birthdate  time.Time `json:"birthdate"`
+	School_id  string    `json:"school_id"`
 }
 
 type UserProfileResponseDTO struct {
@@ -16,4 +17,5 @@ type UserProfileResponseDTO struct {
 	Phone      string    `json:"phone"`
 	Full_name  string    `json:"full_name"`
 	Birthdate  time.Time `json:"birthdate"`
+	School_id  string    `json:"school_id"`
 }

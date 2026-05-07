@@ -2,6 +2,7 @@ package builders
 
 import (
 	infrastructure "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure"
+	accountrolesbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/account_roles_builders"
 	clientbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/client_builders"
 	groupbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/group_builders"
 	leadbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/lead_builders"
@@ -14,11 +15,13 @@ import (
 	studentbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/student_builders"
 	studentclientbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/student_clients_builders"
 	studentgroupbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/student_group_builders"
+	subscriptionbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/subscription_builders"
 	useraccountbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/user_accounts_builders"
 	userprofilebuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/user_profile_builders"
 )
 
 type UseCases struct {
+	AccountRoles   *accountrolesbuilders.AccountRolesUseCases
 	Client         *clientbuilders.ClientUseCases
 	Group          *groupbuilders.GroupUseCases
 	Lead           *leadbuilders.LeadUseCases
@@ -29,6 +32,7 @@ type UseCases struct {
 	Source         *sourcebuilders.SourceUseCases
 	Status         *statusbuilders.StatusUseCases
 	Student        *studentbuilders.StudentUseCases
+	Subscription   *subscriptionbuilders.SubscriptionUseCases
 	StudentGroup   *studentgroupbuilders.StudentGroupUseCases
 	StudentClients *studentclientbuilders.StudentClientUseCases
 	UserAccount    *useraccountbuilders.UserUseCases
@@ -37,6 +41,14 @@ type UseCases struct {
 
 func NewUseCases(app *infrastructure.AppContainer) *UseCases {
 	return &UseCases{
+		AccountRoles: accountrolesbuilders.NewAccountRolesUseCases(
+			app.AccountRolesModule.AccountRolesRepo,
+			app.AccountRolesModule.AccountRolePolicies,
+
+			app.AccountModule.UserRepo,
+			app.AccountModule.AccountPolicies,
+		),
+
 		Client: clientbuilders.NewClientUseCases(
 			app.Tx,
 			app.ClientModule,
@@ -55,6 +67,8 @@ func NewUseCases(app *infrastructure.AppContainer) *UseCases {
 		),
 
 		LeadGroup: leadgroupbuilders.NewLeadGroupsUseCaseBuilder(
+			app.Tx,
+			app.LeadModule,
 			app.LeadGroupsModule,
 		),
 
@@ -84,6 +98,14 @@ func NewUseCases(app *infrastructure.AppContainer) *UseCases {
 		Student: studentbuilders.NewStudentUseCasesBuilder(
 			app.Tx,
 			app.StudentModule,
+			app.StudentGroupsModule,
+		),
+
+		Subscription: subscriptionbuilders.NewSubscriptionUCBuilder(
+			app.SubscriptionModule,
+		),
+
+		StudentGroup: studentgroupbuilders.NewStudentGroupUseCasesBuilder(
 			app.StudentGroupsModule,
 		),
 

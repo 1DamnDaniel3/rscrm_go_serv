@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policytypes"
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	adapters "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm"
 	genericAdapter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/generic"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/gorm/gormutils"
 	"gorm.io/gorm"
 )
 
@@ -32,4 +34,61 @@ func NewGormUserProfileRepo(db *gorm.DB) entitiesrepos.UserProfileRepo {
 		GormRepository: genericAdapter.NewGormRepository[entities.UserProfile](db),
 		db:             db,
 	}
+}
+
+// ============================ OVERRIDE ===============================
+
+func (r *GormUserProfileRepo) GetAllWhere(
+	ctx context.Context,
+	filters map[string]interface{},
+	entities *[]entities.UserProfile,
+	scope *policytypes.Scope,
+) error {
+
+	db := gormutils.DBFromCtx(ctx, r.db)
+
+	delete(filters, "school_id")
+	delete(filters, "account_id")
+
+	db, err := gormutils.ApplyScope(db, scope, "account_id", "school_id")
+	if err != nil {
+		return err
+	}
+
+	db = db.Where(filters)
+
+	return db.Find(entities).Error
+}
+
+func (r *GormUserProfileRepo) Update(
+	ctx context.Context,
+	id any,
+	fields map[string]interface{},
+	scope *policytypes.Scope,
+) error {
+
+	delete(fields, "school_id")
+	delete(fields, "id")
+
+	db := gormutils.DBFromCtx(ctx, r.db)
+	db, err := gormutils.ApplyScope(db, scope, "account_id", "school_id")
+	if err != nil {
+		return err
+	}
+
+	tx := db.
+		Model(&entities.UserProfile{}).
+		Where("id = ?", id).
+		Updates(fields)
+
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+		return errors.New("entity not found or access denied")
+	}
+
+	return nil
+
 }

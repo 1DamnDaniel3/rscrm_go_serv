@@ -5,27 +5,34 @@ import (
 	"strings"
 
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
+	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 	"github.com/gin-gonic/gin"
 )
 
 type AuthCheckHandler struct {
 	JwtService ports.JWTservice
+	uc         genericcruduc.ICRUDUseCase[entities.UserAccount]
 }
 
-func NewAuthCheckHandler(JwtService ports.JWTservice) *AuthCheckHandler {
-	return &AuthCheckHandler{JwtService}
+func NewAuthCheckHandler(
+	JwtService ports.JWTservice,
+	uc genericcruduc.ICRUDUseCase[entities.UserAccount],
+) *AuthCheckHandler {
+	return &AuthCheckHandler{JwtService, uc}
 }
 
 // AuthCheck godoc
 // @Summary      Проверка авторизации
-// @Description  Приходит кука с токеном, высылается 200, если токен ещё валиден
+// @Description  Просто респект и уважуха если токен есть. Если нет то 401.
 // @Tags         Auth
 // @Accept       json
 // @Produce      json
 // @Success      200 	{object}  AuthCheckResponse
 // @Failure      401    {object}  map[string]string
 // @Router       /api/auth/check [get]
-func (a *AuthCheckHandler) CheckAuth(c *gin.Context) {
+func (h *AuthCheckHandler) CheckAuth(c *gin.Context) {
+
 	token, err := c.Cookie("jwt")
 	if err != nil {
 		authHeader := c.GetHeader("Authorisation")
@@ -39,21 +46,16 @@ func (a *AuthCheckHandler) CheckAuth(c *gin.Context) {
 		return
 	}
 
-	claims, err := a.JwtService.Verify(token)
-	if err != nil {
+	if _, err := h.JwtService.Verify(token); err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 		return
 	}
 
-	// c.Set("user", claims)
-	delete(claims, "exp")
 	c.JSON(http.StatusOK, AuthCheckResponse{
 		IsAuthenticated: true,
-		User:            claims,
 	})
 }
 
 type AuthCheckResponse struct {
-	IsAuthenticated bool                   `json:"isAuthenticated"`
-	User            map[string]interface{} `json:"user"`
+	IsAuthenticated bool `json:"isAuthenticated"`
 }

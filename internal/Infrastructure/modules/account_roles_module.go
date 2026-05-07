@@ -20,6 +20,8 @@ func NewAccountRolesModule(
 
 		AccountRolePolicies: accountrolespolicies.NewAccountRolesPolicies(
 			accountrolespolicies.NewAccountRolesCrudPolicy(),
+			accountrolespolicies.NewAccountRolesCreatePolicy(),
+			accountrolespolicies.NewAccountRolesDeletePolicy(),
 		),
 	}
 }

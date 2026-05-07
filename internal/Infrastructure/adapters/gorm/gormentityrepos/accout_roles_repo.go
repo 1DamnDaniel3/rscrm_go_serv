@@ -30,3 +30,19 @@ func (r *GormAccountRolesRepo) Register(ctx context.Context, entity *entities.Ac
 	}
 	return tx.Create(entity).Error
 }
+
+// ======================================= OVERRIDE ==================================
+
+// func (r *GormAccountRolesRepo) Create(
+// 	ctx context.Context,
+// 	entity *entities.AccountRoles,
+// 	scope *policytypes.Scope,
+// ) error {
+
+// 	db := gormutils.DBFromCtx(ctx, r.db)
+
+// 	if scope != nil && !scope.IsGlobal && scope.School_id != "" {
+// 		entity.School_id = scope.School_id
+// 	}
+
+// }

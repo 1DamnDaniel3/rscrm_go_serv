@@ -1,11 +1,16 @@
 package lessonpolicies
 
 type LessonPolicies struct {
-	CRUD ILessonCrudPolicy
+	CRUD         ILessonCrudPolicy
+	CreatePolicy ILessonCreatePolicy
 }
 
-func NewLessonPolicies(crud ILessonCrudPolicy) *LessonPolicies {
+func NewLessonPolicies(
+	crud ILessonCrudPolicy,
+	CreatePolicy ILessonCreatePolicy,
+) *LessonPolicies {
 	return &LessonPolicies{
-		CRUD: crud,
+		CRUD:         crud,
+		CreatePolicy: CreatePolicy,
 	}
 }

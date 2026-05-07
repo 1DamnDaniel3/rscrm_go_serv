@@ -39,25 +39,36 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 	authMiddleware := middleware.NewAuthMiddleware(JWTSigner)
 	tenandMiddleware := middleware.NewTenandMiddleware()
 
-	// ==========================
-	// |		  APP		     |
-	// ==========================
+	// ===========================
+	// |          APP            |
+	// ===========================
 
-	app := infrastructure.NewAppContainer(db, hasher, JWTSigner, tx)
+	app := infrastructure.NewAppContainer(
+		db, hasher,
+		JWTSigner, tx,
+		authMiddleware, tenandMiddleware,
+	)
 	usecases := builders.NewUseCases(app)
 
 	// == routes ==
-	entityroutes.UserAccountRoutes(api, app, usecases.UserAccount, authMiddleware, tenandMiddleware)
-	entityroutes.UserProfileRoutes(api, app, usecases.UserProfile, authMiddleware, tenandMiddleware)
-	entityroutes.SchoolRoutes(api, app, usecases.School, authMiddleware, tenandMiddleware)
-	entityroutes.LeadRoutes(api, app, usecases.Lead, usecases.LeadGroup, authMiddleware, tenandMiddleware)
-	entityroutes.StudentRoutes(api, app, usecases.Student, usecases.StudentGroup, authMiddleware, tenandMiddleware)
-	entityroutes.ClientRoutes(api, app, usecases.Client, authMiddleware, tenandMiddleware)
-	entityroutes.GroupRoutes(api, app, usecases.Group, authMiddleware, tenandMiddleware)
-	entityroutes.StatusRoutes(api, app, usecases.Status, authMiddleware, tenandMiddleware)
-	entityroutes.SourceRoutes(api, app, usecases.Source, authMiddleware, tenandMiddleware)
-	entityroutes.ScheduleRoutes(api, app, usecases.Schedule, authMiddleware, tenandMiddleware)
-	entityroutes.LessonRoutes(api, app, usecases.Lesson, authMiddleware, tenandMiddleware)
+	entityroutes.AccountRolesRoutes(api, app, usecases.AccountRoles)
+	entityroutes.SchoolRoutes(api, app, usecases.School)
+	entityroutes.UserAccountRoutes(api, app, usecases.UserAccount)
+	entityroutes.UserProfileRoutes(api, app, usecases.UserProfile)
+
+	entityroutes.LeadRoutes(api, app, usecases.Lead, usecases.LeadGroup)
+	entityroutes.ClientRoutes(api, app, usecases.Client)
+	entityroutes.StudentRoutes(api, app, usecases.Student, usecases.StudentGroup)
+
+	entityroutes.GroupRoutes(api, app, usecases.Group)
+
+	entityroutes.StatusRoutes(api, app, usecases.Status)
+	entityroutes.SourceRoutes(api, app, usecases.Source)
+
+	entityroutes.ScheduleRoutes(api, app, usecases.Schedule)
+	entityroutes.LessonRoutes(api, app, usecases.Lesson)
+
+	entityroutes.SubscriptionRoutes(api, app, usecases.Subscription)
 
 	// == related tables routes
 	entityroutes.StudentClientRoutes(api, app, usecases.StudentClients, authMiddleware, tenandMiddleware)

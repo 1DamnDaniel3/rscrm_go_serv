@@ -34,7 +34,7 @@ func NewLessonUseCasesBuilder(
 		GenerateFromSchedule: lessonshedulesucs.NewCreateLessonsFromShceduleUC(
 			lessonModule.LessonsRepo,
 			scheduleModule.ScheduleRepo,
-			lessonModule.LessonPolicies.CRUD,
+			lessonModule.LessonPolicies,
 			scheduleModule.SchedulePolicies.CRUD,
 		),
 
@@ -49,7 +49,7 @@ func NewLessonUseCasesBuilder(
 			lessonshedulesucs.NewCreateLessonsFromShceduleUC(
 				lessonModule.LessonsRepo,
 				scheduleModule.ScheduleRepo,
-				lessonModule.LessonPolicies.CRUD,
+				lessonModule.LessonPolicies,
 				scheduleModule.SchedulePolicies.CRUD,
 			),
 			lessonsucs.NewCleanupOldLessonsUC(

@@ -23,9 +23,13 @@ func NewLoginHandler(uc userUCs.ILoginUC) *AuthHandler {
 // === DTO ===
 
 type LoginResponse struct {
-	Message string                      `json:"message" example:"success"`
-	User    *dto.UserAccountResponseDTO `json:"user"`
-	Roles   []string                    `json:"roles"`
+	Message string         `json:"message" example:"success"`
+	Data    *LoginRespData `json:"data"`
+}
+
+type LoginRespData struct {
+	User  *dto.UserAccountResponseDTO `json:"account"`
+	Roles []string                    `json:"roles"`
 }
 
 // Login godoc
@@ -78,8 +82,10 @@ func (r *AuthHandler) Login(c *gin.Context) {
 
 	c.JSON(http.StatusOK, LoginResponse{
 		Message: "success",
-		User:    response,
-		Roles:   roles,
+		Data: &LoginRespData{
+			User:  response,
+			Roles: roles,
+		},
 	})
 
 }

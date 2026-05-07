@@ -33,6 +33,9 @@ func NewCreateLeadUC(
 		tx:             tx,
 		leadRepo:       leadRepo,
 		leadGroupsRepo: leadGroupsRepo,
+
+		leadPolicy:      leadPolicy,
+		leadGroupPolicy: leadGroupPolicy,
 	}
 }
 

@@ -1,11 +1,19 @@
 package accountrolespolicies
 
 type AccountRolesPolicies struct {
-	CRUD IAccountRolesCrudPolicy
+	CRUD         IAccountRolesCrudPolicy
+	CreatePolicy IAccountRolesCreatePolicy
+	DeletePolicy IAccountRolesDeletePolicy
 }
 
-func NewAccountRolesPolicies(crud IAccountRolesCrudPolicy) *AccountRolesPolicies {
+func NewAccountRolesPolicies(
+	crud IAccountRolesCrudPolicy,
+	CreatePolicy IAccountRolesCreatePolicy,
+	DeletePolicy IAccountRolesDeletePolicy,
+) *AccountRolesPolicies {
 	return &AccountRolesPolicies{
-		CRUD: crud,
+		CRUD:         crud,
+		CreatePolicy: CreatePolicy,
+		DeletePolicy: DeletePolicy,
 	}
 }

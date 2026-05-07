@@ -21,6 +21,7 @@ func NewLessonModule(
 		LessonQueryService: gormentityrepos.NewGormLessonQueryService(db),
 		LessonPolicies: lessonpolicies.NewLessonPolicies(
 			lessonpolicies.NewLessonCrudPolicy(),
+			lessonpolicies.NewLessonCreatePolicy(),
 		),
 	}
 }

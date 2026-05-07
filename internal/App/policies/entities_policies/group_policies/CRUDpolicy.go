@@ -55,6 +55,7 @@ func (p *GroupCrudPolicy) CanReadOne(ctx context.Context) (*policytypes.Scope, e
 	if policyutils.HasAnyRole(user,
 		valuetypes.Owner,
 		valuetypes.Manager,
+		valuetypes.Teacher,
 		valuetypes.Accountant,
 	) {
 		return &policytypes.Scope{

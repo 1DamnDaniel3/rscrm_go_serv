@@ -9,8 +9,9 @@ import (
 )
 
 type AccountModule struct {
-	UserRepo        entitiesrepos.UserAccountRepository
-	AccountPolicies *useraccountpolicies.UserAccountPolicies
+	UserRepo         entitiesrepos.UserAccountRepository
+	UserQueryService entitiesrepos.UserAccountQueryService
+	AccountPolicies  *useraccountpolicies.UserAccountPolicies
 }
 
 func NewAccountModule(
@@ -20,6 +21,8 @@ func NewAccountModule(
 	return &AccountModule{
 		// -=== repo
 		UserRepo: gormentityrepos.NewGormUserAccountRepo(db, hasher),
+
+		UserQueryService: gormentityrepos.NewGormUserAccountQueryService(db),
 
 		// -=== policies
 		AccountPolicies: useraccountpolicies.NewUserAccountPolicies(

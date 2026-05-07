@@ -117,7 +117,7 @@ func (h *StudentGroupHandler) CreateRelation(c *gin.Context) {
 // @Produce      json
 // @Param        studId   path      int  true  "ID of the student"
 // @Param        groupId  path      int  true  "ID of the group"
-// @Success      201 {object} dto.StudentGroupResponseDTO
+// @Success      200 {object} dto.StudentGroupResponseDTO
 // @Failure      400 {object} map[string]string
 // @Failure      500 {object} map[string]string
 // @Router       /students/{studId}/groups/{groupId} [delete]

@@ -5,7 +5,6 @@ import (
 
 	lessonbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/lesson_builders"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 
 	"github.com/gin-gonic/gin"
@@ -15,8 +14,6 @@ func LessonRoutes(
 	r *gin.RouterGroup,
 	app *infrastructure.AppContainer,
 	lessonUCs *lessonbuilders.LessonUseCases,
-	authMiddleware *middleware.AuthMiddleware,
-	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 
 	// ================= Handlers =================
@@ -28,8 +25,8 @@ func LessonRoutes(
 	protected := genericrouter.RegisterCRUDRoutes(
 		r,
 		"lessons",
-		authMiddleware,
-		tenantMiddleware,
+		app.AuthMiddleware,
+		app.TenantMiddleware,
 		lessonHandlers.CRUDHandler,
 	)
 

@@ -2,7 +2,6 @@ package entityroutes
 
 import (
 	infrastructure "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure"
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 	clientbuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/client_builders"
 	"github.com/gin-gonic/gin"
@@ -12,8 +11,6 @@ func ClientRoutes(
 	r *gin.RouterGroup,
 	app *infrastructure.AppContainer,
 	clientUCs *clientbuilders.ClientUseCases,
-	authMiddleware *middleware.AuthMiddleware,
-	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 
 	// ================= Handlers =================
@@ -23,8 +20,8 @@ func ClientRoutes(
 	protected := genericrouter.RegisterCRUDRoutes(
 		r,
 		"clients",
-		authMiddleware,
-		tenantMiddleware,
+		app.AuthMiddleware,
+		app.TenantMiddleware,
 		clientHandlers.CRUDHandler,
 	)
 

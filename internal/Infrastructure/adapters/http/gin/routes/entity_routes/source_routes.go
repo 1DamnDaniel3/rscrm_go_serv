@@ -5,7 +5,6 @@ import (
 
 	sourcebuilders "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/modules/builders/source_builders"
 
-	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/middleware"
 	genericrouter "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/routes/entity_routes/generic_router"
 
 	"github.com/gin-gonic/gin"
@@ -15,8 +14,6 @@ func SourceRoutes(
 	r *gin.RouterGroup,
 	app *infrastructure.AppContainer,
 	sourceUCs *sourcebuilders.SourceUseCases,
-	authMiddleware *middleware.AuthMiddleware,
-	tenantMiddleware *middleware.TenantMiddleware,
 ) {
 
 	// ================= Handlers =================
@@ -28,8 +25,8 @@ func SourceRoutes(
 	genericrouter.RegisterCRUDRoutes(
 		r,
 		"sources",
-		authMiddleware,
-		tenantMiddleware,
+		app.AuthMiddleware,
+		app.TenantMiddleware,
 		sourceHandlers.CRUDHandler,
 	)
 }

@@ -35,6 +35,9 @@ func NewCreateStudentUC(
 		tx:            tx,
 		studRepo:      studRepo,
 		studGroupRepo: studGroupRepo,
+
+		studentPolicy:      studentPolicy,
+		studentGroupPolicy: studentGroupPolicy,
 	}
 }
 

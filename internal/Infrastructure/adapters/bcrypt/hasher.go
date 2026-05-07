@@ -1,6 +1,7 @@
 package bcrypt
 
 import (
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -8,7 +9,7 @@ type BcryptHasher struct {
 	cost int
 }
 
-func NewBcryptHasher(cost int) *BcryptHasher {
+func NewBcryptHasher(cost int) ports.PasswordHasher {
 	if cost == 0 {
 		cost = bcrypt.DefaultCost
 	}

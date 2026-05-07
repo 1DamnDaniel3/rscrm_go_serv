@@ -15,7 +15,7 @@ type CreateLessonsFromShceduleUC struct {
 	repoLessons   entitiesrepos.LessonsRepo
 	repoSchedules entitiesrepos.ScheduleRepo
 
-	lessonsPolicy   lessonpolicies.ILessonCrudPolicy
+	lessonsPolicy   *lessonpolicies.LessonPolicies
 	schedulesPolicy schedulepolicies.IScheduleCrudPolicy
 }
 
@@ -26,7 +26,7 @@ type ICreateLessonsFromShceduleUC interface {
 func NewCreateLessonsFromShceduleUC(
 	repo entitiesrepos.LessonsRepo,
 	repoSchedules entitiesrepos.ScheduleRepo,
-	lessonsPolicy lessonpolicies.ILessonCrudPolicy,
+	lessonsPolicy *lessonpolicies.LessonPolicies,
 	schedulesPolicy schedulepolicies.IScheduleCrudPolicy,
 ) ICreateLessonsFromShceduleUC {
 	return &CreateLessonsFromShceduleUC{repo, repoSchedules, lessonsPolicy, schedulesPolicy}
@@ -100,7 +100,7 @@ func (uc *CreateLessonsFromShceduleUC) Execute(ctx context.Context) error {
 		return nil
 	}
 
-	lessonCreateManyScope, err := uc.lessonsPolicy.CanCreate(ctx)
+	lessonCreateManyScope, err := uc.lessonsPolicy.CreatePolicy.CanGenerateLessons(ctx)
 	if err != nil {
 		return err
 	}

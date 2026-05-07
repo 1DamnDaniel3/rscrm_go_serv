@@ -33,13 +33,16 @@ func main() {
 
 	db_cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("failed to load config :( because: %v", err)
+		log.Fatalf("failed to load config :( because of: %v", err)
 	}
 
 	db, err := adapters.ConnectDB(db_cfg)
 	if err != nil {
-		log.Fatalf("failed to connectDB :( because: %v", err)
+		log.Fatalf("failed to connectDB :( because of: %v", err)
 	}
+	// |=================================|
+	// |  BUILD APP and REGISTER ROUTES  |
+	// |=================================|
 	routes.SetupRoutes(router, db)
 
 	// migrations

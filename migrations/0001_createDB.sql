@@ -416,7 +416,7 @@ ins_roles AS (
 ),
 ins_account_roles AS (
     INSERT INTO account_roles (account_id, role_id, school_id) VALUES
-    (1, 1, (SELECT id FROM ins_school)),  -- admin
+    (1, 1, NULL),  -- admin
     (2, 2, (SELECT id FROM ins_school)),  -- owner
     (3, 3, (SELECT id FROM ins_school)),  -- manager
     (4, 4, (SELECT id FROM ins_school)),  -- teacher
@@ -426,7 +426,7 @@ ins_account_roles AS (
 ins_profiles AS (
     INSERT INTO user_profiles (account_id, phone, full_name, birthdate, school_id)
     VALUES
-    (1, '+7 (900) 900-9090', 'Admin', '2025-05-24', (SELECT id FROM ins_school)),
+    (1, '+7 (900) 900-9090', 'Admin', '2025-05-24', NULL),
     (2, '+7 (900) 901-9191', 'Owner', '2025-05-24', (SELECT id FROM ins_school)),
     (3, '+7 (900) 902-9292', 'Manager', '2025-05-24', (SELECT id FROM ins_school)),
     (4, '+7 (900) 903-9393', 'Teacher', '2025-05-24', (SELECT id FROM ins_school)),

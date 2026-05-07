@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/api/auth/check": {
             "get": {
-                "description": "Приходит кука с токеном, высылается 200, если токен ещё валиден",
+                "description": "По токену ищется актуальная инфа пользователя из БД.",
                 "consumes": [
                     "application/json"
                 ],
@@ -27,16 +27,16 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Проверка авторизации",
+                "summary": "Инфа аккаунта пользователя",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/userhandlers.AuthCheckResponse"
+                            "$ref": "#/definitions/userhandlers.GetMeResponse"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -499,52 +499,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/schools/{id}": {
-            "get": {
-                "description": "GetSchool by ID. Role Access only Owner(own school) and Admin",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "School"
-                ],
-                "summary": "GetSchoolByID",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id школы в параметрах",
-                        "name": "input",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.SchoolResponseDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
         "/api/student-clients/createandgetBO": {
             "post": {
                 "description": "Нужен, чтобы создать связь, получив при этом в ответ StudentClients бизнес-объект StudentClients",
@@ -827,6 +781,142 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/user_account/{acc_id}/roles/{role_id}": {
+            "delete": {
+                "description": "Admin может убирать роли всем, Owner только внутри школы. Себе нельзя удалить роль. Роли admin и owner не стираются.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AccountRoles"
+                ],
+                "summary": "Убрать роль сотруднику",
+                "parameters": [
+                    {
+                        "description": "Данные для выдачи роли",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AccountRolesCreateUpdateDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AccountRolesResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user_accounts/allwithroles": {
+            "get": {
+                "description": "Сотрудники школы с ролями для owner и абсолютно все для admin.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Аккаунты сотрудников с их ролями",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/userhandlers.AccsWithRolesResponseDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user_accounts/assignroles": {
+            "post": {
+                "description": "Admin может раздавать роли всем, Owner только внутри школы. Себе нельзя выдать роль.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AccountRoles"
+                ],
+                "summary": "Добавить роль сотруднику",
+                "parameters": [
+                    {
+                        "description": "Данные для выдачи роли",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AccountRolesCreateUpdateDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AccountRolesResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/user_accounts/createemployee": {
             "post": {
                 "description": "Добавить сотрудника с ролями.",
@@ -869,54 +959,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/user_accounts/{id}/profile": {
-            "get": {
-                "description": "Получить свой профиль пользователя по account_id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Account"
-                ],
-                "summary": "Логин",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "account_id по которому ищем профиль в пути маршрута",
-                        "name": "input",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.UserProfileResponseDTO"
-                        },
-                        "headers": {
-                            "Set-Cookie": {
-                                "type": "string",
-                                "description": "JWT-токен"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -1189,8 +1231,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.StudentGroupResponseDTO"
                         }
@@ -1297,6 +1339,20 @@ const docTemplate = `{
                 }
             }
         },
+        "bodtos.BoDTO_User": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "$ref": "#/definitions/dto.UserAccountResponseDTO"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "clienthandlers.ClientSearchHandlerDTO": {
             "type": "object",
             "properties": {
@@ -1357,6 +1413,40 @@ const docTemplate = `{
                 },
                 "group": {
                     "$ref": "#/definitions/dto.ClientGroupCreateUpdateDTO"
+                }
+            }
+        },
+        "dto.AccountRolesCreateUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.AccountRolesResponseDTO": {
+            "type": "object",
+            "properties": {
+                "account_id": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
                 }
             }
         },
@@ -1599,29 +1689,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.SchoolResponseDTO": {
-            "type": "object",
-            "properties": {
-                "city": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.StudentClientCreateUpdateDTO": {
             "type": "object",
             "properties": {
@@ -1785,6 +1852,9 @@ const docTemplate = `{
                 },
                 "phone": {
                     "type": "string"
+                },
+                "school_id": {
+                    "type": "string"
                 }
             }
         },
@@ -1804,6 +1874,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "phone": {
+                    "type": "string"
+                },
+                "school_id": {
                     "type": "string"
                 }
             }
@@ -1986,15 +2059,22 @@ const docTemplate = `{
                 }
             }
         },
+        "userhandlers.AccsWithRolesResponseDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/bodtos.BoDTO_User"
+                    }
+                }
+            }
+        },
         "userhandlers.AuthCheckResponse": {
             "type": "object",
             "properties": {
                 "isAuthenticated": {
                     "type": "boolean"
-                },
-                "user": {
-                    "type": "object",
-                    "additionalProperties": true
                 }
             }
         },
@@ -2032,21 +2112,37 @@ const docTemplate = `{
                 }
             }
         },
-        "userhandlers.LoginResponse": {
+        "userhandlers.GetMeResponse": {
             "type": "object",
             "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "success"
+                "data": {
+                    "$ref": "#/definitions/bodtos.BoDTO_User"
+                }
+            }
+        },
+        "userhandlers.LoginRespData": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "$ref": "#/definitions/dto.UserAccountResponseDTO"
                 },
                 "roles": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "userhandlers.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/userhandlers.LoginRespData"
                 },
-                "user": {
-                    "$ref": "#/definitions/dto.UserAccountResponseDTO"
+                "message": {
+                    "type": "string",
+                    "example": "success"
                 }
             }
         }

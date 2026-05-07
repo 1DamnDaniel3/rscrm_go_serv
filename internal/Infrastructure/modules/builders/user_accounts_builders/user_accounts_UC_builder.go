@@ -1,6 +1,7 @@
 package useraccountbuilders
 
 import (
+	useraccountpolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/user_account_policies.go"
 	userucs "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/entitiesUCs/userUCs"
 	genericcruduc "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/generic_crud_uc"
 
@@ -11,10 +12,12 @@ import (
 )
 
 type UserUseCases struct {
-	CRUD              genericcruduc.ICRUDUseCase[entities.UserAccount]
-	Login             userucs.ILoginUC
-	Register          userucs.IRegisterUseCase
-	CreateEmployeeAcc userucs.ICreateEmployeeAccountUC
+	CRUD                      genericcruduc.ICRUDUseCase[entities.UserAccount]
+	Login                     userucs.ILoginUC
+	Register                  userucs.IRegisterUseCase
+	GetMe                     userucs.IGetMeUC
+	CreateEmployeeAcc         userucs.ICreateEmployeeAccountUC
+	GetAllAccountsWithRolesUC userucs.IGetAllAccountsWithRolesUC
 }
 
 func NewUserUseCasesBuilder(
@@ -53,6 +56,17 @@ func NewUserUseCasesBuilder(
 			schoolModule.SchoolRepo,
 			accountRolesModule.AccountRolesRepo,
 			hasher,
+		),
+
+		// ================= GETME =================
+		GetMe: userucs.NewGetMeUC(
+			userModule.UserQueryService,
+		),
+
+		// ================= GETALLEMPLOYESS ACCS WITH ROLES =================
+		GetAllAccountsWithRolesUC: userucs.NewGetAllAccountsWithRolesUC(
+			userModule.UserQueryService,
+			useraccountpolicies.NewUserAccountCrudPolicy(),
 		),
 
 		// ================= EMPLOYEE ACCOUNT =================

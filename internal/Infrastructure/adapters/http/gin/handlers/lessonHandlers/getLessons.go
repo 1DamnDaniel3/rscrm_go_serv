@@ -32,7 +32,7 @@ func (h *GetLessonsHandler) GetLessons(c *gin.Context) {
 
 	lessons, err := h.uc.Execute(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -47,7 +47,6 @@ func (h *GetLessonsHandler) GetLessons(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, resp)
-
 }
 
 type GetLessonHandlerResDTO struct {

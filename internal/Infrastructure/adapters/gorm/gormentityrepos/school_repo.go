@@ -103,6 +103,7 @@ func (r *GormSchoolRepo) GetAll(
 	return db.Find(entities).Error
 }
 
+// ==================================================== UPDATE
 func (r *GormSchoolRepo) Update(
 	ctx context.Context,
 	entityID any,
@@ -114,10 +115,10 @@ func (r *GormSchoolRepo) Update(
 		return nil
 	}
 
-	db := gormutils.DBFromCtx(ctx, r.db)
-
-	// запрещаем менять id
 	delete(fields, "id")
+	delete(fields, "created_at")
+
+	db := gormutils.DBFromCtx(ctx, r.db)
 
 	// ===================== ACCESS CONTROL =====================
 	if scope != nil && !scope.IsGlobal {

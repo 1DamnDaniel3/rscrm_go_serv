@@ -180,7 +180,7 @@ func (r *GormRepository[T]) Delete(ctx context.Context, id any, entity *T, scope
 // ==================================================== FindRelation
 
 // FindRelation by map where keys is column name(string) value is ID (int64 usually)
-// expample: relationMap := map[string]any{"user_id": user.ID, "school_id: user.School_ID"}
+// expample: relationMap := map[string]any{"user_id": user.ID, "school_id": user.School_ID}
 func (r *GormRepository[T]) FindRelation(ctx context.Context, relationMap map[string]any, scope *policytypes.Scope) (*T, error) {
 	db := r.DBFromCtx(ctx)
 	db = r.ApplyScope(db, scope)
