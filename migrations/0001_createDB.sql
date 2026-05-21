@@ -107,40 +107,8 @@ CREATE TABLE student_clients (
   CONSTRAINT unique_student_client UNIQUE (student_id, client_id, school_id)
 );
 
--- 6. Абонементы
-CREATE TABLE subscriptions (
-  id SERIAL PRIMARY KEY,
-  name TEXT,
-  price NUMERIC,
-  visit_limit INTEGER,
-  active_from DATE,
-  active_to DATE,
-  is_archived BOOLEAN DEFAULT FALSE,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
-);
 
-CREATE TABLE student_subscriptions (
-  id SERIAL PRIMARY KEY,
-  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
-  subscription_id INTEGER REFERENCES subscriptions(id) ON DELETE CASCADE,
-  issued_at DATE,
-  expires_at DATE,
-  remaining_visits INTEGER,
-  is_active BOOLEAN,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
-
-  CONSTRAINT unique_student_subscription UNIQUE (student_id, subscription_id, school_id)
-);
-
-CREATE TABLE subscription_pauses (
-  id SERIAL PRIMARY KEY,
-  student_subscription_id INTEGER REFERENCES student_subscriptions(id) ON DELETE CASCADE,
-  paused_from DATE,
-  paused_to DATE,
-  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
-);
-
--- 7. Группы
+-- 6. Группы
 CREATE TABLE groups (
   id SERIAL PRIMARY KEY,
   name TEXT,
@@ -176,7 +144,40 @@ CREATE TABLE student_groups (
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
   CONSTRAINT unique_student_group UNIQUE (student_id, group_id, school_id)
+);
 
+-- 7. Абонементы
+CREATE TABLE subscriptions (
+  id SERIAL PRIMARY KEY,
+  name TEXT,
+  price NUMERIC,
+  visit_limit INTEGER,
+  active_from DATE,
+  active_to DATE,
+  is_archived BOOLEAN DEFAULT FALSE,
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
+);
+
+CREATE TABLE student_subscriptions (
+  id SERIAL PRIMARY KEY,
+  student_id INTEGER REFERENCES students(id) ON DELETE CASCADE,
+  subscription_id INTEGER REFERENCES subscriptions(id) ON DELETE CASCADE,
+  group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
+  issued_at DATE,
+  expires_at DATE,
+  remaining_visits INTEGER,
+  is_active BOOLEAN, 
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+
+  CONSTRAINT unique_student_subscription UNIQUE (student_id, subscription_id, group_id, school_id)
+);
+
+CREATE TABLE subscription_pauses (
+  id SERIAL PRIMARY KEY,
+  student_subscription_id INTEGER REFERENCES student_subscriptions(id) ON DELETE CASCADE,
+  paused_from DATE,
+  paused_to DATE,
+  school_id UUID REFERENCES schools(id) ON DELETE CASCADE
 );
 
 -- 8. Направления танцев
@@ -195,14 +196,13 @@ CREATE TABLE schedules (
   group_id INTEGER REFERENCES groups(id) ON DELETE CASCADE,
   direction_id INTEGER REFERENCES dance_styles(id) ON DELETE SET NULL,
   teacher_id INTEGER REFERENCES user_accounts(id) ON DELETE SET NULL,
-  weekday INTEGER,
+  weekday INTEGER, -- Воскресенье = 0 ... суббота = 6
   start_time TIME,
   duration_minutes INTEGER,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
   active_from DATE,
   active_to DATE,
 
-  CONSTRAINT unique_schedule UNIQUE(group_id, direction_id, weekday, start_time, school_id),
   CONSTRAINT unique_group_time UNIQUE(group_id, weekday, start_time, school_id),
   CONSTRAINT unique_teacher_time UNIQUE(teacher_id, weekday, start_time, school_id)
   -- накладки в расписании проверять при создании
@@ -219,7 +219,7 @@ CREATE TABLE lessons (
   is_canceled BOOLEAN DEFAULT FALSE,
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
   
-  CONSTRAINT unique_lesson UNIQUE(lesson_date, teacher_id, group_id, school_id)
+  CONSTRAINT unique_lesson UNIQUE(group_id, lesson_date, school_id)
 );
 
 -- 11. Посещаемость
@@ -233,7 +233,6 @@ CREATE TABLE attendance (
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
   CONSTRAINT unique_student_attendance UNIQUE (student_id, lesson_id, school_id)
-
 );
 
 -- Транзакции - расходы/доходы, тип
@@ -319,7 +318,6 @@ CREATE TABLE lesson_subscriptions (
   school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
 
   CONSTRAINT unique_lesson_subscription UNIQUE (lesson_id, student_id, subscription_id, school_id) 
-
 );
 
 -- 16. Политика оплаты сотрудникам
@@ -481,20 +479,6 @@ ins_student_clients AS (
     (1, 1, TRUE, 'папа', (SELECT id FROM ins_school)),
     (1, 2, FALSE, 'мама', (SELECT id FROM ins_school))
 ),
-ins_subscriptions AS (
-    INSERT INTO subscriptions (name, price, visit_limit, active_from, active_to, is_archived, school_id)
-    VALUES
-    ('Пробный', 500, 1, '2025-01-01', '2025-12-31', FALSE, (SELECT id FROM ins_school)),
-    ('8 занятий', 4000, 8, '2025-01-01', '2025-12-31', FALSE, (SELECT id FROM ins_school))
-),
-ins_student_subscriptions AS (
-    INSERT INTO student_subscriptions (student_id, subscription_id, issued_at, expires_at, remaining_visits, is_active, school_id)
-    VALUES (1, 1, NOW(), '2025-06-01', 1, TRUE, (SELECT id FROM ins_school))
-),
-ins_pauses AS (
-    INSERT INTO subscription_pauses (student_subscription_id, paused_from, paused_to, school_id)
-    VALUES (1, '2025-05-10', '2025-05-15', (SELECT id FROM ins_school))
-),
 ins_groups AS (
     INSERT INTO groups (name, entity_type, created_at, school_id)
     VALUES ('Группа для новичков', 'student', NOW(), (SELECT id FROM ins_school))
@@ -502,6 +486,20 @@ ins_groups AS (
 ins_student_groups AS (
     INSERT INTO student_groups (student_id, group_id, school_id)
     VALUES (1, 1, (SELECT id FROM ins_school))
+),
+ins_subscriptions AS (
+    INSERT INTO subscriptions (name, price, visit_limit, active_from, active_to, is_archived, school_id)
+    VALUES
+    ('Пробный', 500, 1, '2025-01-01', '2025-12-31', FALSE, (SELECT id FROM ins_school)),
+    ('8 занятий', 4000, 8, '2025-01-01', '2025-12-31', FALSE, (SELECT id FROM ins_school))
+),
+ins_student_subscriptions AS (
+    INSERT INTO student_subscriptions (student_id, subscription_id, group_id, issued_at, expires_at, remaining_visits, is_active, school_id)
+    VALUES (1, 1, 1, NOW(), '2025-06-01', 1, TRUE, (SELECT id FROM ins_school))
+),
+ins_pauses AS (
+    INSERT INTO subscription_pauses (student_subscription_id, paused_from, paused_to, school_id)
+    VALUES (1, '2025-05-10', '2025-05-15', (SELECT id FROM ins_school))
 ),
 ins_schedules AS (
     INSERT INTO schedules (group_id, weekday, start_time, duration_minutes, school_id, active_from, active_to)

@@ -3,6 +3,7 @@ package entitiesrepos
 import (
 	"context"
 
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policytypes"
 	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
 	genericrepo "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/genericRepo"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
@@ -10,7 +11,7 @@ import (
 
 type StudentsRepo interface {
 	genericrepo.Repository[entities.Student]
-	GetGroupedStudents(ctx context.Context, group_id int64, entities *[]entities.Student) error
+	GetGroupedStudents(ctx context.Context, group_id int64, entities *[]entities.Student, scope *policytypes.Scope) error
 }
 
 type StudentQueryService interface {

@@ -1,7 +1,7 @@
 package dto
 
 type SalaryAccrualItemsCreateDTO struct {
-	Id          int64  `json:"id"`
+	ID          int64  `json:"id"`
 	Accrual_id  int64  `json:"accrual_id"`
 	Source_type string `json:"source_type"` //CHECK (source_type IN ('fixed', 'per_student', 'per_lesson', 'percent', 'bonus')),
 	Source_id   int64  `json:"source_id"`   //-- ссылка на lesson, policy, transaction, если нужно
@@ -10,7 +10,7 @@ type SalaryAccrualItemsCreateDTO struct {
 }
 
 type SalaryAccrualItemsResponseDTO struct {
-	Id          int64  `json:"id"`
+	ID          int64  `json:"id"`
 	Accrual_id  int64  `json:"accrual_id"`
 	Source_type string `json:"source_type"` //CHECK (source_type IN ('fixed', 'per_student', 'per_lesson', 'percent', 'bonus')),
 	Source_id   int64  `json:"source_id"`   //-- ссылка на lesson, policy, transaction, если нужно

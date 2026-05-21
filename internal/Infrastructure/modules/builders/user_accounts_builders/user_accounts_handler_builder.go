@@ -63,6 +63,7 @@ func NewUserAccountHandlerBuilder(
 		// ================= GET ALL ACCS WITH ROLES =================
 		GetAllAccountsWithRolesHandler: userhandlers.NewGetAllAccountsWithRolesHandler(
 			uc.GetAllAccountsWithRolesUC,
+			uc.GetAllAccountsWithRolesFilteredUC,
 		),
 
 		// ================= EMPLOYEE =================

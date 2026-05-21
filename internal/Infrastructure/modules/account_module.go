@@ -27,6 +27,7 @@ func NewAccountModule(
 		// -=== policies
 		AccountPolicies: useraccountpolicies.NewUserAccountPolicies(
 			useraccountpolicies.NewUserAccountCrudPolicy(),
+			useraccountpolicies.NewUserAccountReadPolicy(),
 		),
 	}
 }

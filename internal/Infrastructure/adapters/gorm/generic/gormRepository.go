@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+// GENERIC FOR ALL ENTITIES
 type GormRepository[T any] struct {
 	db *gorm.DB
 }
@@ -52,6 +53,7 @@ func (r *GormRepository[T]) Create(ctx context.Context, entity *T, scope *policy
 	}
 
 	// ===================== CREATE =====================
+	db = db.Omit("ID")
 	return db.Create(entity).Error
 }
 
@@ -138,6 +140,7 @@ func (r *GormRepository[T]) Update(ctx context.Context, id any, fields map[strin
 	db = r.ApplyScope(db, scope)
 
 	delete(fields, "school_id")
+	delete(fields, "id")
 
 	tx := db.
 		Model(new(T)).

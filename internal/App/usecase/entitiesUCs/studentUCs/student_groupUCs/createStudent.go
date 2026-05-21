@@ -61,7 +61,7 @@ func (uc *CreateStudentUC) Execute(ctx context.Context, student *entities.Studen
 		}
 
 		//stud_group repo
-		studGroup.Student_id = student.Id
+		studGroup.Student_id = student.ID
 		if err := uc.studGroupRepo.Create(txCtx, studGroup, studGroupPolicy); err != nil {
 			return err
 		}

@@ -3,7 +3,7 @@ package dto
 import "time"
 
 type SchoolCreateUpdateDTO struct {
-	Id         string    `json:"id"`
+	ID         string    `json:"id"`
 	Name       string    `json:"name"`
 	City       string    `json:"city"`
 	Phone      string    `json:"phone"`
@@ -12,7 +12,7 @@ type SchoolCreateUpdateDTO struct {
 }
 
 type SchoolResponseDTO struct {
-	Id         string    `json:"id"`
+	ID         string    `json:"id"`
 	Name       string    `json:"name"`
 	City       string    `json:"city"`
 	Phone      string    `json:"phone"`

@@ -30,6 +30,8 @@ func UserProfileRoutes(
 
 	// ================= routes =================
 	protected.GET("/user_accounts/:id/profiles", handlers.CRUDHandler.GetByID)
+
 	protected.GET("/user_profiles", handlers.CRUDHandler.GetAll)
+	protected.GET("/user_profiles/profilesbyroles", handlers.ProfilesByRolesHandler.GetProfiles)
 	protected.POST("/user_profiles/getallwhere", handlers.CRUDHandler.GetAllWhere)
 }

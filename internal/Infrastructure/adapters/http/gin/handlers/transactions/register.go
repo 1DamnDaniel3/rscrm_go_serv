@@ -40,7 +40,7 @@ func (h *RegisterHandler) Register(c *gin.Context) {
 
 	// 1. Маппим школу
 	school := &entities.School{
-		Id:         uuid.New().String(),
+		ID:         uuid.New().String(),
 		Name:       input.School.Name,
 		City:       input.School.City,
 		Phone:      input.School.Phone,
@@ -52,14 +52,14 @@ func (h *RegisterHandler) Register(c *gin.Context) {
 		Email:      input.Account.Email,
 		Password:   input.Account.Password,
 		Created_at: now,
-		School_id:  school.Id,
+		School_id:  school.ID,
 	}
 	// 3. Создаём профиль
 	profile := &entities.UserProfile{
 		Full_name:  input.Profile.FullName,
 		Phone:      input.Profile.Phone,
 		Birthdate:  input.Profile.Birthdate,
-		Account_id: user.Id,
+		Account_id: user.ID,
 	}
 	accountRoles := &entities.AccountRoles{}
 
@@ -72,7 +72,7 @@ func (h *RegisterHandler) Register(c *gin.Context) {
 	// маппим ответ
 
 	output := RegisterOutput{
-		School_id: outputEnity.Id,
+		School_id: outputEnity.ID,
 	}
 
 	c.JSON(http.StatusOK, output)

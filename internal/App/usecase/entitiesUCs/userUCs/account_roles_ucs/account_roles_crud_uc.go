@@ -89,5 +89,5 @@ func (uc *AccountRolesCrudUC) RemoveRole(ctx context.Context, relation *entities
 		return err
 	}
 
-	return uc.AccountRolesRepo.Delete(ctx, dbRelation.Id, dbRelation, del_scope)
+	return uc.AccountRolesRepo.Delete(ctx, dbRelation.ID, dbRelation, del_scope)
 }

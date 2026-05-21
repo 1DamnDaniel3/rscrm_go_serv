@@ -15,6 +15,101 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/attendances/generate": {
+            "post": {
+                "description": "Посещаемость по group_id и lesson_id. Генерирует посещаемость в момент вызова.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attendaces"
+                ],
+                "summary": "GenerateAttendancies",
+                "parameters": [
+                    {
+                        "description": "Данные для генерации",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/attendancehandlers.GenerateAttendanceInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/attendancehandlers.GenerateAttendanceOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/attendances/mark/{attendanceID}": {
+            "patch": {
+                "description": "Отметка посещаемости absent \u003c-\u003e presence. Преподу доступны отметки только своих занятий.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attendaces"
+                ],
+                "summary": "MarkAttendances",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "id посещения для отметки attendanceID",
+                        "name": "input",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.AttendanceResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/check": {
             "get": {
                 "description": "По токену ищется актуальная инфа пользователя из БД.",
@@ -835,7 +930,7 @@ const docTemplate = `{
         },
         "/api/user_accounts/allwithroles": {
             "get": {
-                "description": "Сотрудники школы с ролями для owner и абсолютно все для admin.",
+                "description": "Сотрудники школы с ролями для owner и абсолютно все для admin.\nМожно передать несколько параметров в path ?role=teacher\u0026role=... получить всех сотрудников с этими ролями.\nМожно выполнить БЕЗ параметров (для owner и admin).",
                 "consumes": [
                     "application/json"
                 ],
@@ -843,9 +938,25 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Employee"
                 ],
                 "summary": "Аккаунты сотрудников с их ролями",
+                "parameters": [
+                    {
+                        "enum": [
+                            "admin",
+                            "owner",
+                            "manager",
+                            "teacher",
+                            "accountant",
+                            "receptionist"
+                        ],
+                        "type": "string",
+                        "description": "Роль для фильтра",
+                        "name": "role",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -955,6 +1066,54 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "string"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user_profile/profilesbyroles": {
+            "get": {
+                "description": "Профили сотрудников школы для owner и абсолютно все для admin.\nМожно передать несколько параметров в path ?role=teacher?role=... получить все профили сотрудников с этими ролями.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employee"
+                ],
+                "summary": "Профили сотрудников с их ролями",
+                "parameters": [
+                    {
+                        "enum": [
+                            "admin",
+                            "owner",
+                            "manager",
+                            "teacher",
+                            "accountant",
+                            "receptionist"
+                        ],
+                        "type": "string",
+                        "description": "Роль для фильтра",
+                        "name": "role",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/profilehandlers.ProfilesByRolesResponseDTO"
                         }
                     },
                     "500": {
@@ -1260,6 +1419,32 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "attendancehandlers.GenerateAttendanceInputDTO": {
+            "type": "object",
+            "required": [
+                "group_id",
+                "lesson_id"
+            ],
+            "properties": {
+                "group_id": {
+                    "type": "integer"
+                },
+                "lesson_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "attendancehandlers.GenerateAttendanceOutputDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.AttendanceResponseDTO"
+                    }
+                }
+            }
+        },
         "bodtos.BoDTO_ClientStudentsReponse": {
             "type": "object",
             "properties": {
@@ -1447,6 +1632,32 @@ const docTemplate = `{
                 },
                 "school_id": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.AttendanceResponseDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "lesson_id": {
+                    "type": "integer"
+                },
+                "marked_at": {
+                    "type": "string"
+                },
+                "marked_by": {
+                    "type": "integer"
+                },
+                "school_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "student_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1918,6 +2129,17 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dto.LessonResponseDTO"
+                    }
+                }
+            }
+        },
+        "profilehandlers.ProfilesByRolesResponseDTO": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.UserProfileResponseDTO"
                     }
                 }
             }

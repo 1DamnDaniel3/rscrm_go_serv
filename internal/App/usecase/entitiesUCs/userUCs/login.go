@@ -43,7 +43,7 @@ func (uc *LoginUC) Execute(input *entities.UserAccount) (*entities.UserAccount, 
 	accountRoleIds := []entities.AccountRoles{} // Получаем все роли аккаунта
 	filters := make(map[string]interface{})
 	filters["school_id"] = account.School_id
-	filters["account_id"] = account.Id
+	filters["account_id"] = account.ID
 	ctx := context.Background()
 	if err := uc.accRolesRepo.GetAllWhere(ctx, filters, &accountRoleIds, nil); err != nil {
 		return nil, "", make([]string, 0), err
@@ -55,7 +55,7 @@ func (uc *LoginUC) Execute(input *entities.UserAccount) (*entities.UserAccount, 
 	}
 	allRolesMap := make(map[int64]string) //складываем в map
 	for _, v := range *allRoles {
-		allRolesMap[v.Id] = v.Role
+		allRolesMap[v.ID] = v.Role
 	}
 
 	accountRoleNames := make([]string, 0, 7) // Заполняем slice ролей
@@ -65,7 +65,7 @@ func (uc *LoginUC) Execute(input *entities.UserAccount) (*entities.UserAccount, 
 
 	// JWT SIGNING
 	claims := map[string]interface{}{
-		"id":        account.Id,
+		"id":        account.ID,
 		"roles":     accountRoleNames,
 		"email":     account.Email,
 		"school_id": account.School_id,

@@ -51,14 +51,14 @@ func (uc *RegisterUseCase) Execute(ctx context.Context,
 		}
 
 		// UserAccount Create
-		userAccount.School_id = school.Id
+		userAccount.School_id = school.ID
 		if err := uc.userRepo.Register(txCtx, userAccount); err != nil {
 			return err
 		}
 
-		userProfile.Id = userAccount.Id
-		userProfile.Account_id = userAccount.Id
-		userProfile.School_id = school.Id
+		userProfile.Id = userAccount.ID
+		userProfile.Account_id = userAccount.ID
+		userProfile.School_id = school.ID
 		// UserProfile Create
 		if err := uc.profileRepo.Register(txCtx, userProfile); err != nil {
 			return err
@@ -66,8 +66,8 @@ func (uc *RegisterUseCase) Execute(ctx context.Context,
 
 		// устанавливаем роль при регистрации - owner
 		accountRoles.Role_id = 2
-		accountRoles.Account_id = userAccount.Id
-		accountRoles.School_id = school.Id
+		accountRoles.Account_id = userAccount.ID
+		accountRoles.School_id = school.ID
 		if err := uc.accountRolesRepo.Register(txCtx, accountRoles); err != nil {
 			return err
 		}

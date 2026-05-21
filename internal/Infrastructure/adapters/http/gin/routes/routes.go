@@ -70,6 +70,11 @@ func SetupRoutes(r *gin.Engine, db *gorm.DB) {
 
 	entityroutes.SubscriptionRoutes(api, app, usecases.Subscription)
 
+	entityroutes.TransactionRoutes(api, app, usecases.Transactions)
+
+	entityroutes.AttendanceRoutes(api, app, usecases.Attendance)
+	entityroutes.DanceStyleRoutes(api, app, usecases.DanceStyle)
+
 	// == related tables routes
 	entityroutes.StudentClientRoutes(api, app, usecases.StudentClients, authMiddleware, tenandMiddleware)
 

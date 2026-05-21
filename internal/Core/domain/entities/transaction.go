@@ -7,7 +7,7 @@ import (
 )
 
 type Transaction struct {
-	Id             int64
+	ID             int64
 	Type           string // CHECK (type IN ('income', 'expense')),
 	Category       string // lesson or subscription_payment or rent
 	Amount         valuetypes.Money

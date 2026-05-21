@@ -7,7 +7,7 @@ import (
 )
 
 type SalaryAccural struct {
-	Id              int64
+	ID              int64
 	Employee_id     int64
 	Period_start    time.Time
 	Period_end      time.Time

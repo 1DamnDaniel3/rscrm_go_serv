@@ -82,7 +82,7 @@ func (h *AccountRolesCrudHandler) RemoveRoles(c *gin.Context) {
 	}
 
 	relation := &entities.AccountRoles{
-		Id:         0,
+		ID:         0,
 		Account_id: acc_id,
 		Role_id:    role_id,
 		School_id:  "",

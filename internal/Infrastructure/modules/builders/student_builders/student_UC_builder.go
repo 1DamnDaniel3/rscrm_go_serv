@@ -52,6 +52,7 @@ func NewStudentUseCasesBuilder(
 		// ================= GROUPED =================
 		GroupedStudents: studentucs.NewGroupedStudentsUC(
 			studentModule.StudentRepo,
+			studentModule.StudentPolicies.CRUD,
 		),
 
 		// ================= RELATIONS =================

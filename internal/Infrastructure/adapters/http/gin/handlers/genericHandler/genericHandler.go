@@ -22,7 +22,7 @@ type ResponceArrayDTO[T any] struct {
 	Data *[]T `json:"data"`
 }
 
-// ===========================================================CREATE
+// =========================================================== CREATE
 func (h *GenericHandler[T, C, R]) Create(c *gin.Context) {
 	ctx := c.Request.Context()
 
@@ -59,6 +59,8 @@ func (h *GenericHandler[T, C, R]) Update(c *gin.Context) {
 
 	// get school_id from token
 	ctx := c.Request.Context()
+
+	delete(fields, "id")
 
 	err := h.uc.Update(ctx, id, fields)
 	if err != nil {

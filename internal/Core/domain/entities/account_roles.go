@@ -1,7 +1,7 @@
 package entities
 
 type AccountRoles struct {
-	Id         int64
+	ID         int64
 	Account_id int64
 	Role_id    int64
 	School_id  string

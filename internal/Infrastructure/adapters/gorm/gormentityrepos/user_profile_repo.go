@@ -36,6 +36,49 @@ func NewGormUserProfileRepo(db *gorm.DB) entitiesrepos.UserProfileRepo {
 	}
 }
 
+func (r *GormUserProfileRepo) GetAllProfilesByRoles(
+	ctx context.Context,
+	scope *policytypes.Scope,
+	roles ...string,
+) (*[]entities.UserProfile, error) {
+
+	userProfiles := &[]entities.UserProfile{}
+
+	db := gormutils.DBFromCtx(ctx, r.db)
+	db, err := gormutils.ApplyScope(db, scope, "up.id", "up.school_id")
+	if err != nil {
+		return nil, err
+	}
+
+	// if len(roles) > 0 {
+	// 	db = db.Where(`
+	// 	EXISTS (
+	// 		SELECT 1
+	// 		FROM account_roles ar2
+	// 		JOIN roles r2 ON r2.id = ar2.role_id
+	// 		WHERE ar2.account_id = up.account_id
+	// 		AND r2.role IN ?
+	// 	)
+	// `, roles)
+	// }
+
+	if len(roles) > 0 {
+		db = db.Where("r.role IN ?", roles)
+	}
+
+	err = db.Table("user_profiles up").
+		Select("DISTINCT up.*").
+		Joins("JOIN account_roles ar ON ar.account_id = up.account_id").
+		Joins("JOIN roles r ON ar.role_id = r.id").
+		Scan(userProfiles).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return userProfiles, nil
+
+}
+
 // ============================ OVERRIDE ===============================
 
 func (r *GormUserProfileRepo) GetAllWhere(

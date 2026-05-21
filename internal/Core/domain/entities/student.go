@@ -3,7 +3,7 @@ package entities
 import "time"
 
 type Student struct {
-	Id          int64
+	ID          int64
 	Name        string
 	Birthdate   *time.Time
 	Skill_level string

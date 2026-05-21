@@ -1,6 +1,6 @@
 package entities
 
 type Roles struct {
-	Id   int64
+	ID   int64
 	Role string
 }

@@ -60,14 +60,14 @@ func (uc *CreateEmployeeAccountUC) Execute(
 		}
 
 		// Profile
-		profile.Id = account.Id
-		profile.Account_id = account.Id
+		profile.Id = account.ID
+		profile.Account_id = account.ID
 		if err := uc.profileCrudUC.Create(txCtx, profile); err != nil {
 			return err
 		}
 
 		for i := range roles {
-			roles[i].Account_id = account.Id
+			roles[i].Account_id = account.ID
 		}
 
 		// Roles

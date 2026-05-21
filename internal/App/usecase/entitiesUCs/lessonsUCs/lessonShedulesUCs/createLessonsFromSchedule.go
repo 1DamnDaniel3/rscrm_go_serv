@@ -5,7 +5,6 @@ import (
 	"time"
 
 	lessonpolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/lesson_policies"
-	schedulepolicies "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/entities_policies/schedule_policies"
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
 	usecaseutils "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/usecase/usecase_utils"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
@@ -15,8 +14,7 @@ type CreateLessonsFromShceduleUC struct {
 	repoLessons   entitiesrepos.LessonsRepo
 	repoSchedules entitiesrepos.ScheduleRepo
 
-	lessonsPolicy   *lessonpolicies.LessonPolicies
-	schedulesPolicy schedulepolicies.IScheduleCrudPolicy
+	lessonsPolicy *lessonpolicies.LessonPolicies
 }
 
 type ICreateLessonsFromShceduleUC interface {
@@ -27,20 +25,19 @@ func NewCreateLessonsFromShceduleUC(
 	repo entitiesrepos.LessonsRepo,
 	repoSchedules entitiesrepos.ScheduleRepo,
 	lessonsPolicy *lessonpolicies.LessonPolicies,
-	schedulesPolicy schedulepolicies.IScheduleCrudPolicy,
 ) ICreateLessonsFromShceduleUC {
-	return &CreateLessonsFromShceduleUC{repo, repoSchedules, lessonsPolicy, schedulesPolicy}
+	return &CreateLessonsFromShceduleUC{repo, repoSchedules, lessonsPolicy}
 }
 
 func (uc *CreateLessonsFromShceduleUC) Execute(ctx context.Context) error {
 	schedules := []entities.Schedule{}
 
-	scheduleGetAllScope, err := uc.schedulesPolicy.CanReadAll(ctx)
+	lessonCreateManyScope, err := uc.lessonsPolicy.CreatePolicy.CanGenerateLessons(ctx)
 	if err != nil {
 		return err
 	}
 
-	if err := uc.repoSchedules.GetAll(ctx, &schedules, scheduleGetAllScope); err != nil {
+	if err := uc.repoSchedules.GetAll(ctx, &schedules, nil); err != nil {
 		return err
 	}
 
@@ -98,11 +95,6 @@ func (uc *CreateLessonsFromShceduleUC) Execute(ctx context.Context) error {
 
 	if len(lessonsToInsert) == 0 {
 		return nil
-	}
-
-	lessonCreateManyScope, err := uc.lessonsPolicy.CreatePolicy.CanGenerateLessons(ctx)
-	if err != nil {
-		return err
 	}
 
 	return uc.repoLessons.CreateMany(ctx, &lessonsToInsert, lessonCreateManyScope)

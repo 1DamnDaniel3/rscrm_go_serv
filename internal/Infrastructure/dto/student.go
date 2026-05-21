@@ -3,7 +3,7 @@ package dto
 import "time"
 
 type StudentCreateUpdateDTO struct {
-	Id          int64      `json:"id"`
+	ID          int64      `json:"id"`
 	Name        string     `json:"name"`
 	Birthdate   *time.Time `json:"birthdate"`
 	Skill_level string     `json:"skill_level"`
@@ -13,7 +13,7 @@ type StudentCreateUpdateDTO struct {
 }
 
 type StudentResponseDTO struct {
-	Id          int64      `json:"id"`
+	ID          int64      `json:"id"`
 	Name        string     `json:"name"`
 	Birthdate   *time.Time `json:"birthdate"`
 	Skill_level string     `json:"skill_level"`

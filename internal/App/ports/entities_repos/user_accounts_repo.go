@@ -18,5 +18,5 @@ type UserAccountRepository interface {
 
 type UserAccountQueryService interface {
 	GetMe(ctx context.Context) (*businessobjects.UserBO, error)
-	GetAllAccountsWithRoles(ctx context.Context, scope *policytypes.Scope) ([]*businessobjects.UserBO, error)
+	GetAllAccountsWithRoles(ctx context.Context, scope *policytypes.Scope, roles ...string) ([]*businessobjects.UserBO, error)
 }

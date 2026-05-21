@@ -33,20 +33,21 @@ func NewGetLessonsUC(
 
 func (uc *GetLessonsUC) Execute(ctx context.Context) ([]entities.Lesson, error) {
 
-	if err := uc.generateUC.Execute(ctx); err != nil {
-		return nil, fmt.Errorf("lesson generating error: %v", err)
-	}
-
-	if err := uc.cleanupUC.Execute(ctx); err != nil {
-		return nil, fmt.Errorf("cleanup error: %v", err)
-	}
-
-	lessons := []entities.Lesson{}
-
 	scope, err := uc.policy.CanReadAll(ctx)
 	if err != nil {
 		return nil, err
 	}
+
+	if err := uc.generateUC.Execute(ctx); err != nil {
+		return nil, fmt.Errorf("lesson generating error: %v", err)
+	}
+
+	// ПОЗЖЕ НАСТРОИТЬ АРХИВАЦИЮ СТАРЫХ ЗАПИСЕЙ ВМЕСТО СТИРАНИЯ
+	// if err := uc.cleanupUC.Execute(ctx); err != nil {
+	// 	return nil, fmt.Errorf("cleanup error: %v", err)
+	// }
+
+	lessons := []entities.Lesson{}
 
 	if err := uc.repo.GetAll(ctx, &lessons, scope); err != nil {
 		return nil, fmt.Errorf("read err: %v", err)

@@ -12,12 +12,13 @@ import (
 )
 
 type UserUseCases struct {
-	CRUD                      genericcruduc.ICRUDUseCase[entities.UserAccount]
-	Login                     userucs.ILoginUC
-	Register                  userucs.IRegisterUseCase
-	GetMe                     userucs.IGetMeUC
-	CreateEmployeeAcc         userucs.ICreateEmployeeAccountUC
-	GetAllAccountsWithRolesUC userucs.IGetAllAccountsWithRolesUC
+	CRUD                              genericcruduc.ICRUDUseCase[entities.UserAccount]
+	Login                             userucs.ILoginUC
+	Register                          userucs.IRegisterUseCase
+	GetMe                             userucs.IGetMeUC
+	CreateEmployeeAcc                 userucs.ICreateEmployeeAccountUC
+	GetAllAccountsWithRolesUC         userucs.IGetAllAccountsWithRolesUC
+	GetAllAccountsWithRolesFilteredUC userucs.IGetAllAccountsWithRolesFilteredUC
 }
 
 func NewUserUseCasesBuilder(
@@ -67,6 +68,11 @@ func NewUserUseCasesBuilder(
 		GetAllAccountsWithRolesUC: userucs.NewGetAllAccountsWithRolesUC(
 			userModule.UserQueryService,
 			useraccountpolicies.NewUserAccountCrudPolicy(),
+		),
+
+		GetAllAccountsWithRolesFilteredUC: userucs.NewGetAllAccountsWithRolesFilteredUC(
+			userModule.UserQueryService,
+			userModule.AccountPolicies.ReadPolicy,
 		),
 
 		// ================= EMPLOYEE ACCOUNT =================

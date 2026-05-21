@@ -1,12 +1,16 @@
 package useraccountpolicies
 
 type UserAccountPolicies struct {
-	CRUD IUserAccountCrudPolicy
+	CRUD       IUserAccountCrudPolicy
+	ReadPolicy IUserAccountReadPolicy
 }
 
 func NewUserAccountPolicies(
-	crud IUserAccountCrudPolicy) *UserAccountPolicies {
+	crud IUserAccountCrudPolicy,
+	ReadPolicy IUserAccountReadPolicy,
+) *UserAccountPolicies {
 	return &UserAccountPolicies{
-		CRUD: crud,
+		CRUD:       crud,
+		ReadPolicy: ReadPolicy,
 	}
 }

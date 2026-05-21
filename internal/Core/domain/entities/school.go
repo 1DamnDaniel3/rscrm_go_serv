@@ -3,7 +3,7 @@ package entities
 import "time"
 
 type School struct {
-	Id         string
+	ID         string
 	Name       string
 	City       string
 	Phone      string

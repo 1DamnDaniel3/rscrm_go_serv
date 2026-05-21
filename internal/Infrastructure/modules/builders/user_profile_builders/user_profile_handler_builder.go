@@ -4,6 +4,7 @@ import (
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
 
 	generichandler "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/genericHandler"
+	profilehandlers "github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/adapters/http/gin/handlers/user_handlers/profile_handlers"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Infrastructure/dto"
 )
 
@@ -13,6 +14,7 @@ type UserProfileHandlerBuilder struct {
 		dto.UserProfileCreateUpdateDTO,
 		dto.UserProfileResponseDTO,
 	]
+	ProfilesByRolesHandler *profilehandlers.GetProfilesByRolesHandler
 }
 
 func NewUserProfileHandlerBuilder(
@@ -25,5 +27,10 @@ func NewUserProfileHandlerBuilder(
 			dto.UserProfileCreateUpdateDTO,
 			dto.UserProfileResponseDTO,
 		](uc.CRUD),
+
+		// -=== ProfilesByRoles
+		ProfilesByRolesHandler: profilehandlers.NewGetProfilesByRolesHandler(
+			uc.GetProfilesByRoles,
+		),
 	}
 }

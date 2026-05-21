@@ -54,6 +54,7 @@ func (p *StudentCrudPolicy) CanReadOne(ctx context.Context) (*policytypes.Scope,
 	if policyutils.HasAnyRole(user,
 		valuetypes.Owner,
 		valuetypes.Accountant,
+		valuetypes.Teacher,
 		valuetypes.Receptionist,
 	) {
 		return &policytypes.Scope{

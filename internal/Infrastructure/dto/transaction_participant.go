@@ -1,7 +1,7 @@
 package dto
 
 type TransactionParticipantCreateDTO struct {
-	Id             int64  `json:"id"`
+	ID             int64  `json:"id"`
 	Transaction_id int64  `json:"transaction_id"`
 	Role           string `json:"role"` //CHECK (role IN ('payer', 'beneficiary')),
 	Entity_type    string `json:"entity_type"`
@@ -9,7 +9,7 @@ type TransactionParticipantCreateDTO struct {
 }
 
 type TransactionParticipantResponseDTO struct {
-	Id             int64  `json:"id"`
+	ID             int64  `json:"id"`
 	Transaction_id int64  `json:"transaction_id"`
 	Role           string `json:"role"` //CHECK (role IN ('payer', 'beneficiary')),
 	Entity_type    string `json:"entity_type"`

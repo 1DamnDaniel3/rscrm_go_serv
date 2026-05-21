@@ -3,6 +3,7 @@ package gormentityrepos
 import (
 	"context"
 
+	"github.com/1DamnDaniel3/rscrm_go_serv/internal/App/policies/policytypes"
 	businessobjects "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/business_objects"
 	entitiesrepos "github.com/1DamnDaniel3/rscrm_go_serv/internal/App/ports/entities_repos"
 	"github.com/1DamnDaniel3/rscrm_go_serv/internal/Core/domain/entities"
@@ -23,8 +24,17 @@ func NewGormStudentsRepo(db *gorm.DB) entitiesrepos.StudentsRepo {
 	}
 }
 
-func (r *GormStudentsRepo) GetGroupedStudents(ctx context.Context, group_id int64, entities *[]entities.Student) error {
+func (r *GormStudentsRepo) GetGroupedStudents(
+	ctx context.Context,
+	group_id int64,
+	entities *[]entities.Student,
+	scope *policytypes.Scope,
+) error {
 	db := r.DBFromCtx(ctx)
+	db, err := gormutils.ApplyScope(db, scope, "", "s.school_id")
+	if err != nil {
+		return err
+	}
 
 	school_id, err := gormutils.GetTenandID(ctx)
 	if err != nil {

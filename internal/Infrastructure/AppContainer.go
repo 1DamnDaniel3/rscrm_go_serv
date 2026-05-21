@@ -38,7 +38,18 @@ type AppContainer struct {
 	EmployeeRateRuleModule   *modules.EmployeeRateRuleModule
 	EmployeeRateModule       *modules.EmployeeRateModule
 
-	SubscriptionModule *modules.SubscriptionModule
+	TransactionModule *modules.TransactionModule
+
+	SalaryAccuralsModule     *modules.SalaryAccuralsModule
+	SalaryAccuralItemsModule *modules.SalaryAccuralItemsModule
+
+	SubscriptionModule         *modules.SubscriptionModule
+	StudentSubscriptionsModule *modules.StudentSubscriptionsModule
+	LessonSubscriptionsModule  *modules.LessonSubscriptionsModule
+
+	AttendanceModule *modules.AttendanceModule
+
+	DanceStyleModule *modules.DanceStyleModule
 
 	// -=== services
 	Hasher ports.PasswordHasher
@@ -89,7 +100,18 @@ func NewAppContainer(
 		EmployeeRateRuleModule:   modules.NewEmployeeRateRuleModule(db),
 		EmployeeRateModule:       modules.NewEmployeeRateModule(db),
 
-		SubscriptionModule: modules.NewSubscriptionModule(db),
+		TransactionModule: modules.NewTransactionModule(db),
+
+		SalaryAccuralsModule:     modules.NewSalaryAccuralsModule(db),
+		SalaryAccuralItemsModule: modules.NewSalaryAccuralItemsModule(db),
+
+		SubscriptionModule:         modules.NewSubscriptionModule(db),
+		StudentSubscriptionsModule: modules.NewStudentSubscriptionsModule(db),
+		LessonSubscriptionsModule:  modules.NewLessonSubscriptionsModule(db),
+
+		AttendanceModule: modules.NewAttendanceModule(db),
+
+		DanceStyleModule: modules.NewDanceStyleModule(db),
 
 		// -=== services
 		Hasher: hasher,

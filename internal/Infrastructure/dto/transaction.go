@@ -5,7 +5,7 @@ import (
 )
 
 type TransactionCreateDTO struct {
-	Id             int64     `json:"id"`
+	ID             int64     `json:"id"`
 	Type           string    `json:"type"`     // CHECK (type IN ('income', 'expense')),
 	Category       string    `json:"category"` // lesson or subscription_payment or rent
 	Amount         string    `json:"amount"`
@@ -17,7 +17,7 @@ type TransactionCreateDTO struct {
 }
 
 type TransactionResponseDTO struct {
-	Id             int64     `json:"id"`
+	ID             int64     `json:"id"`
 	Type           string    `json:"type"`     // CHECK (type IN ('income', 'expense')),
 	Category       string    `json:"category"` // lesson or subscription_payment or rent
 	Amount         string    `json:"amount"`

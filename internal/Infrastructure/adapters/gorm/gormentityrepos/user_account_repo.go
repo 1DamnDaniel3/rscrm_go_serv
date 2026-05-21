@@ -206,7 +206,7 @@ func (r *GormUserAccountQueryService) GetMe(ctx context.Context) (*businessobjec
 
 	userBO := &businessobjects.UserBO{
 		UserAccount: entities.UserAccount{
-			Id:         res.ID,
+			ID:         res.ID,
 			Email:      res.Email,
 			Password:   res.Password,
 			Created_at: res.CreatedAt,
@@ -221,6 +221,7 @@ func (r *GormUserAccountQueryService) GetMe(ctx context.Context) (*businessobjec
 func (r *GormUserAccountQueryService) GetAllAccountsWithRoles(
 	ctx context.Context,
 	scope *policytypes.Scope,
+	roles ...string,
 ) ([]*businessobjects.UserBO, error) {
 
 	db := gormutils.DBFromCtx(ctx, r.db)
@@ -239,6 +240,19 @@ func (r *GormUserAccountQueryService) GetAllAccountsWithRoles(
 	}
 
 	var results []result
+
+	// Фильтр по переданным ролям
+	if len(roles) > 0 {
+		db = db.Where(`
+		EXISTS (
+			SELECT 1
+			FROM account_roles ar2
+			JOIN roles r2 ON r2.id = ar2.role_id
+			WHERE ar2.account_id = ua.id
+			AND r2.role IN ?
+		)
+	`, roles)
+	}
 
 	err = db.Table("user_accounts ua").
 		Select(`
@@ -268,7 +282,7 @@ func (r *GormUserAccountQueryService) GetAllAccountsWithRoles(
 
 		userBO := &businessobjects.UserBO{
 			UserAccount: entities.UserAccount{
-				Id:         res.ID,
+				ID:         res.ID,
 				Email:      res.Email,
 				Password:   res.Password,
 				Created_at: res.CreatedAt,

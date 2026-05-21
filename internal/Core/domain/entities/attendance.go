@@ -7,7 +7,11 @@ type Attendance struct {
 	Student_id int64
 	Lesson_id  int64
 	Status     string
-	Marked_by  int64
-	Marked_at  time.Time
+	Marked_by  *int64
+	Marked_at  *time.Time
 	School_id  string
+}
+
+func (Attendance) TableName() string {
+	return "attendance"
 }

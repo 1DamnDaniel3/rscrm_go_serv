@@ -35,7 +35,6 @@ func NewLessonUseCasesBuilder(
 			lessonModule.LessonsRepo,
 			scheduleModule.ScheduleRepo,
 			lessonModule.LessonPolicies,
-			scheduleModule.SchedulePolicies.CRUD,
 		),
 
 		// ================= CLEANUP =================
@@ -50,7 +49,6 @@ func NewLessonUseCasesBuilder(
 				lessonModule.LessonsRepo,
 				scheduleModule.ScheduleRepo,
 				lessonModule.LessonPolicies,
-				scheduleModule.SchedulePolicies.CRUD,
 			),
 			lessonsucs.NewCleanupOldLessonsUC(
 				lessonModule.LessonQueryService,
